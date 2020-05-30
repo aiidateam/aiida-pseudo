@@ -25,6 +25,12 @@
         "click~=7.0",
         "click-completion~=0.5"
     ],
+    "extras_require": {
+        "pre-commit": [
+            "pre-commit~=2.2",
+            "pylint~=2.5"
+        ]
+    },
     "license": "MIT License",
     "name": "aiida-pseudo",
     "url": "https://github.com/aiidateam/aiida-pseudo",

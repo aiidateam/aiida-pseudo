@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=redefined-outer-name
 """Configuration and fixtures for unit test suite."""
+import os
+
 import pytest
+
+from aiida_pseudo.data.pseudo import UpfData
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures']
 
@@ -44,3 +49,37 @@ def run_cli_command():
         return result
 
     return _run_cli_command
+
+
+@pytest.fixture
+def filepath_fixtures() -> str:
+    """Return the absolute filepath to the directory containing the file `fixtures`.
+
+    :return: absolute filepath to directory containing test fixture data.
+    """
+    return os.path.join(os.path.dirname(__file__), 'fixtures')
+
+
+@pytest.fixture
+def filepath_pseudos(filepath_fixtures) -> str:
+    """Return the absolute filepath to the directory containing the pseudo potential files.
+
+    :return: absolute filepath to directory containing test pseudo potentials.
+    """
+    return os.path.join(filepath_fixtures, 'pseudos')
+
+
+@pytest.fixture
+def get_upf_data(filepath_pseudos):
+    """Return a factory for `UpfData` nodes."""
+
+    def _get_upf_data(element='Ar') -> UpfData:
+        """Return a `UpfData` for the given element.
+
+        :param element: one of the elements for which there is a UPF test file available.
+        :return: the `UpfData`
+        """
+        with open(os.path.join(filepath_pseudos, '{}.upf'.format(element)), 'rb') as handle:
+            return UpfData(handle)
+
+    return _get_upf_data

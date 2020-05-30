@@ -19,7 +19,8 @@
             "aiida-pseudo = aiida_pseudo.cli:cmd_root"
         ],
         "aiida.data": [
-            "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData"
+            "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData",
+            "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData"
         ]
     },
     "python_requires": ">=3.5",

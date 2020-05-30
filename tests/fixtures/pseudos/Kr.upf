@@ -1,0 +1,13 @@
+<UPF version="2.0.1">
+    <PP_INFO>
+        <PP_INPUTFILE>
+        </PP_INPUTFILE>
+    </PP_INFO>
+    <PP_HEADER
+        generated="Manually created by S.P.Huber just for testing purposes"
+        author="sphuber"
+        date="200411"
+        element="Kr"
+        pseudo_type="NC"
+    />
+</UPF>

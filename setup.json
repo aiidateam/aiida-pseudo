@@ -1,0 +1,23 @@
+{
+    "author": "Sebastiaan P. Huber",
+    "author_email": "mail@sphuber.net",
+    "classifiers": [
+        "Development Status :: 4 - Beta",
+        "Framework :: AiiDA",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
+    ],
+    "description": "AiiDA plugin that simplifies working with pseudo potentials",
+    "entry_points": {},
+    "python_requires": ">=3.5",
+    "license": "MIT License",
+    "name": "aiida-pseudo",
+    "url": "https://github.com/aiidateam/aiida-pseudo",
+    "version": "0.1.0"
+}

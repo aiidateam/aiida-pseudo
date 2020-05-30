@@ -17,6 +17,9 @@
     "entry_points": {
         "console_scripts": [
             "aiida-pseudo = aiida_pseudo.cli:cmd_root"
+        ],
+        "aiida.data": [
+            "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData"
         ]
     },
     "python_requires": ">=3.5",

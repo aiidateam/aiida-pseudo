@@ -5,6 +5,7 @@
 def setup_package():
     """Install the `aiida-pseudo` package."""
     import json
+    from aiida_pseudo.utils import fastentrypoints  # pylint: disable=unused-import
     from setuptools import setup, find_packages
 
     filename_setup_json = 'setup.json'

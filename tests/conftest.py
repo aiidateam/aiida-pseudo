@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-argument
 """Configuration and fixtures for unit test suite."""
 import os
+import shutil
 
 import pytest
 
-from aiida_pseudo.data.pseudo import UpfData
+from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
+from aiida_pseudo.groups.family import PseudoPotentialFamily
 
-pytest_plugins = ['aiida.manage.tests.pytest_fixtures']
+pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
 
 
 @pytest.fixture
-@pytest.mark.usefixtures('clear_database_before_test')
-def clear_db():
+def clear_db(clear_database_before_test):
     """Alias for the `clear_database_before_test` fixture from `aiida-core`."""
     yield
 
@@ -79,7 +80,46 @@ def get_upf_data(filepath_pseudos):
         :param element: one of the elements for which there is a UPF test file available.
         :return: the `UpfData`
         """
-        with open(os.path.join(filepath_pseudos, '{}.upf'.format(element)), 'rb') as handle:
-            return UpfData(handle)
+        filename = '{}.upf'.format(element)
+        with open(os.path.join(filepath_pseudos, filename), 'rb') as handle:
+            return UpfData(handle, filename)
 
     return _get_upf_data
+
+
+@pytest.fixture
+def get_pseudo_potential_data(filepath_pseudos):
+    """Return a factory for `PseudoPotentialData` nodes."""
+
+    def _get_pseudo_potential_data(element='Ar') -> PseudoPotentialData:
+        """Return a `PseudoPotentialData` for the given element.
+
+        :param element: one of the elements for which there is a UPF test file available.
+        :return: the `PseudoPotentialData`
+        """
+        filename = '{}.upf'.format(element)
+        with open(os.path.join(filepath_pseudos, filename), 'rb') as handle:
+            pseudo = PseudoPotentialData(handle, filename)
+            pseudo.element = element
+            return pseudo
+
+    return _get_pseudo_potential_data
+
+
+@pytest.fixture
+def get_pseudo_family(tmpdir, filepath_pseudos):
+    """Return a factory for a `PseudoPotentialFamily` instance."""
+
+    def _get_pseudo_family(label='family', cls=PseudoPotentialFamily, elements=None) -> PseudoPotentialFamily:
+        """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
+
+        :param elements: optional list of elements to include instead of all the available ones
+        :return: the pseudo family
+        """
+        for pseudo in os.listdir(filepath_pseudos):
+            if elements is None or any([pseudo.startswith(element) for element in elements]):
+                shutil.copyfile(os.path.join(filepath_pseudos, pseudo), os.path.join(str(tmpdir), pseudo))
+
+        return cls.create_from_folder(str(tmpdir), label)
+
+    return _get_pseudo_family

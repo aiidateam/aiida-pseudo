@@ -21,6 +21,9 @@
         "aiida.data": [
             "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData",
             "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData"
+        ],
+        "aiida.groups": [
+            "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily"
         ]
     },
     "python_requires": ">=3.5",

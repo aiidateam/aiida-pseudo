@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+# pylint: disable=unused-argument
+"""Test the command line interface utilities."""
+import tarfile
+import tempfile
+
+import pytest
+
+from aiida_pseudo.cli.utils import attempt, create_family_from_archive
+from aiida_pseudo.groups.family import PseudoPotentialFamily
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_create_family_from_archive(get_pseudo_archive):
+    """Test the `create_family_from_archive` utility function."""
+    label = 'PSEUDO/0.0/LDA/extreme'
+    family = create_family_from_archive(PseudoPotentialFamily, label, get_pseudo_archive)
+    assert isinstance(family, PseudoPotentialFamily)
+    assert family.label == label
+    assert family.count() != 0
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_create_family_from_archive_incorrect_filetype(tmpdir):
+    """Test the `create_family_from_archive` utility function for incorrect archive filetype."""
+    with pytest.raises(OSError, match=r'failed to unpack the archive.*'):
+        create_family_from_archive(PseudoPotentialFamily, 'label', str(tmpdir))
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_create_family_from_archive_incorrect_format(tmpdir):
+    """Test the `create_family_from_archive` utility function for invalid archive content."""
+    with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:
+
+        with tarfile.open(filepath_archive.name, 'w:gz') as tar:
+            tar.add(str(tmpdir), arcname='.')
+
+        with pytest.raises(OSError, match=r'failed to parse pseudos from.*'):
+            create_family_from_archive(PseudoPotentialFamily, 'label', filepath_archive.name)
+
+
+def test_attempt_sucess(capsys):
+    """Test the `attempt` utility function."""
+    message = 'some message'
+
+    with attempt(message):
+        pass
+
+    captured = capsys.readouterr()
+    assert captured.out == 'Info: {} [OK]\n'.format(message)
+    assert captured.err == ''
+
+
+def test_attempt_exception(capsys):
+    """Test the `attempt` utility function when exception is raised."""
+    message = 'some message'
+    exception = 'run-time-error'
+
+    with pytest.raises(SystemExit):
+        with attempt(message):
+            raise RuntimeError(exception)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'Info: {} [FAILED]\n'.format(message)
+    assert captured.err == 'Critical: {}\n'.format(exception)
+
+
+def test_attempt_exception_traceback(capsys):
+    """Test the `attempt` utility function when exception is raised and `include_traceback=True`."""
+    message = 'some message'
+    exception = 'run-time-error'
+
+    with pytest.raises(SystemExit):
+        with attempt(message, include_traceback=True):
+            raise RuntimeError(exception)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'Info: {} [FAILED]\n'.format(message)
+    assert captured.err.startswith('Critical: {}\n'.format(exception))
+    assert 'Traceback' in captured.err

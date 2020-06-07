@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=redefined-outer-name,unused-argument
 """Configuration and fixtures for unit test suite."""
+import distutils.dir_util
 import os
 import shutil
+import tarfile
+import tempfile
 
 import pytest
 
@@ -123,3 +126,16 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         return cls.create_from_folder(str(tmpdir), label)
 
     return _get_pseudo_family
+
+
+@pytest.fixture
+def get_pseudo_archive(tmpdir, filepath_pseudos):
+    """Create an archive with pseudos."""
+    distutils.dir_util.copy_tree(filepath_pseudos, str(tmpdir))
+
+    with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:
+
+        with tarfile.open(filepath_archive.name, 'w:gz') as tar:
+            tar.add(str(tmpdir), arcname='.')
+
+        yield filepath_archive.name

@@ -7,6 +7,7 @@ import shutil
 import tarfile
 import tempfile
 
+import click
 import pytest
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
@@ -19,6 +20,12 @@ pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=inval
 def clear_db(clear_database_before_test):
     """Alias for the `clear_database_before_test` fixture from `aiida-core`."""
     yield
+
+
+@pytest.fixture
+def ctx():
+    """Return an empty `click.Context` instance."""
+    return click.Context(click.Command(name='dummy'))
 
 
 @pytest.fixture

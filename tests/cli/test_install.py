@@ -2,7 +2,9 @@
 """Tests for `aiida-pseudo install`."""
 import pytest
 
-from aiida_pseudo.cli import cmd_install_family
+from aiida.orm import QueryBuilder
+
+from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp
 from aiida_pseudo.groups.family import PseudoPotentialFamily, UpfFamily
 
 
@@ -40,3 +42,21 @@ def test_install_family_upf(run_cli_command, get_pseudo_archive):
     assert type(family) is UpfFamily  # pylint: disable=unidiomatic-typecheck
     assert family.description == description
     assert len(family.pseudos) != 0
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_install_sssp(run_cli_command):
+    """Test the `aiida-pseudo install sssp` command."""
+    from aiida_pseudo import __version__
+    from aiida_pseudo.groups.family import SsspFamily
+
+    result = run_cli_command(cmd_install_sssp)
+    assert 'installed `SSSP/' in result.output
+    assert QueryBuilder().append(SsspFamily).count() == 1
+
+    family = QueryBuilder().append(SsspFamily).one()[0]
+    assert 'SSSP v1.1 PBE efficiency installed with aiida-pseudo v{}'.format(__version__) in family.description
+    assert 'Archive pseudos md5: 4803ce9fd1d84c777f87173cd4a2de33' in family.description
+
+    result = run_cli_command(cmd_install_sssp, raises=SystemExit)
+    assert 'is already installed' in result.output

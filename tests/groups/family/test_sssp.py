@@ -6,6 +6,11 @@ import pytest
 from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
 
 
+def test_type_string(clear_db):
+    """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
+    assert SsspFamily._type_string == 'pseudo.family.sssp'  # pylint: disable=protected-access
+
+
 def test_default_configuration():
     """Test the `SsspFamily.default_configuration` class attribute."""
     assert isinstance(SsspFamily.default_configuration, SsspConfiguration)

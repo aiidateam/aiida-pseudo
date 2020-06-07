@@ -9,3 +9,4 @@ click_completion.init()
 from .root import cmd_root
 from .install import cmd_install, cmd_install_family
 from .list import cmd_list
+from .show import cmd_show

@@ -3,7 +3,15 @@
 """Custom parameter types for command line interface commands."""
 import click
 
-__all__ = ('PseudoPotentialFamilyTypeParam',)
+from aiida.cmdline.params.types import GroupParamType
+
+__all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam')
+
+
+class PseudoPotentialFamilyParam(GroupParamType):
+    """Parameter type for `click` commands to define an instance of a `PseudoPotentialFamily`."""
+
+    name = 'pseudo_family'
 
 
 class PseudoPotentialFamilyTypeParam(click.ParamType):

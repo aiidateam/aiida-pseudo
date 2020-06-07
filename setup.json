@@ -24,7 +24,8 @@
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
-            "pseudo.family.upf = aiida_pseudo.groups.family.upf:UpfFamily"
+            "pseudo.family.upf = aiida_pseudo.groups.family.upf:UpfFamily",
+            "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily"
         ]
     },
     "python_requires": ">=3.5",

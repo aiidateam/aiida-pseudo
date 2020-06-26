@@ -7,5 +7,6 @@ max-line-length = 120
 
 [tool.pylint.messages_control]
 disable = [
+    'duplicate-code',
     'import-outside-toplevel',
 ]

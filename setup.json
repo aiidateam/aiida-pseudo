@@ -20,6 +20,7 @@
         "aiida.data": [
             "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData",
             "pseudo.psf = aiida_pseudo.data.pseudo.psf:PsfData",
+            "pseudo.psml = aiida_pseudo.data.pseudo.psml:PsmlData",
             "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData"
         ],
         "aiida.groups": [

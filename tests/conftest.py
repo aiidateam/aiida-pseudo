@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name,unused-argument
 """Configuration and fixtures for unit test suite."""
 import distutils.dir_util
+import io
 import os
 import shutil
 import tarfile
@@ -10,7 +11,9 @@ import tempfile
 import click
 import pytest
 
-from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
+from aiida.plugins import DataFactory
+
+from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family import PseudoPotentialFamily
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
@@ -72,46 +75,44 @@ def filepath_fixtures() -> str:
 
 
 @pytest.fixture
-def filepath_pseudos(filepath_fixtures) -> str:
+def filepath_pseudos(filepath_fixtures):
     """Return the absolute filepath to the directory containing the pseudo potential files.
 
     :return: absolute filepath to directory containing test pseudo potentials.
     """
-    return os.path.join(filepath_fixtures, 'pseudos')
 
+    def _filepath_pseudos(entry_point='upf') -> str:
+        """Return the absolute filepath containing the pseudo potential files for a given entry point.
 
-@pytest.fixture
-def get_upf_data(filepath_pseudos):
-    """Return a factory for `UpfData` nodes."""
-
-    def _get_upf_data(element='Ar') -> UpfData:
-        """Return a `UpfData` for the given element.
-
-        :param element: one of the elements for which there is a UPF test file available.
-        :return: the `UpfData`
+        :param entry_point: pseudo potential data entry point
+        :return: filepath to folder containing pseudo files.
         """
-        filename = '{}.upf'.format(element)
-        with open(os.path.join(filepath_pseudos, filename), 'rb') as handle:
-            return UpfData(handle, filename)
+        return os.path.join(filepath_fixtures, 'pseudos', entry_point)
 
-    return _get_upf_data
+    return _filepath_pseudos
 
 
 @pytest.fixture
 def get_pseudo_potential_data(filepath_pseudos):
     """Return a factory for `PseudoPotentialData` nodes."""
 
-    def _get_pseudo_potential_data(element='Ar') -> PseudoPotentialData:
+    def _get_pseudo_potential_data(element='Ar', entry_point=None) -> PseudoPotentialData:
         """Return a `PseudoPotentialData` for the given element.
 
         :param element: one of the elements for which there is a UPF test file available.
         :return: the `PseudoPotentialData`
         """
-        filename = '{}.upf'.format(element)
-        with open(os.path.join(filepath_pseudos, filename), 'rb') as handle:
-            pseudo = PseudoPotentialData(handle, filename)
+        if entry_point is None:
+            cls = DataFactory('pseudo')
+            pseudo = cls(io.BytesIO(b'content'), '{}.pseudo'.format(element))
             pseudo.element = element
-            return pseudo
+        else:
+            cls = DataFactory('pseudo.{}'.format(entry_point))
+            filename = '{}.{}'.format(element, entry_point)
+            with open(os.path.join(filepath_pseudos(entry_point), filename), 'rb') as handle:
+                pseudo = cls(handle, filename)
+
+        return pseudo
 
     return _get_pseudo_potential_data
 
@@ -126,9 +127,10 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         :param elements: optional list of elements to include instead of all the available ones
         :return: the pseudo family
         """
-        for pseudo in os.listdir(filepath_pseudos):
+        dirpath = filepath_pseudos('upf')
+        for pseudo in os.listdir(dirpath):
             if elements is None or any([pseudo.startswith(element) for element in elements]):
-                shutil.copyfile(os.path.join(filepath_pseudos, pseudo), os.path.join(str(tmpdir), pseudo))
+                shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmpdir), pseudo))
 
         return cls.create_from_folder(str(tmpdir), label)
 
@@ -138,7 +140,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 @pytest.fixture
 def get_pseudo_archive(tmpdir, filepath_pseudos):
     """Create an archive with pseudos."""
-    distutils.dir_util.copy_tree(filepath_pseudos, str(tmpdir))
+    distutils.dir_util.copy_tree(filepath_pseudos('upf'), str(tmpdir))
 
     with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:
 

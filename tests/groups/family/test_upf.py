@@ -26,7 +26,7 @@ def test_construct(clear_db):
 def test_create_from_folder(filepath_pseudos):
     """Test the `UpfFamily.create_from_folder` class method."""
     label = 'label'
-    family = UpfFamily.create_from_folder(filepath_pseudos, label)
+    family = UpfFamily.create_from_folder(filepath_pseudos('upf'), label)
     assert isinstance(family, UpfFamily)
 
 
@@ -37,4 +37,4 @@ def test_create_from_folder_duplicate(filepath_pseudos):
     UpfFamily(label=label).store()
 
     with pytest.raises(ValueError, match=r'the UpfFamily `.*` already exists'):
-        UpfFamily.create_from_folder(filepath_pseudos, label)
+        UpfFamily.create_from_folder(filepath_pseudos('upf'), label)

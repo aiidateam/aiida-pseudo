@@ -51,11 +51,11 @@ def test_construct():
 def test_create_from_folder(filepath_pseudos):
     """Test the `PseudoPotentialFamily.create_from_folder` class method."""
     label = 'label'
-    family = PseudoPotentialFamily.create_from_folder(filepath_pseudos, label)
+    family = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), label)
     assert isinstance(family, PseudoPotentialFamily)
     assert family.is_stored
     assert family.label == label
-    assert len(family.nodes) == len(os.listdir(filepath_pseudos))
+    assert len(family.nodes) == len(os.listdir(filepath_pseudos()))
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -92,7 +92,7 @@ def test_create_from_folder_empty(tmpdir):
 @pytest.mark.usefixtures('clear_db')
 def test_create_from_folder_duplicate_element(tmpdir, filepath_pseudos):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for folder containing duplicate element."""
-    distutils.dir_util.copy_tree(filepath_pseudos, str(tmpdir))
+    distutils.dir_util.copy_tree(filepath_pseudos(), str(tmpdir))
 
     with open(os.path.join(str(tmpdir), 'Ar.UPF'), 'wb'):
         pass
@@ -108,7 +108,7 @@ def test_create_from_folder_duplicate(filepath_pseudos):
     PseudoPotentialFamily(label=label).store()
 
     with pytest.raises(ValueError, match=r'the PseudoPotentialFamily `.*` already exists'):
-        PseudoPotentialFamily.create_from_folder(filepath_pseudos, label)
+        PseudoPotentialFamily.create_from_folder(filepath_pseudos(), label)
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -161,15 +161,15 @@ def test_add_nodes_unstored(get_pseudo_family, nodes_unstored):
 
 
 @pytest.fixture
-def nodes_incorrect_type(get_pseudo_potential_data, get_upf_data, request):
+def nodes_incorrect_type(get_pseudo_potential_data, request):
     """Dynamic fixture returning instances of `UpfData` either isolated or as a list."""
     if request.param == 'single':
-        return get_upf_data().store()
+        return get_pseudo_potential_data(entry_point='upf').store()
 
     if request.param == 'tuple':
-        return (get_upf_data().store(),)
+        return (get_pseudo_potential_data(entry_point='upf').store(),)
 
-    return [get_pseudo_potential_data().store(), get_upf_data().store()]
+    return [get_pseudo_potential_data().store(), get_pseudo_potential_data(entry_point='upf').store()]
 
 
 @pytest.mark.usefixtures('clear_db')

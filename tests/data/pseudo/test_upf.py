@@ -11,30 +11,30 @@ from aiida_pseudo.data.pseudo import UpfData
 @pytest.mark.usefixtures('clear_db')
 def test_constructor(filepath_pseudos):
     """Test the constructor."""
-    for filename in os.listdir(filepath_pseudos):
-        with open(os.path.join(filepath_pseudos, filename), 'rb') as handle:
-            upf = UpfData(handle, filename=filename)
-            assert isinstance(upf, UpfData)
-            assert not upf.is_stored
-            assert upf.element == filename.split('.')[0]
+    for filename in os.listdir(filepath_pseudos('upf')):
+        with open(os.path.join(filepath_pseudos('upf'), filename), 'rb') as handle:
+            pseudo = UpfData(handle, filename=filename)
+            assert isinstance(pseudo, UpfData)
+            assert not pseudo.is_stored
+            assert pseudo.element == filename.split('.')[0]
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_set_file(filepath_pseudos, get_upf_data):
+def test_set_file(filepath_pseudos, get_pseudo_potential_data):
     """Test the `UpfData.set_file` method.
 
     This method allows to change the file, as long as the node has not been stored yet. We need to verify that all the
     information, such as attributes are commensurate when it is stored.
     """
-    upf = get_upf_data(element='Ar')
-    assert upf.element == 'Ar'
+    pseudo = get_pseudo_potential_data(element='Ar', entry_point='upf')
+    assert pseudo.element == 'Ar'
 
-    with open(os.path.join(filepath_pseudos, 'He.upf'), 'rb') as handle:
-        upf.set_file(handle)
-        assert upf.element == 'He'
+    with open(os.path.join(filepath_pseudos('upf'), 'He.upf'), 'rb') as handle:
+        pseudo.set_file(handle)
+        assert pseudo.element == 'He'
 
-        upf.store()
-        assert upf.element == 'He'
+        pseudo.store()
+        assert pseudo.element == 'He'
 
         with pytest.raises(ModificationNotAllowed):
-            upf.set_file(handle)
+            pseudo.set_file(handle)

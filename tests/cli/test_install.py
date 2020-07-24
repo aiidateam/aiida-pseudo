@@ -13,15 +13,37 @@ def test_install_family(run_cli_command, get_pseudo_archive):
     """Test `aiida-pseudo install family`."""
     label = 'family'
     description = 'description'
-    options = ['-D', description, get_pseudo_archive, label]
+    filepath_archive = next(get_pseudo_archive())
+    options = ['-D', description, filepath_archive, label]
 
     result = run_cli_command(cmd_install_family, options)
     assert 'installed `{}`'.format(label) in result.output
     assert PseudoPotentialFamily.objects.count() == 1
 
     family = PseudoPotentialFamily.objects.get(label=label)
-    assert type(family) is PseudoPotentialFamily  # pylint: disable=unidiomatic-typecheck
-    assert type(family) is not UpfFamily  # pylint: disable=unidiomatic-typecheck
+    assert family.__class__ is PseudoPotentialFamily
+    assert family.description == description
+    assert len(family.pseudos) != 0
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_install_family_url(run_cli_command):
+    """Test `aiida-pseudo install family` when installing from a URL.
+
+    When a URL is passed, the parameter converts it into a `http.client.HTTPResponse`, which is not trivial to mock so
+    instead we use an actual URL, which is slow, but is anyway already tested indirectly in `test_install_sssp`.
+    """
+    label = 'family'
+    description = 'description'
+    filepath_archive = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/SSSP_1.0_PBE_efficiency.tar.gz'
+    options = ['-D', description, filepath_archive, label, '-T', 'pseudo.family.upf']
+
+    result = run_cli_command(cmd_install_family, options)
+    assert 'installed `{}`'.format(label) in result.output
+    assert UpfFamily.objects.count() == 1
+
+    family = UpfFamily.objects.get(label=label)
+    assert family.__class__ is UpfFamily
     assert family.description == description
     assert len(family.pseudos) != 0
 
@@ -31,15 +53,15 @@ def test_install_family_upf(run_cli_command, get_pseudo_archive):
     """Test `aiida-pseudo install family` to install a `UpfFamily`."""
     label = 'family'
     description = 'description'
-    options = ['-D', description, '-T', 'pseudo.family.upf', get_pseudo_archive, label]
+    filepath_archive = next(get_pseudo_archive())
+    options = ['-D', description, '-T', 'pseudo.family.upf', filepath_archive, label]
 
     result = run_cli_command(cmd_install_family, options)
     assert 'installed `{}`'.format(label) in result.output
     assert UpfFamily.objects.count() == 1
 
     family = UpfFamily.objects.get(label=label)
-    assert type(family) is not PseudoPotentialFamily  # pylint: disable=unidiomatic-typecheck
-    assert type(family) is UpfFamily  # pylint: disable=unidiomatic-typecheck
+    assert family.__class__ is UpfFamily
     assert family.description == description
     assert len(family.pseudos) != 0
 

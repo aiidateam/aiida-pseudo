@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """Reusable options for CLI commands."""
+import shutil
+
 import click
 
 from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
-__all__ = ('VERSION', 'FUNCTIONAL', 'PROTOCOL', 'TRACEBACK', 'FAMILY_TYPE')
+__all__ = ('VERSION', 'FUNCTIONAL', 'PROTOCOL', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT')
 
 VERSION = OverridableOption(
     '-v', '--version', type=click.STRING, required=False, help='Select the version of the SSSP configuration.'
@@ -30,4 +32,8 @@ FAMILY_TYPE = OverridableOption(
     default='pseudo.family',
     show_default=True,
     help='Choose the type of pseudo potential family to create.'
+)
+
+ARCHIVE_FORMAT = OverridableOption(
+    '-F', '--archive-format', type=click.Choice([fmt[0] for fmt in shutil.get_archive_formats()])
 )

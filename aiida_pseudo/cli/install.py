@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 """Command to install a pseudo potential family."""
 import os
+import shutil
+import tempfile
 
 import click
 
 from aiida.cmdline.utils import decorators, echo
 from aiida.cmdline.params import options as options_core
+from aiida.cmdline.params import types
 
 from .params import options
 from .root import cmd_root
@@ -19,18 +22,43 @@ def cmd_install():
 
 
 @cmd_install.command('family')
+@click.argument('archive', type=types.FileOrUrl(mode='rb'))
+@click.argument('label', type=click.STRING)
 @options_core.DESCRIPTION(help='Description for the family.')
+@options.ARCHIVE_FORMAT()
 @options.FAMILY_TYPE()
 @options.TRACEBACK()
-@click.argument('filepath_archive', type=click.Path(exists=True))
-@click.argument('label', type=click.STRING)
 @decorators.with_dbenv()
-def cmd_install_family(description, family_type, traceback, filepath_archive, label):
-    """Install a standard pseudo potential family."""
+def cmd_install_family(archive, label, description, archive_format, family_type, traceback):  # pylint: disable=too-many-arguments
+    """Install a standard pseudo potential family from an ARCHIVE on the local file system or from a URL.
+
+    The command will attempt to infer the archive format from the filename extension of the ARCHIVE. If this fails, the
+    archive format can be specified explicitly with the archive format option, which will also display which formats
+    are supported.
+
+    By default, the command will create a base `PseudoPotentialFamily`, but the type can be changed with the family
+    type option. If the base type is used, the pseudo potential files in the archive *have* to have filenames that
+    strictly follow the format `ELEMENT.EXTENSION`, because otherwise the element cannot be determined automatically.
+    """
     from .utils import attempt, create_family_from_archive
 
-    with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
-        family = create_family_from_archive(family_type, label, filepath_archive)
+    # The `archive` is now either a `http.client.HTTPResponse` or a normal filelike object, so we get the original file
+    # name in a different way.
+    try:
+        suffix = os.path.basename(archive.url)
+    except AttributeError:
+        suffix = os.path.basename(archive.name)
+
+    # Write the content of the archive to a temporary file, because `create_family_from_archive` does currently not
+    # accept filelike objects because the underlying `shutil.unpack_archive` does not. Likewise, `unpack_archive` will
+    # attempt to deduce the archive format from the filename extension, so it is important we maintain the original
+    # filename. Of course if this fails, users can specify the archive format explicitly wiht the corresponding option.
+    with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
+        shutil.copyfileobj(archive, handle)
+        handle.flush()
+
+        with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
+            family = create_family_from_archive(family_type, label, handle.name, fmt=archive_format)
 
     family.description = description
     echo.echo_success('installed `{}` containing {} pseudo potentials'.format(label, family.count()))
@@ -50,7 +78,6 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     """
     # pylint: disable=too-many-locals
     import requests
-    import tempfile
 
     from aiida.common.files import md5_file
     from aiida.orm import QueryBuilder

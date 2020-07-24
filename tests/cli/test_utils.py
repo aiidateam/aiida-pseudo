@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=unused-argument
 """Test the command line interface utilities."""
+import shutil
 import tarfile
 import tempfile
 
@@ -11,10 +12,13 @@ from aiida_pseudo.groups.family import PseudoPotentialFamily
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_create_family_from_archive(get_pseudo_archive):
+@pytest.mark.parametrize(('fmt',), [(fmt[0],) for fmt in shutil.get_archive_formats()])
+def test_create_family_from_archive(get_pseudo_archive, fmt):
     """Test the `create_family_from_archive` utility function."""
     label = 'PSEUDO/0.0/LDA/extreme'
-    family = create_family_from_archive(PseudoPotentialFamily, label, get_pseudo_archive)
+    filepath_archive = next(get_pseudo_archive(fmt))
+    family = create_family_from_archive(PseudoPotentialFamily, label, filepath_archive, fmt=fmt)
+
     assert isinstance(family, PseudoPotentialFamily)
     assert family.label == label
     assert family.count() != 0

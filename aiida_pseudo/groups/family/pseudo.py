@@ -43,8 +43,10 @@ class PseudoPotentialFamily(Group):
     def parse_pseudos_from_directory(cls, dirpath):
         """Parse the pseudo potential files in the given directory into a list of data nodes.
 
-        .. note:: the directory pointed to by `dirpath` should only contain UPF files. If it contains any folders or any
-            of the files cannot be parsed as valid UPF, the method will raise a `ValueError`.
+        .. note:: The directory pointed to by `dirpath` should only contain pseudo potential files. Optionally, it can
+            contain just a single directory, that contains all the pseudo potential files. If any other files are stored
+            in the basepath or the subdirectory, that cannot be successfully parsed as pseudo potential files the method
+            will raise a `ValueError`.
 
         :param dirpath: absolute path to a directory containing pseudo potentials.
         :return: list of data nodes
@@ -58,6 +60,11 @@ class PseudoPotentialFamily(Group):
 
         if not os.path.isdir(dirpath):
             raise ValueError('`{}` is not a directory'.format(dirpath))
+
+        dirpath_contents = os.listdir(dirpath)
+
+        if len(dirpath_contents) == 1 and os.path.isdir(os.path.join(dirpath, dirpath_contents[0])):
+            dirpath = os.path.join(dirpath, dirpath_contents[0])
 
         for filename in os.listdir(dirpath):
             filepath = os.path.join(dirpath, filename)

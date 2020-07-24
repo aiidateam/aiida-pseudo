@@ -59,12 +59,17 @@ def test_create_from_folder(filepath_pseudos):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_create_from_folder_non_file(tmpdir):
-    """Test the `PseudoPotentialFamily.create_from_folder` class method for folder containing a non-file."""
-    os.mkdir(os.path.join(str(tmpdir), 'pseudos'))
+def test_create_from_folder_nested(filepath_pseudos, tmpdir):
+    """Test the `PseudoPotentialFamily.create_from_folder` class method when the pseudos are in a subfolder."""
+    filepath = str(tmpdir / 'subdirectory')
+    distutils.dir_util.copy_tree(filepath_pseudos(), filepath)
 
-    with pytest.raises(ValueError, match=r'dirpath `.*` contains at least one entry that is not a file'):
-        PseudoPotentialFamily.create_from_folder(str(tmpdir), 'label')
+    label = 'label'
+    family = PseudoPotentialFamily.create_from_folder(str(tmpdir), label)
+    assert isinstance(family, PseudoPotentialFamily)
+    assert family.is_stored
+    assert family.label == label
+    assert len(family.nodes) == len(os.listdir(filepath_pseudos()))
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -109,6 +114,34 @@ def test_create_from_folder_duplicate(filepath_pseudos):
 
     with pytest.raises(ValueError, match=r'the PseudoPotentialFamily `.*` already exists'):
         PseudoPotentialFamily.create_from_folder(filepath_pseudos(), label)
+
+
+def test_parse_pseudos_from_directory_non_file(tmpdir):
+    """Test the `PseudoPotentialFamily.parse_pseudos_from_directory` class method for folder containing a non-file.
+
+    Note that a subdirectory containing the pseudos is fine, but if we find a directory and any other object at the
+    base path, it should raise.
+    """
+    os.makedirs(os.path.join(str(tmpdir), 'directory'))
+    with open(os.path.join(str(tmpdir), 'Ar.upf'), 'wb'):
+        pass
+
+    with pytest.raises(ValueError, match=r'dirpath `.*` contains at least one entry that is not a file'):
+        PseudoPotentialFamily.parse_pseudos_from_directory(str(tmpdir))
+
+
+def test_parse_pseudos_from_directory_non_file_nested(tmpdir):
+    """Test the `PseudoPotentialFamily.parse_pseudos_from_directory` class method for folder containing a non-file.
+
+    Note that a subdirectory containing the pseudos is fine, but if we find a directory and any other object at the
+    base path, it should raise.
+    """
+    os.makedirs(os.path.join(str(tmpdir), 'pseudos', 'directory'))
+    with open(os.path.join(str(tmpdir), 'pseudos', 'Ar.upf'), 'wb'):
+        pass
+
+    with pytest.raises(ValueError, match=r'dirpath `.*` contains at least one entry that is not a file'):
+        PseudoPotentialFamily.parse_pseudos_from_directory(str(tmpdir))
 
 
 @pytest.mark.usefixtures('clear_db')

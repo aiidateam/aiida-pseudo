@@ -38,6 +38,8 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         if not issubclass(family_type, PseudoPotentialFamily):
             raise click.BadParameter('`{}` entry point is not a subclass of `PseudoPotentialFamily`.'.format(value))
 
+        PseudoPotentialFamily.entry_point = value
+
         return family_type
 
     def complete(self, _, incomplete):

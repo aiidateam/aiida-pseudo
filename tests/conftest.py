@@ -144,3 +144,21 @@ def get_pseudo_archive(tmpdir, filepath_pseudos):
         yield filepath
 
     return _get_pseudo_archive
+
+
+@pytest.fixture
+def generate_structure():
+    """Return a ``StructureData``."""
+
+    def _generate_structure(elements=('Ar',)):
+        """Return a ``StructureData``."""
+        from aiida.orm import StructureData
+
+        structure = StructureData(cell=[[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+        for index, element in enumerate(elements):
+            structure.append_atom(position=(index * 0.5, index * 0.5, index * 0.5), symbols=element, name=element)
+
+        return structure
+
+    return _generate_structure

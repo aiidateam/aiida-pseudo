@@ -2,14 +2,18 @@
 """Subclass of `Group` that serves as a base class for representing pseudo potential families."""
 import os
 import re
+from typing import Union, List, Tuple, Mapping
 
 from aiida.common import exceptions
 from aiida.common.lang import type_check
 from aiida.orm import Group, QueryBuilder
+from aiida.plugins import DataFactory
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 
 __all__ = ('PseudoPotentialFamily',)
+
+StructureData = DataFactory('structure')
 
 
 class PseudoPotentialFamily(Group):
@@ -202,3 +206,19 @@ class PseudoPotentialFamily(Group):
                 self.pseudos[element] = pseudo
 
         return pseudo
+
+    def get_pseudos(self, elements: Union[List[str], Tuple[str], StructureData]) -> Mapping[str, StructureData]:
+        """Return the mapping of kind names on pseudo potential data nodes for the given list of elements or structure.
+
+        :param elements: list of element symbols.
+        :param structure: the ``StructureData`` node.
+        :return: dictionary mapping the kind names of a structure on the corresponding pseudo potential data nodes.
+        :raises ValueError: if the family does not contain a pseudo for any of the elements of the given structure.
+        """
+        if not isinstance(elements, (list, tuple)) and not isinstance(elements, StructureData):
+            raise ValueError('elements should either be a list of symbols or a StructureData instance.')
+
+        if isinstance(elements, StructureData):
+            elements = [kind.symbol for kind in elements.kinds]
+
+        return {element: self.get_pseudo(element) for element in elements}

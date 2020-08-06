@@ -8,6 +8,7 @@ import pytest
 
 from aiida.common import exceptions
 
+from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
 
 
@@ -274,3 +275,44 @@ def test_get_pseudo(get_pseudo_family):
 
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
         family.get_pseudo('He')
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_pseudos_raise(get_pseudo_family):
+    """Test the `PseudoPotentialFamily.get_pseudos` method when it is supposed to raise."""
+    elements = ('Ar', 'He', 'Ne')
+    family = get_pseudo_family(elements=elements[:2])  # Create family with only subset of the elements
+
+    with pytest.raises(TypeError, match='missing 1 required positional argument:.*'):
+        family.get_pseudos()
+
+    with pytest.raises(ValueError, match='elements should either be a list of symbols or a StructureData instance.'):
+        family.get_pseudos(elements={'He', 'Ar'})
+
+    with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
+        family.get_pseudos(elements=elements)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_pseudos_list(get_pseudo_family):
+    """Test the `PseudoPotentialFamily.get_pseudos` method when passing a list of elements."""
+    elements = ('Ar', 'He', 'Ne')
+    family = get_pseudo_family(elements=elements)
+
+    pseudos = family.get_pseudos(elements)
+    assert isinstance(pseudos, dict)
+    for element in elements:
+        assert isinstance(pseudos[element], PseudoPotentialData)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_pseudos_structure(get_pseudo_family, generate_structure):
+    """Test the `PseudoPotentialFamily.get_pseudos` method when passing a ``StructureData`` instance."""
+    elements = ('Ar', 'He', 'Ne')
+    structure = generate_structure(elements)
+    family = get_pseudo_family(elements=elements)
+
+    pseudos = family.get_pseudos(structure)
+    assert isinstance(pseudos, dict)
+    for element in elements:
+        assert isinstance(pseudos[element], PseudoPotentialData)

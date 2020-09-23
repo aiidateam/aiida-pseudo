@@ -3,6 +3,7 @@
 """Configuration and fixtures for unit test suite."""
 import io
 import os
+import re
 import shutil
 
 import click
@@ -157,7 +158,8 @@ def generate_structure():
         structure = StructureData(cell=[[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
         for index, element in enumerate(elements):
-            structure.append_atom(position=(index * 0.5, index * 0.5, index * 0.5), symbols=element, name=element)
+            symbol = re.sub(r'[0-9]+', '', element)
+            structure.append_atom(position=(index * 0.5, index * 0.5, index * 0.5), symbols=symbol, name=element)
 
         return structure
 

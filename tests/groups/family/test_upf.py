@@ -89,3 +89,49 @@ def test_get_cutoffs(get_pseudo_family):
 
     family.set_cutoffs(cutoffs)
     assert family.get_cutoffs() == cutoffs
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
+    """Test the `UpfFamily.get_recommended_cutoffs` method."""
+    elements = ['Ar', 'He']
+    cutoffs = {
+        'Ar': {
+            'cutoff_wfc': 1.0,
+            'cutoff_rho': 2.0
+        },
+        'He': {
+            'cutoff_wfc': 3.0,
+            'cutoff_rho': 8.0
+        },
+    }
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=UpfFamily, elements=elements)
+    family.set_cutoffs(cutoffs)
+    structure = generate_structure(elements=elements)
+
+    with pytest.raises(ValueError):
+        family.get_recommended_cutoffs(elements=None, structure=None)
+
+    with pytest.raises(ValueError):
+        family.get_recommended_cutoffs(elements='Ar', structure=structure)
+
+    with pytest.raises(TypeError):
+        family.get_recommended_cutoffs(elements=False, structure=None)
+
+    with pytest.raises(TypeError):
+        family.get_recommended_cutoffs(elements=None, structure='Ar')
+
+    expected = cutoffs['Ar']
+    assert family.get_recommended_cutoffs(elements='Ar') == (expected['cutoff_wfc'], expected['cutoff_rho'])
+    assert family.get_recommended_cutoffs(elements=('Ar',)) == (expected['cutoff_wfc'], expected['cutoff_rho'])
+
+    expected = cutoffs['He']
+    assert family.get_recommended_cutoffs(elements=('Ar', 'He')) == (expected['cutoff_wfc'], expected['cutoff_rho'])
+
+    expected = cutoffs['He']
+    assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])
+
+    # Try structure with multiple kinds with the same element
+    expected = cutoffs['He']
+    structure = generate_structure(elements=['He1', 'He2'])
+    assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])

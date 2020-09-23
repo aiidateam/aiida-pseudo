@@ -52,11 +52,11 @@ def create_family_from_archive(cls, label, filepath_archive, fmt=None):
         try:
             shutil.unpack_archive(filepath_archive, dirpath, format=fmt)
         except shutil.ReadError as exception:
-            raise OSError('failed to unpack the archive `{}`: {}'.format(filepath_archive, exception))
+            raise OSError(f'failed to unpack the archive `{filepath_archive}`: {exception}') from exception
 
         try:
             family = cls.create_from_folder(dirpath, label)
         except ValueError as exception:
-            raise OSError('failed to parse pseudos from `{}`: {}'.format(dirpath, exception))
+            raise OSError(f'failed to parse pseudos from `{dirpath}`: {exception}') from exception
 
     return family

@@ -47,6 +47,6 @@ class SsspFamily(UpfFamily):
     def __init__(self, label=None, **kwargs):
         """Construct a new instance, validating that the label matches the required format."""
         if label not in self.get_valid_labels():
-            raise ValueError('the label `{}` is not a valid SSSP configuration label.'.format(label))
+            raise ValueError(f'the label `{label}` is not a valid SSSP configuration label.')
 
         super().__init__(label=label, **kwargs)

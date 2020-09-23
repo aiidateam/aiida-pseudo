@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=unused-argument,pointless-statement
 """Tests for the `UpfFamily` class."""
+import copy
+
 import pytest
 
 from aiida_pseudo.groups.family.upf import UpfFamily
@@ -38,3 +40,52 @@ def test_create_from_folder_duplicate(filepath_pseudos):
 
     with pytest.raises(ValueError, match=r'the UpfFamily `.*` already exists'):
         UpfFamily.create_from_folder(filepath_pseudos('upf'), label)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_set_cutoffs(get_pseudo_family):
+    """Test the `UpfFamily.set_cutoffs` method."""
+    elements = ['Ar', 'He']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=UpfFamily, elements=elements)
+    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    family.set_cutoffs(cutoffs)
+
+    assert family.get_cutoffs() == cutoffs
+
+    with pytest.raises(ValueError, match=r'cutoffs defined for unsupported elements: .*'):
+        cutoffs_invalid = copy.copy(cutoffs)
+        cutoffs_invalid['C'] = {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0}
+        assert family.set_cutoffs(cutoffs_invalid)
+
+    with pytest.raises(ValueError, match=r'cutoffs not defined for all family elements: .*'):
+        cutoffs_invalid = copy.copy(cutoffs)
+        cutoffs_invalid.pop('He')
+        assert family.set_cutoffs(cutoffs_invalid)
+
+    with pytest.raises(ValueError, match=r'invalid cutoff keys for element .*: .*'):
+        cutoffs_invalid = copy.copy(cutoffs)
+        cutoffs_invalid['He'] = {'cutoff_wfc': 1.0}
+        assert family.set_cutoffs(cutoffs_invalid)
+
+    with pytest.raises(ValueError, match=r'invalid cutoff keys for element .*: .*'):
+        cutoffs_invalid = copy.copy(cutoffs)
+        cutoffs_invalid['He'] = {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0, 'cutoff_extra': 3.0}
+        assert family.set_cutoffs(cutoffs_invalid)
+
+    with pytest.raises(ValueError, match=r'invalid cutoff values for element .*: .*'):
+        cutoffs_invalid = copy.copy(cutoffs)
+        cutoffs_invalid['He'] = {'cutoff_wfc': 1.0, 'cutoff_rho': 'string'}
+        assert family.set_cutoffs(cutoffs_invalid)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_cutoffs(get_pseudo_family):
+    """Test the `UpfFamily.get_cutoffs` method."""
+    elements = ['Ar', 'He']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=UpfFamily, elements=elements)
+    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+
+    assert family.get_cutoffs() is None
+
+    family.set_cutoffs(cutoffs)
+    assert family.get_cutoffs() == cutoffs

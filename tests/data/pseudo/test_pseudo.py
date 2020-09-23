@@ -68,7 +68,7 @@ def test_element():
 
     pseudo.store()
 
-    with pytest.raises(ModificationNotAllowed, match='the attributes of a stored node are immutable'):
+    with pytest.raises(ModificationNotAllowed, match='the attributes of a stored entity are immutable'):
         pseudo.element = element
 
 
@@ -88,5 +88,5 @@ def test_md5():
 
     pseudo.store()
 
-    with pytest.raises(ModificationNotAllowed, match='the attributes of a stored node are immutable'):
+    with pytest.raises(ModificationNotAllowed, match='the attributes of a stored entity are immutable'):
         pseudo.md5 = md5

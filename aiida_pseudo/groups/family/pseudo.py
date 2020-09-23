@@ -29,17 +29,17 @@ class PseudoPotentialFamily(Group):
 
     def __repr__(self):
         """Represent the instance for debugging purposes."""
-        return '{}<{}>'.format(self.__class__.__name__, self.pk or self.uuid)
+        return f'{self.__class__.__name__}<{self.pk or self.uuid}>'
 
     def __str__(self):
         """Represent the instance for human-readable purposes."""
-        return '{}<{}>'.format(self.__class__.__name__, self.label)
+        return f'{self.__class__.__name__}<{self.label}>'
 
     def __init__(self, *args, **kwargs):
         """Validate that the `_pseudo_type` class attribute is a subclass of `PseudoPotentialData`."""
         if not issubclass(self._pseudo_type, PseudoPotentialData):
             class_name = self._pseudo_type.__class__.__name__
-            raise RuntimeError('`{}` is not a subclass of `PseudoPotentialData`.'.format(class_name))
+            raise RuntimeError(f'`{class_name}` is not a subclass of `PseudoPotentialData`.')
 
         super().__init__(*args, **kwargs)
 
@@ -63,7 +63,7 @@ class PseudoPotentialFamily(Group):
         pseudos = []
 
         if not os.path.isdir(dirpath):
-            raise ValueError('`{}` is not a directory'.format(dirpath))
+            raise ValueError(f'`{dirpath}` is not a directory')
 
         dirpath_contents = os.listdir(dirpath)
 
@@ -74,33 +74,32 @@ class PseudoPotentialFamily(Group):
             filepath = os.path.join(dirpath, filename)
 
             if not os.path.isfile(filepath):
-                raise ValueError('dirpath `{}` contains at least one entry that is not a file'.format(dirpath))
+                raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file')
 
             try:
                 with open(filepath, 'rb') as handle:
                     pseudo = cls._pseudo_type(handle, filename=filename)
             except ParsingError as exception:
-                raise ParsingError('failed to parse `{}`: {}'.format(filepath, exception))
+                raise ParsingError(f'failed to parse `{filepath}`: {exception}') from exception
             else:
                 if pseudo.element is None:
                     match = re.search(r'^([A-Za-z]{1,2})\.\w+', filename)
                     if match is None:
                         raise ParsingError(
-                            '`{}` constructor did not define the element and could not parse a valid element symbol '
-                            'from the filename `{}` either. It should have the format `ELEMENT.EXTENSION`'.format(
-                                cls._pseudo_type, filename
-                            )
+                            f'`{cls._pseudo_type}` constructor did not define the element and could not parse a valid '
+                            'element symbol from the filename `{filename}` either. It should have the format '
+                            '`ELEMENT.EXTENSION`'
                         )
                     pseudo.element = match.group(1)
                 pseudos.append(pseudo)
 
         if not pseudos:
-            raise ValueError('no pseudo potentials were parsed from `{}`'.format(dirpath))
+            raise ValueError(f'no pseudo potentials were parsed from `{dirpath}`')
 
         elements = set(pseudo.element for pseudo in pseudos)
 
         if len(pseudos) != len(elements):
-            raise ValueError('directory `{}` contains pseudo potentials with duplicate elements'.format(dirpath))
+            raise ValueError(f'directory `{dirpath}` contains pseudo potentials with duplicate elements')
 
         return pseudos
 
@@ -120,7 +119,7 @@ class PseudoPotentialFamily(Group):
         except exceptions.NotExistent:
             family = cls(label=label, description=description)
         else:
-            raise ValueError('the {} `{}` already exists'.format(cls.__name__, label))
+            raise ValueError(f'the {cls.__name__} `{label}` already exists')
 
         pseudos = cls.parse_pseudos_from_directory(dirpath)
 
@@ -149,14 +148,14 @@ class PseudoPotentialFamily(Group):
             nodes = [nodes]
 
         if any([type(node) is not self._pseudo_type for node in nodes]):  # pylint: disable=unidiomatic-typecheck
-            raise TypeError('only nodes of type `{}` can be added'.format(self._pseudo_type))
+            raise TypeError(f'only nodes of type `{self._pseudo_type}` can be added')
 
         pseudos = {}
 
         # Check for duplicates before adding any pseudo to the internal cache
         for pseudo in nodes:
             if pseudo.element in self.elements:
-                raise ValueError('element `{}` already present in this family'.format(pseudo.element))
+                raise ValueError(f'element `{pseudo.element}` already present in this family')
             pseudos[pseudo.element] = pseudo
 
         self.pseudos.update(pseudos)
@@ -198,10 +197,12 @@ class PseudoPotentialFamily(Group):
 
             try:
                 pseudo = builder.one()[0]
-            except exceptions.MultipleObjectsError:
-                raise RuntimeError('family `{}` contains multiple pseudos for `{}`'.format(self.label, element))
-            except exceptions.NotExistent:
-                raise ValueError('family `{}` does not contain pseudo for element `{}`'.format(self.label, element))
+            except exceptions.MultipleObjectsError as exception:
+                raise RuntimeError(f'family `{self.label}` contains multiple pseudos for `{element}`') from exception
+            except exceptions.NotExistent as exception:
+                raise ValueError(
+                    f'family `{self.label}` does not contain pseudo for element `{element}`'
+                ) from exception
             else:
                 self.pseudos[element] = pseudo
 

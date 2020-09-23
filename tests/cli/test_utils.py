@@ -51,7 +51,7 @@ def test_attempt_sucess(capsys):
         pass
 
     captured = capsys.readouterr()
-    assert captured.out == 'Info: {} [OK]\n'.format(message)
+    assert captured.out == f'Info: {message} [OK]\n'
     assert captured.err == ''
 
 
@@ -65,8 +65,8 @@ def test_attempt_exception(capsys):
             raise RuntimeError(exception)
 
     captured = capsys.readouterr()
-    assert captured.out == 'Info: {} [FAILED]\n'.format(message)
-    assert captured.err == 'Critical: {}\n'.format(exception)
+    assert captured.out == f'Info: {message} [FAILED]\n'
+    assert captured.err == f'Critical: {exception}\n'
 
 
 def test_attempt_exception_traceback(capsys):
@@ -79,6 +79,6 @@ def test_attempt_exception_traceback(capsys):
             raise RuntimeError(exception)
 
     captured = capsys.readouterr()
-    assert captured.out == 'Info: {} [FAILED]\n'.format(message)
-    assert captured.err.startswith('Critical: {}\n'.format(exception))
+    assert captured.out == f'Info: {message} [FAILED]\n'
+    assert captured.err.startswith(f'Critical: {exception}\n')
     assert 'Traceback' in captured.err

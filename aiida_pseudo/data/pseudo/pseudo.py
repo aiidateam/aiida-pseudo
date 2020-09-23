@@ -26,7 +26,7 @@ class PseudoPotentialData(SingleFileData):
         :raises ValueError: if the element symbol is invalid.
         """
         if element not in [values['symbol'] for values in elements.values()]:
-            raise ValueError('`{}` is not a valid element.'.format(element))
+            raise ValueError(f'`{element}` is not a valid element.')
 
     def validate_md5(self, md5: str):
         """Validate that the md5 checksum matches that of the currently stored file.
@@ -37,7 +37,7 @@ class PseudoPotentialData(SingleFileData):
         with self.open(mode='rb') as handle:
             md5_file = md5_from_filelike(handle)
             if md5 != md5_file:
-                raise ValueError('md5 does not match that of stored file: {} != {}'.format(md5, md5_file))
+                raise ValueError(f'md5 does not match that of stored file: {md5} != {md5_file}')
 
     def set_file(self, stream: typing.BinaryIO, filename: str = None, **kwargs):
         """Set the file content.
@@ -56,13 +56,13 @@ class PseudoPotentialData(SingleFileData):
         """
         try:
             self.validate_element(self.element)
-        except ValueError:
-            raise StoringNotAllowed('no valid element has been defined.')
+        except ValueError as exception:
+            raise StoringNotAllowed('no valid element has been defined.') from exception
 
         try:
             self.validate_md5(self.md5)
         except ValueError as exception:
-            raise StoringNotAllowed(exception)
+            raise StoringNotAllowed(exception) from exception
 
         return super().store()
 

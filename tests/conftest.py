@@ -101,11 +101,11 @@ def get_pseudo_potential_data(filepath_pseudos):
         """
         if entry_point is None:
             cls = DataFactory('pseudo')
-            pseudo = cls(io.BytesIO(b'content'), '{}.pseudo'.format(element))
+            pseudo = cls(io.BytesIO(b'content'), f'{element}.pseudo')
             pseudo.element = element
         else:
-            cls = DataFactory('pseudo.{}'.format(entry_point))
-            filename = '{}.{}'.format(element, entry_point)
+            cls = DataFactory(f'pseudo.{entry_point}')
+            filename = f'{element}.{entry_point}'
             with open(os.path.join(filepath_pseudos(entry_point), filename), 'rb') as handle:
                 pseudo = cls(handle, filename)
 

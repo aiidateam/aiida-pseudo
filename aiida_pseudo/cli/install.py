@@ -61,7 +61,7 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
             family = create_family_from_archive(family_type, label, handle.name, fmt=archive_format)
 
     family.description = description
-    echo.echo_success('installed `{}` containing {} pseudo potentials'.format(label, family.count()))
+    echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
 
 
 @cmd_install.command('sssp')
@@ -88,17 +88,17 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 
     configuration = SsspConfiguration(version, functional, protocol)
     label = SsspFamily.format_configuration_label(configuration)
-    description = 'SSSP v{} {} {} installed with aiida-pseudo v{}'.format(*configuration, __version__)
+    description = f'SSSP v{version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
 
     if configuration not in SsspFamily.valid_configurations:
-        echo.echo_critical('{} {} {} is not a valid SSSP configuration'.format(*configuration))
+        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
 
     if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
-        echo.echo_critical('{}<{}> is already installed'.format(SsspFamily.__name__, label))
+        echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        url_archive = '{}/SSSP_{}_{}_{}.tar.gz'.format(URL_SSSP_BASE, version, functional, protocol)
+        url_archive = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.tar.gz'
         filepath_archive = os.path.join(dirpath, 'archive.tar.gz')
 
         with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
@@ -107,10 +107,10 @@ def cmd_install_sssp(version, functional, protocol, traceback):
             with open(filepath_archive, 'wb') as handle:
                 handle.write(response.content)
                 handle.flush()
-                description += '\nArchive pseudos md5: {}'.format(md5_file(filepath_archive))
+                description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(SsspFamily, label, filepath_archive)
 
         family.description = description
-        echo.echo_success('installed `{}` containing {} pseudo potentials'.format(label, family.count()))
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

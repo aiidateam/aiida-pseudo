@@ -32,11 +32,11 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
 
         try:
             family_type = GroupFactory(value)
-        except exceptions.EntryPointError:
-            raise click.BadParameter('`{}` is not an existing group plugin.'.format(value))
+        except exceptions.EntryPointError as exception:
+            raise click.BadParameter(f'`{value}` is not an existing group plugin.') from exception
 
         if not issubclass(family_type, PseudoPotentialFamily):
-            raise click.BadParameter('`{}` entry point is not a subclass of `PseudoPotentialFamily`.'.format(value))
+            raise click.BadParameter(f'`{value}` entry point is not a subclass of `PseudoPotentialFamily`.')
 
         PseudoPotentialFamily.entry_point = value
 

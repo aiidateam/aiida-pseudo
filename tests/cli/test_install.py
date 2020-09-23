@@ -17,7 +17,7 @@ def test_install_family(run_cli_command, get_pseudo_archive):
     options = ['-D', description, filepath_archive, label]
 
     result = run_cli_command(cmd_install_family, options)
-    assert 'installed `{}`'.format(label) in result.output
+    assert f'installed `{label}`' in result.output
     assert PseudoPotentialFamily.objects.count() == 1
 
     family = PseudoPotentialFamily.objects.get(label=label)
@@ -39,7 +39,7 @@ def test_install_family_url(run_cli_command):
     options = ['-D', description, filepath_archive, label, '-T', 'pseudo.family.upf']
 
     result = run_cli_command(cmd_install_family, options)
-    assert 'installed `{}`'.format(label) in result.output
+    assert f'installed `{label}`' in result.output
     assert UpfFamily.objects.count() == 1
 
     family = UpfFamily.objects.get(label=label)
@@ -57,7 +57,7 @@ def test_install_family_upf(run_cli_command, get_pseudo_archive):
     options = ['-D', description, '-T', 'pseudo.family.upf', filepath_archive, label]
 
     result = run_cli_command(cmd_install_family, options)
-    assert 'installed `{}`'.format(label) in result.output
+    assert f'installed `{label}`' in result.output
     assert UpfFamily.objects.count() == 1
 
     family = UpfFamily.objects.get(label=label)
@@ -77,7 +77,7 @@ def test_install_sssp(run_cli_command):
     assert QueryBuilder().append(SsspFamily).count() == 1
 
     family = QueryBuilder().append(SsspFamily).one()[0]
-    assert 'SSSP v1.1 PBE efficiency installed with aiida-pseudo v{}'.format(__version__) in family.description
+    assert f'SSSP v1.1 PBE efficiency installed with aiida-pseudo v{__version__}' in family.description
     assert 'Archive pseudos md5: 4803ce9fd1d84c777f87173cd4a2de33' in family.description
 
     result = run_cli_command(cmd_install_sssp, raises=SystemExit)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Command to install a pseudo potential family."""
+import json
 import os
 import shutil
 import tempfile
@@ -80,7 +81,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     import requests
 
     from aiida.common.files import md5_file
-    from aiida.orm import QueryBuilder
+    from aiida.orm import Group, QueryBuilder
 
     from aiida_pseudo import __version__
     from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
@@ -101,6 +102,9 @@ def cmd_install_sssp(version, functional, protocol, traceback):
         url_archive = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.tar.gz'
         filepath_archive = os.path.join(dirpath, 'archive.tar.gz')
 
+        url_metadata = '{}/SSSP_{}_{}_{}.json'.format(URL_SSSP_BASE, version, functional, protocol)
+        filepath_metadata = os.path.join(dirpath, 'metadata.json')
+
         with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
             response = requests.get(url_archive)
             response.raise_for_status()
@@ -109,8 +113,30 @@ def cmd_install_sssp(version, functional, protocol, traceback):
                 handle.flush()
                 description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
 
+        with attempt('downloading selected pseudo potentials metadata... ', include_traceback=traceback):
+            response = requests.get(url_metadata)
+            response.raise_for_status()
+            with open(filepath_metadata, 'a+b') as handle:
+                handle.write(response.content)
+                handle.flush()
+                handle.seek(0)
+                metadata = json.load(handle)
+                description += '\nPseudo metadata md5: {}'.format(md5_file(filepath_metadata))
+
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(SsspFamily, label, filepath_archive)
 
+        cutoffs = {}
+
+        for element, values in metadata.items():
+            if family.get_pseudo(element).md5 != values['md5']:
+                Group.objects.delete(family.pk)
+                msg = f"md5 of pseudo for element {element} does not match that of the metadata {values['md5']}"
+                echo.echo_critical(msg)
+
+            cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
+
         family.description = description
+        family.set_cutoffs(cutoffs)
+
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

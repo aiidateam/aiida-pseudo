@@ -21,15 +21,13 @@ repos:
     hooks:
     -   id: pylint
         language: system
-        args: ['--max-line-length=120', '--disable=import-outside-toplevel']
-        exclude: &exclude_files >
-            (?x)^(
-                aiida_pseudo/utils/fastentrypoints.py
-            )$
+        args: [
+            '--max-line-length=120',
+            '--disable=import-outside-toplevel'
+        ]
 
 -   repo: https://github.com/PyCQA/pydocstyle
     rev: 5.0.2
     hooks:
     -   id: pydocstyle
-        exclude: *exclude_files
         args: ['--ignore=D104,D203,D213']

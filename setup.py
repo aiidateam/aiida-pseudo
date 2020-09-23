@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 """Define the setup for the `aiida-pseudo` plugin."""
+try:
+    import fastentrypoints  # pylint: disable=unused-import
+except ImportError:
+    # This should only occur when building the package, i.e. for `python setup.py sdist/bdist_wheel`
+    pass
 
 
 def setup_package():
     """Install the `aiida-pseudo` package."""
     import json
-    from aiida_pseudo.utils import fastentrypoints  # pylint: disable=unused-import
     from setuptools import setup, find_packages
 
     filename_setup_json = 'setup.json'

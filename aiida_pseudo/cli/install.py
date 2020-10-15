@@ -102,7 +102,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
         url_archive = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.tar.gz'
         filepath_archive = os.path.join(dirpath, 'archive.tar.gz')
 
-        url_metadata = '{}/SSSP_{}_{}_{}.json'.format(URL_SSSP_BASE, version, functional, protocol)
+        url_metadata = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.json'
         filepath_metadata = os.path.join(dirpath, 'metadata.json')
 
         with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
@@ -121,7 +121,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
                 handle.flush()
                 handle.seek(0)
                 metadata = json.load(handle)
-                description += '\nPseudo metadata md5: {}'.format(md5_file(filepath_metadata))
+                description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(SsspFamily, label, filepath_archive)

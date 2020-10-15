@@ -25,7 +25,7 @@ def attempt(message, exception_types=Exception, include_traceback=False):
         echo.echo_highlight(' [FAILED]', color='error', bold=True)
         message = str(exception)
         if include_traceback:
-            message += '\n' + ''.join(traceback.format_exception(*sys.exc_info()))
+            message += f"\n{''.join(traceback.format_exception(*sys.exc_info()))}"
         echo.echo_critical(message)
     else:
         echo.echo_highlight(' [OK]', color='success', bold=True)

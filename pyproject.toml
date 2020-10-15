@@ -1,3 +1,11 @@
 [build-system]
 requires = ['setuptools>=40.8.0', 'wheel', 'reentry~=1.3', 'fastentrypoints~=0.12']
 build-backend = 'setuptools.build_meta:__legacy__'
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.messages_control]
+disable = [
+    'import-outside-toplevel',
+]

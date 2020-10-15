@@ -17,14 +17,10 @@ repos:
         args: ['-i']
 
 -   repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.5.2
+    rev: pylint-2.6.0
     hooks:
     -   id: pylint
         language: system
-        args: [
-            '--max-line-length=120',
-            '--disable=import-outside-toplevel'
-        ]
 
 -   repo: https://github.com/PyCQA/pydocstyle
     rev: 5.0.2

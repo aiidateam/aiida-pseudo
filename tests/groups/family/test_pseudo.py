@@ -7,6 +7,7 @@ import os
 import pytest
 
 from aiida.common import exceptions
+from aiida.orm import QueryBuilder
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
@@ -15,6 +16,11 @@ from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
 def test_type_string():
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
     assert PseudoPotentialFamily._type_string == 'pseudo.family'  # pylint: disable=protected-access
+
+
+def test_pseudo_type():
+    """Test the `PseudoPotentialFamily.pseudo_type` method."""
+    assert PseudoPotentialFamily.pseudo_type is PseudoPotentialData
 
 
 @pytest.mark.filterwarnings('ignore:no registered entry point for')
@@ -71,6 +77,34 @@ def test_create_from_folder_nested(filepath_pseudos, tmpdir):
     assert family.is_stored
     assert family.label == label
     assert len(family.nodes) == len(os.listdir(filepath_pseudos()))
+
+
+@pytest.mark.usefixtures('clear_db')
+@pytest.mark.parametrize('deduplicate', (True, False))
+def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
+    """Test the `PseudoPotentialFamily.create_from_folder` class method."""
+    from aiida_pseudo.groups.family.upf import UpfFamily
+
+    # We create an existing `PseudoPotentialFamily` as well as a `UpfFamily` to test that the deduplication mechanism
+    # will only ever check for pseudo potentials of the exact same type and not allow subclasses
+    original = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'original_family')
+    UpfFamily.create_from_folder(filepath_pseudos(), 'upf_family')
+
+    family = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'duplicate_family', deduplicate=deduplicate)
+
+    assert isinstance(family, PseudoPotentialFamily)
+    assert family.is_stored
+
+    pseudo_count = len(os.listdir(filepath_pseudos()))
+    original_pseudos = {pseudo.pk for pseudo in original.pseudos.values()}
+    family_pseudos = {pseudo.pk for pseudo in family.pseudos.values()}
+
+    if deduplicate:
+        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_type, subclassing=False).count() == pseudo_count
+        assert not original_pseudos.difference(family_pseudos)
+    else:
+        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_type, subclassing=False).count() == pseudo_count * 2
+        assert not original_pseudos.intersection(family_pseudos)
 
 
 @pytest.mark.usefixtures('clear_db')

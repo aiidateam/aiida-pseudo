@@ -5,7 +5,7 @@ import re
 from typing import Union, List, Tuple, Mapping
 
 from aiida.common import exceptions
-from aiida.common.lang import type_check
+from aiida.common.lang import classproperty, type_check
 from aiida.orm import Group, QueryBuilder
 from aiida.plugins import DataFactory
 
@@ -42,6 +42,14 @@ class PseudoPotentialFamily(Group):
             raise RuntimeError(f'`{class_name}` is not a subclass of `PseudoPotentialData`.')
 
         super().__init__(*args, **kwargs)
+
+    @classproperty
+    def pseudo_type(cls):  # pylint: disable=no-self-argument
+        """Return the pseudo potential type that this family accepts.
+
+        :return: the subclass of ``PseudoPotentialData`` that this family hosts nodes of.
+        """
+        return cls._pseudo_type
 
     @classmethod
     def parse_pseudos_from_directory(cls, dirpath):
@@ -104,12 +112,14 @@ class PseudoPotentialFamily(Group):
         return pseudos
 
     @classmethod
-    def create_from_folder(cls, dirpath, label, description=''):
+    def create_from_folder(cls, dirpath, label, description='', deduplicate=True):
         """Create a new `PseudoPotentialFamily` from the pseudo potentials contained in a directory.
 
         :param dirpath: absolute path to the folder containing the UPF files.
         :param label: label to give to the `PseudoPotentialFamily`, should not already exist.
         :param description: description to give to the family.
+        :param deduplicate: if True, will scan database for existing pseudo potentials of same type and with the same
+            md5 checksum, and use that instead of the parsed one.
         :raises ValueError: if a `PseudoPotentialFamily` already exists with the given name.
         """
         type_check(description, str, allow_none=True)
@@ -121,12 +131,22 @@ class PseudoPotentialFamily(Group):
         else:
             raise ValueError(f'the {cls.__name__} `{label}` already exists')
 
-        pseudos = cls.parse_pseudos_from_directory(dirpath)
+        parsed_pseudos = cls.parse_pseudos_from_directory(dirpath)
+        family_pseudos = []
+
+        for pseudo in parsed_pseudos:
+            if deduplicate:
+                query = QueryBuilder()
+                query.append(cls.pseudo_type, subclassing=False, filters={'attributes.md5': pseudo.md5})
+                existing = query.first()
+                if existing:
+                    pseudo = existing[0]
+            family_pseudos.append(pseudo)
 
         # Only store the `Group` and the pseudo nodes now, such that we don't have to worry about the clean up in the
         # case that an exception is raised during creating them.
         family.store()
-        family.add_nodes([pseudo.store() for pseudo in pseudos])
+        family.add_nodes([pseudo.store() for pseudo in family_pseudos])
 
         return family
 
@@ -148,7 +168,7 @@ class PseudoPotentialFamily(Group):
             nodes = [nodes]
 
         if any([type(node) is not self._pseudo_type for node in nodes]):  # pylint: disable=unidiomatic-typecheck
-            raise TypeError(f'only nodes of type `{self._pseudo_type}` can be added')
+            raise TypeError(f'only nodes of type `{self._pseudo_type}` can be added: {nodes}')
 
         pseudos = {}
 

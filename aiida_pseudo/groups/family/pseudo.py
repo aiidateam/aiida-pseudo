@@ -228,7 +228,12 @@ class PseudoPotentialFamily(Group):
 
         return pseudo
 
-    def get_pseudos(self, elements: Union[List[str], Tuple[str], StructureData]) -> Mapping[str, StructureData]:
+    def get_pseudos(
+        self,
+        *,
+        elements: Union[List[str], Tuple[str]] = None,
+        structure: StructureData = None,
+    ) -> Mapping[str, StructureData]:
         """Return the mapping of kind names on pseudo potential data nodes for the given list of elements or structure.
 
         :param elements: list of element symbols.
@@ -236,10 +241,19 @@ class PseudoPotentialFamily(Group):
         :return: dictionary mapping the kind names of a structure on the corresponding pseudo potential data nodes.
         :raises ValueError: if the family does not contain a pseudo for any of the elements of the given structure.
         """
-        if not isinstance(elements, (list, tuple)) and not isinstance(elements, StructureData):
-            raise ValueError('elements should either be a list of symbols or a StructureData instance.')
+        if elements is not None and structure is not None:
+            raise ValueError('cannot specify both keyword arguments `elements` and `structure`.')
 
-        if isinstance(elements, StructureData):
-            elements = [kind.symbol for kind in elements.kinds]
+        if elements is None and structure is None:
+            raise ValueError('have to specify one of the keyword arguments `elements` and `structure`.')
+
+        if elements is not None and not isinstance(elements, (list, tuple)) and not isinstance(elements, StructureData):
+            raise ValueError('elements should be a list or tuple of symbols.')
+
+        if structure is not None and not isinstance(structure, StructureData):
+            raise ValueError('structure should be a `StructureData` instance.')
+
+        if structure is not None:
+            elements = [kind.symbol for kind in structure.kinds]
 
         return {element: self.get_pseudo(element) for element in elements}

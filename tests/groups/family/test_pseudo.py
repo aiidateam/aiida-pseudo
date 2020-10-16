@@ -312,19 +312,29 @@ def test_get_pseudo(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_pseudos_raise(get_pseudo_family):
+def test_get_pseudos_raise(get_pseudo_family, generate_structure):
     """Test the `PseudoPotentialFamily.get_pseudos` method when it is supposed to raise."""
     elements = ('Ar', 'He', 'Ne')
+    structure = generate_structure(elements)
     family = get_pseudo_family(elements=elements[:2])  # Create family with only subset of the elements
 
-    with pytest.raises(TypeError, match='missing 1 required positional argument:.*'):
+    with pytest.raises(ValueError, match='have to specify one of the keyword arguments `elements` and `structure`.'):
         family.get_pseudos()
 
-    with pytest.raises(ValueError, match='elements should either be a list of symbols or a StructureData instance.'):
+    with pytest.raises(ValueError, match='cannot specify both keyword arguments `elements` and `structure`.'):
+        family.get_pseudos(elements=elements, structure=structure)
+
+    with pytest.raises(ValueError, match='elements should be a list or tuple of symbols.'):
         family.get_pseudos(elements={'He', 'Ar'})
+
+    with pytest.raises(ValueError, match='structure should be a `StructureData` instance.'):
+        family.get_pseudos(structure={'He', 'Ar'})
 
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
         family.get_pseudos(elements=elements)
+
+    with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
+        family.get_pseudos(structure=structure)
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -333,7 +343,7 @@ def test_get_pseudos_list(get_pseudo_family):
     elements = ('Ar', 'He', 'Ne')
     family = get_pseudo_family(elements=elements)
 
-    pseudos = family.get_pseudos(elements)
+    pseudos = family.get_pseudos(elements=elements)
     assert isinstance(pseudos, dict)
     for element in elements:
         assert isinstance(pseudos[element], PseudoPotentialData)
@@ -346,7 +356,7 @@ def test_get_pseudos_structure(get_pseudo_family, generate_structure):
     structure = generate_structure(elements)
     family = get_pseudo_family(elements=elements)
 
-    pseudos = family.get_pseudos(structure)
+    pseudos = family.get_pseudos(structure=structure)
     assert isinstance(pseudos, dict)
     for element in elements:
         assert isinstance(pseudos[element], PseudoPotentialData)

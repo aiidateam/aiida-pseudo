@@ -49,7 +49,7 @@ class PseudoPotentialData(SingleFileData):
         stream.seek(0)
         self.md5 = md5_from_filelike(stream)
 
-    def store(self):
+    def store(self, **kwargs):
         """Store the node verifying first that all required attributes are set.
 
         :raises :py:exc:`~aiida.common.StoringNotAllowed`: if no valid element has been defined.
@@ -64,7 +64,7 @@ class PseudoPotentialData(SingleFileData):
         except ValueError as exception:
             raise StoringNotAllowed(exception) from exception
 
-        return super().store()
+        return super().store(**kwargs)
 
     @property
     def element(self) -> typing.Union[str, None]:

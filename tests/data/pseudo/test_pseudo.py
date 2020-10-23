@@ -6,6 +6,8 @@ import pytest
 
 from aiida.common.files import md5_from_filelike
 from aiida.common.exceptions import ModificationNotAllowed, StoringNotAllowed
+from aiida.common.links import LinkType
+from aiida.orm import CalcJobNode
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 
@@ -90,3 +92,14 @@ def test_md5():
 
     with pytest.raises(ModificationNotAllowed, match='the attributes of a stored entity are immutable'):
         pseudo.md5 = md5
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_store_indirect():
+    """Test the `PseudoPotentialData.store` method when called indirectly because its is an input."""
+    pseudo = PseudoPotentialData(io.BytesIO(b'pseudo'))
+    pseudo.element = 'Ar'
+
+    node = CalcJobNode()
+    node.add_incoming(pseudo, link_type=LinkType.INPUT_CALC, link_label='pseudo')
+    node.store_all()

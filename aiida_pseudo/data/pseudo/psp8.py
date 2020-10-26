@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Module for data plugin to represent a pseudo potential in UPF format."""
-import re
 from typing import BinaryIO
 
 from .pseudo import PseudoPotentialData
 
 __all__ = ('Psp8Data',)
+
 
 def parse_element(stream: BinaryIO):
     """Parse the content of the UPF file to determine the element.

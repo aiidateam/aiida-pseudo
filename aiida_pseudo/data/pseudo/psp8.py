@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for data plugin to represent a pseudo potential in UPF format."""
+"""Module for data plugin to represent a pseudo potential in Psp8 format."""
 from typing import BinaryIO
 
 from .pseudo import PseudoPotentialData
@@ -8,7 +8,7 @@ __all__ = ('Psp8Data',)
 
 
 def parse_element(stream: BinaryIO):
-    """Parse the content of the UPF file to determine the element.
+    """Parse the content of the Psp8 file to determine the element.
 
     :param stream: a filelike object with the binary content of the file.
     :return: the symbol of the element following the IUPAC naming standard.

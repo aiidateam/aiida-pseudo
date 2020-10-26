@@ -6,8 +6,7 @@ from .pseudo import PseudoPotentialFamily
 
 __all__ = ('Psp8Family',)
 
-PsfData = DataFactory('pseudo.psp8')  # pylint: disable=invalid-name
-
+Psp8Data = DataFactory('pseudo.psp8')  # pylint: disable=invalid-name
 
 class Psp8Family(PseudoPotentialFamily):
     """Group to represent a pseudo potential family with pseudos in Psp8 format."""

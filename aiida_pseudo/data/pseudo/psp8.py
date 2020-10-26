@@ -14,8 +14,8 @@ def parse_element(stream: BinaryIO):
     :return: the symbol of the element following the IUPAC naming standard.
     """
     lines = stream.read().decode('utf-8')
-    
-    match = lines.split()[0]
+
+    return lines.split()[0].strip()
 
 
 class Psp8Data(PseudoPotentialData):

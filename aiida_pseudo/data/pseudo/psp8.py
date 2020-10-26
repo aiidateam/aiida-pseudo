@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module for data plugin to represent a pseudo potential in Psp8 format."""
 from typing import BinaryIO
+from aiida.common.constants import elements
 
 from .pseudo import PseudoPotentialData
 
@@ -15,7 +16,23 @@ def parse_element(stream: BinaryIO):
     """
     lines = stream.read().decode('utf-8')
 
-    return lines.split()[0].strip()
+    # Split the line at each new line character \n
+    lines_splt = lines.splitlines()
+
+    # Split the second line on white space
+    lines_splt_space = lines_splt[1].split()
+
+    try:
+        atomic_number = int(float(lines_splt_space[0]))
+    except (IndexError, ValueError) as val_err:
+        raise ValueError('failed to parse the atomic number.') from val_err
+
+    try:
+        symbol = elements[atomic_number]['symbol']
+    except KeyError as key_err:
+        raise ValueError('the atomic number {atomic_number} is not supported.') from key_err
+
+    return symbol
 
 
 class Psp8Data(PseudoPotentialData):

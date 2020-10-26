@@ -21,12 +21,14 @@
             "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData",
             "pseudo.psf = aiida_pseudo.data.pseudo.psf:PsfData",
             "pseudo.psml = aiida_pseudo.data.pseudo.psml:PsmlData",
+            "pseudo.psp8 = aiida_pseudo.data.pseudo.psp8:Psp8Data",
             "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData"
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
             "pseudo.family.psf = aiida_pseudo.groups.family.psf:PsfFamily",
             "pseudo.family.psml = aiida_pseudo.groups.family.psml:PsmlFamily",
+            "pseudo.family.psp8 = aiida_pseudo.groups.family.psp8:Psp8Family",
             "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily",
             "pseudo.family.upf = aiida_pseudo.groups.family.upf:UpfFamily"
         ]

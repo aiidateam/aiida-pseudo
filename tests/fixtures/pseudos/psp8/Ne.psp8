@@ -1,0 +1,7 @@
+Ne    ONCVPSP-3.3.0  r_core=   1.31204   1.70576
+10.0000      8.0000      180423    zatom,zion,pspd
+8      11   1     4   400     0    pspcod,pspxc,lmax,lloc,mmax,r2well
+3.99000000  0.00000000  0.00000000    rchrg fchrg qchrg
+2     2     0     0    nproj
+3     1           extension_switch
+2     0     0    nprojso

@@ -16,7 +16,7 @@ VERSION = OverridableOption(
     '--version',
     type=click.STRING,
     required=False,
-    help='Select the version of the SSSP/PseudoDojo configuration.'
+    help='Select the version of the SSSP or PseudoDojo configuration.'
 )
 
 FUNCTIONAL = OverridableOption(
@@ -24,7 +24,7 @@ FUNCTIONAL = OverridableOption(
     '--functional',
     type=click.STRING,
     required=False,
-    help='Select the functional of the SSSP/PseudoDojo configuration.'
+    help='Select the functional of the SSSP or PseudoDojo configuration.'
 )
 
 REL = OverridableOption(
@@ -40,7 +40,7 @@ PROTOCOL = OverridableOption(
     '--protocol',
     type=click.STRING,
     required=False,
-    help='Select the protocol of the SSSP/PseudoDojo configuration.'
+    help='Select the protocol of the SSSP or PseudoDojo configuration.'
 )
 
 HINT = OverridableOption(

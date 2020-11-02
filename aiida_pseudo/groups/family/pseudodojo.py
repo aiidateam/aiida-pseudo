@@ -3,8 +3,6 @@
 from collections import namedtuple
 from typing import Sequence
 
-from aiida_pseudo.data.pseudo import PseudoPotentialData
-
 from .pseudo import PseudoPotentialFamily
 from .psml import PsmlFamily
 from .psp8 import Psp8Family
@@ -22,8 +20,9 @@ PseudoDojoConfiguration = namedtuple(
 class PseudoDojoFamily(PseudoPotentialFamily):
     """Subclass of `PseudoPotentialFamily` designed to represent an PseudoDojo configuration.
 
-    The `PseudoDojoFamily` is essentially a `PseudoPotentialFamily` with some additional constraints. It can only be used to contain the
-    pseudo potentials and corresponding metadata of an official PseudoDojo configuration.
+    The `PseudoDojoFamily` is essentially a `PseudoPotentialFamily` with some additional constraints.
+    It can only be used to contain the pseudo potentials and corresponding metadata of an official
+    PseudoDojo configuration.
     """
 
     label_template = 'PseudoDojo/{version}/{functional}/{rel}/{protocol}/{hint}/{format}'
@@ -60,8 +59,9 @@ class PseudoDojoFamily(PseudoPotentialFamily):
 class PseudoDojoPsp8Family(PseudoDojoFamily, Psp8Family):
     """Subclass of `PseudoDojoFamily` and `Psp8Family` designed to represent a psp8 PseudoDojo configuration.
 
-    The `PseudoDojoPsp8Family` is essentially a `PseudoDojoFamily` with some additional constraints. It can only be used to contain the
-    pseudo potentials and corresponding metadata of an official psp8 PseudoDojo configuration.
+    The `PseudoDojoPsp8Family` is essentially a `PseudoDojoFamily` with some additional constraints.
+    It can only be used to contain the pseudo potentials and corresponding metadata of an official psp8
+    PseudoDojo configuration.
     """
 
     default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psp8')
@@ -119,8 +119,9 @@ class PseudoDojoPsp8Family(PseudoDojoFamily, Psp8Family):
 class PseudoDojoUpfFamily(PseudoDojoFamily, UpfFamily):
     """Subclass of `PseudoDojoFamily` and `UpfFamily` designed to represent a upf PseudoDojo configuration.
 
-    The `PseudoDojoUpfFamily` is essentially a `PseudoDojoFamily` with some additional constraints. It can only be used to contain the
-    pseudo potentials and corresponding metadata of an official upf PseudoDojo configuration.
+    The `PseudoDojoUpfFamily` is essentially a `PseudoDojoFamily` with some additional constraints.
+    It can only be used to contain the pseudo potentials and corresponding metadata of an official upf
+    PseudoDojo configuration.
     """
 
     default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'upf')
@@ -178,8 +179,9 @@ class PseudoDojoUpfFamily(PseudoDojoFamily, UpfFamily):
 class PseudoDojoPsmlFamily(PseudoDojoFamily, PsmlFamily):
     """Subclass of `PseudoDojoFamily` and `PsmlFamily` designed to represent a psml PseudoDojo configuration.
 
-    The `PseudoDojoPsmlFamily` is essentially a `PseudoDojoFamily` with some additional constraints. It can only be used to contain the
-    pseudo potentials and corresponding metadata of an official psml PseudoDojo configuration.
+    The `PseudoDojoPsmlFamily` is essentially a `PseudoDojoFamily` with some additional constraints.
+    It can only be used to contain the pseudo potentials and corresponding metadata of an official psml
+    PseudoDojo configuration.
     """
 
     default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psml')

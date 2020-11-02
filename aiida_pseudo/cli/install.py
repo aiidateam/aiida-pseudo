@@ -157,7 +157,7 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
     `PseudoDojoFamily` subclass based on the correct pseudopotential format.
     """
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-arguments,too-many-statements
     import requests
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
@@ -181,18 +181,19 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
 
     configuration = PseudoDojoConfiguration(version, functional, rel, protocol, hint, pseudo_format)
     label = PseudoDojoFamily.format_configuration_label(configuration)
-    description = f'PseudoDojo v{version} {functional} {rel} {protocol} {hint} {pseudo_format} installed with aiida-pseudo v{__version__}'
+    description = f'PseudoDojo v{version} {functional} {rel} {protocol} {hint} {pseudo_format} \
+        installed with aiida-pseudo v{__version__}'
 
     if pseudo_format not in pseudo_format_families:
         echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format')
     else:
-        PseudoDojoFormatFamily = pseudo_format_families[pseudo_format]
+        pseudo_dojo_format_family = pseudo_format_families[pseudo_format]
 
-    if configuration not in PseudoDojoFormatFamily.valid_configurations:
+    if configuration not in pseudo_dojo_format_family.valid_configurations:
         echo.echo_critical(f'{version} {functional} {protocol} is not a valid PseudoDojo configuration')
 
-    if QueryBuilder().append(PseudoDojoFormatFamily, filters={'label': label}).first():
-        echo.echo_critical(f'{PseudoDojoFormatFamily.__name__}<{label}> is already installed')
+    if QueryBuilder().append(pseudo_dojo_format_family, filters={'label': label}).first():
+        echo.echo_critical(f'{pseudo_dojo_format_family.__name__}<{label}> is already installed')
 
     with tempfile.TemporaryDirectory() as dirpath:
 
@@ -211,7 +212,7 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
                 description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
-            family = create_family_from_archive(PseudoDojoFormatFamily, label, filepath_archive)
+            family = create_family_from_archive(pseudo_dojo_format_family, label, filepath_archive)
 
         family.description = description
 

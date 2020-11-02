@@ -7,18 +7,30 @@ import click
 from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
-__all__ = ('VERSION', 'FUNCTIONAL', 'PROTOCOL', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT')
+__all__ = ('VERSION', 'FUNCTIONAL', 'REL', 'PROTOCOL', 'HINT', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT')
 
 VERSION = OverridableOption(
-    '-v', '--version', type=click.STRING, required=False, help='Select the version of the SSSP configuration.'
+    '-v', '--version', type=click.STRING, required=False, help='Select the version of the SSSP/PseudoDojo configuration.'
 )
 
 FUNCTIONAL = OverridableOption(
-    '-f', '--functional', type=click.STRING, required=False, help='Select the functional of the SSSP configuration.'
+    '-x', '--functional', type=click.STRING, required=False, help='Select the functional of the SSSP/PseudoDojo configuration.'
+)
+
+REL = OverridableOption(
+    '-r', '--rel', type=click.STRING, required=False, help='Select the type of relativistic effects included in the PseudoDojo configuration.'
 )
 
 PROTOCOL = OverridableOption(
-    '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the SSSP configuration.'
+    '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the SSSP/PseudoDojo configuration.'
+)
+
+HINT = OverridableOption(
+    '-c', '--hint', type=click.STRING, required=False, help='Select the stringency of energy cutoff hints of the PseudoDojo configuration.'
+)
+
+PSEUDO_FORMAT = OverridableOption(
+    '-f', '--pseudo-format', type=click.STRING, required=True, help='Select the pseudopotential file format of the PseudoDojo configuration.'
 )
 
 TRACEBACK = OverridableOption(

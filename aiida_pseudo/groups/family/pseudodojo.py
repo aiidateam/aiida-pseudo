@@ -122,6 +122,7 @@ class PseudoDojoUpfFamily(PseudoDojoFamily, UpfFamily):
     The `PseudoDojoUpfFamily` is essentially a `PseudoDojoFamily` with some additional constraints. It can only be used to contain the
     pseudo potentials and corresponding metadata of an official upf PseudoDojo configuration.
     """
+
     default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'upf')
     valid_configurations = (
         # nc-sr-03_pbe
@@ -180,6 +181,7 @@ class PseudoDojoPsmlFamily(PseudoDojoFamily, PsmlFamily):
     The `PseudoDojoPsmlFamily` is essentially a `PseudoDojoFamily` with some additional constraints. It can only be used to contain the
     pseudo potentials and corresponding metadata of an official psml PseudoDojo configuration.
     """
+
     default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psml')
     valid_configurations = (
         # nc-sr-04_pbe_standard

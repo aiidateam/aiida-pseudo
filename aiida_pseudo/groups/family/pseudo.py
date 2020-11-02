@@ -150,7 +150,7 @@ class PseudoPotentialFamily(Group):
         family.add_nodes([pseudo.store() for pseudo in family_pseudos])
 
         return family
-    
+
     @classmethod
     def validate_cutoffs(cls, elements: set, cutoffs: dict) -> None:
         """Validate a cutoff dictionary for a given set of elements.

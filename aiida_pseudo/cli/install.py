@@ -162,11 +162,9 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
     from aiida_pseudo import __version__
-    from aiida_pseudo.groups.family import (PseudoDojoConfiguration,
-                                            PseudoDojoFamily,
-                                            PseudoDojoPsmlFamily,
-                                            PseudoDojoPsp8Family,
-                                            PseudoDojoUpfFamily)
+    from aiida_pseudo.groups.family import (
+        PseudoDojoConfiguration, PseudoDojoFamily, PseudoDojoPsmlFamily, PseudoDojoPsp8Family, PseudoDojoUpfFamily
+    )
 
     from .utils import attempt, create_family_from_archive
 
@@ -241,7 +239,10 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
                     echo.echo_critical(msg)
 
                 # All supported PseudoDojo potentials are NC, so we take dual as 8.0
-                cutoffs[element] = {'cutoff_wfc': values['hints'][hint]['ecut'], 'cutoff_rho': values['hints'][hint]['ecut'] * 8.0}
+                cutoffs[element] = {
+                    'cutoff_wfc': values['hints'][hint]['ecut'],
+                    'cutoff_rho': values['hints'][hint]['ecut'] * 8.0
+                }
 
             family.set_cutoffs(cutoffs)
 

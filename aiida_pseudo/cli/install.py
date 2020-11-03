@@ -142,20 +142,20 @@ def cmd_install_sssp(version, functional, protocol, traceback):
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
 
 
-@cmd_install.command('pseudodojo')
+@cmd_install.command('pseudo-dojo')
 @options.VERSION(type=click.Choice(['03', '04']), default='04')
 @options.FUNCTIONAL(type=click.Choice(['pbe', 'pbesol', 'lda']), default='pbe')
-@options.REL(type=click.Choice(['sr', 'sr3plus', 'fr']), default='sr')
+@options.RELATIVISTIC(type=click.Choice(['sr', 'sr3plus', 'fr']), default='sr')
 @options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard')
 @options.HINT(type=click.Choice(['low', 'normal', 'high', 'none']), default='none')
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml']), default='psp8')
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_format, traceback):
-    """Install an PseudoDojo configuration.
+def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, pseudo_format, traceback):
+    """Install a PseudoDojo configuration.
 
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
-    `PseudoDojoFamily` subclass based on the correct pseudopotential format.
+    `PseudoDojoFamily` subclass instance based on the correct pseudopotential format.
     """
     # pylint: disable=too-many-locals,too-many-arguments,too-many-statements
     import requests
@@ -179,9 +179,9 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
         # 'nc-fr-04_pbe_stringent': 'ONCVPSP-PBE-FR-PDv0.4/stringent.djson'  # missing elements
     }
 
-    configuration = PseudoDojoConfiguration(version, functional, rel, protocol, hint, pseudo_format)
+    configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, hint, pseudo_format)
     label = PseudoDojoFamily.format_configuration_label(configuration)
-    description = f'PseudoDojo v{version} {functional} {rel} {protocol} {hint} {pseudo_format} \
+    description = f'PseudoDojo v{version} {functional} {relativistic} {protocol} {hint} {pseudo_format} \
         installed with aiida-pseudo v{__version__}'
 
     if pseudo_format not in pseudo_format_families:
@@ -197,10 +197,10 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        if rel == 'sr3plus':
+        if relativistic == 'sr3plus':
             url_archive = f'{URL_PSEUDODOJO_BASE}/nc-sr-{version}-3plus_{functional}_{protocol}_{pseudo_format}.tgz'
         else:
-            url_archive = f'{URL_PSEUDODOJO_BASE}/nc-{rel}-{version}_{functional}_{protocol}_{pseudo_format}.tgz'
+            url_archive = f'{URL_PSEUDODOJO_BASE}/nc-{relativistic}-{version}_{functional}_{protocol}_{pseudo_format}.tgz'
         filepath_archive = os.path.join(dirpath, 'archive.tgz')
 
         with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
@@ -217,7 +217,7 @@ def cmd_install_pseudodojo(version, functional, rel, protocol, hint, pseudo_form
         family.description = description
 
         if hint != 'none':
-            label_metadata = f'nc-{rel}-{version}_{functional}_{protocol}'
+            label_metadata = f'nc-{relativistic}-{version}_{functional}_{protocol}'
             url_metadata = f'{URL_PSEUDODOJO_METADATA_BASE}/{metadata_urls[label_metadata]}'
             filepath_metadata = os.path.join(dirpath, 'metadata.json')
 

@@ -8,7 +8,8 @@ from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
 __all__ = (
-    'VERSION', 'FUNCTIONAL', 'REL', 'PROTOCOL', 'HINT', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT'
+    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'HINT', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE',
+    'ARCHIVE_FORMAT'
 )
 
 VERSION = OverridableOption(
@@ -27,9 +28,9 @@ FUNCTIONAL = OverridableOption(
     help='Select the functional of the SSSP or PseudoDojo configuration.'
 )
 
-REL = OverridableOption(
+RELATIVISTIC = OverridableOption(
     '-r',
-    '--rel',
+    '--relativistic',
     type=click.STRING,
     required=False,
     help='Select the type of relativistic effects included in the PseudoDojo configuration.'

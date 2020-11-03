@@ -13,7 +13,7 @@ __all__ = (
 )
 
 PseudoDojoConfiguration = namedtuple(
-    'PseudoDojoConfiguration', ['version', 'functional', 'rel', 'protocol', 'hint', 'format']
+    'PseudoDojoConfiguration', ['version', 'functional', 'relativistic', 'protocol', 'hint', 'format']
 )
 
 
@@ -25,7 +25,7 @@ class PseudoDojoFamily(PseudoPotentialFamily):
     PseudoDojo configuration.
     """
 
-    label_template = 'PseudoDojo/{version}/{functional}/{rel}/{protocol}/{hint}/{format}'
+    label_template = 'PseudoDojo/{version}/{functional}/{relativistic}/{protocol}/{hint}/{format}'
 
     @classmethod
     def get_valid_labels(cls) -> Sequence[str]:
@@ -42,7 +42,7 @@ class PseudoDojoFamily(PseudoPotentialFamily):
         return cls.label_template.format(
             version=configuration.version,
             functional=configuration.functional,
-            rel=configuration.rel,
+            relativistic=configuration.relativistic,
             protocol=configuration.protocol,
             hint=configuration.hint,
             format=configuration.format

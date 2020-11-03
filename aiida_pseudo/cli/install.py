@@ -31,7 +31,7 @@ def cmd_install():
 @options.FAMILY_TYPE()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_family(archive, label, description, archive_format, family_type, traceback):  # pylint: disable=too-many-arguments
+def cmd_install_family(archive, label, description, archive_format, family_type, traceback):
     """Install a standard pseudo potential family from an ARCHIVE on the local file system or from a URL.
 
     The command will attempt to infer the archive format from the filename extension of the ARCHIVE. If this fails, the
@@ -42,6 +42,7 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
     type option. If the base type is used, the pseudo potential files in the archive *have* to have filenames that
     strictly follow the format `ELEMENT.EXTENSION`, because otherwise the element cannot be determined automatically.
     """
+    # pylint: disable=too-many-arguments
     from .utils import attempt, create_family_from_archive
 
     # The `archive` is now either a `http.client.HTTPResponse` or a normal filelike object, so we get the original file
@@ -147,7 +148,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 @options.FUNCTIONAL(type=click.Choice(['pbe', 'pbesol', 'lda']), default='pbe')
 @options.RELATIVISTIC(type=click.Choice(['sr', 'sr3plus', 'fr']), default='sr')
 @options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard')
-@options.HINT(type=click.Choice(['low', 'normal', 'high', 'none']), default='none')
+@options.HINT(type=click.Choice(['low', 'normal', 'high', None]), default=None)
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml']), default='psp8')
 @options.TRACEBACK()
 @decorators.with_dbenv()
@@ -181,8 +182,8 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
 
     configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, hint, pseudo_format)
     label = PseudoDojoFamily.format_configuration_label(configuration)
-    description = f'PseudoDojo v{version} {functional} {relativistic} {protocol} {hint} {pseudo_format} \
-        installed with aiida-pseudo v{__version__}'
+    description = f'PseudoDojo v{version} {functional} {relativistic} {protocol} {hint} {pseudo_format} ' + \
+        f'installed with aiida-pseudo v{__version__}'
 
     if pseudo_format not in pseudo_format_families:
         echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format')
@@ -200,7 +201,9 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
         if relativistic == 'sr3plus':
             url_archive = f'{URL_PSEUDODOJO_BASE}/nc-sr-{version}-3plus_{functional}_{protocol}_{pseudo_format}.tgz'
         else:
-            url_archive = f'{URL_PSEUDODOJO_BASE}/nc-{relativistic}-{version}_{functional}_{protocol}_{pseudo_format}.tgz'
+            url_archive = f'{URL_PSEUDODOJO_BASE}/nc-{relativistic}-{version}_{functional}_{protocol}_' + \
+                f'{pseudo_format}.tgz'
+
         filepath_archive = os.path.join(dirpath, 'archive.tgz')
 
         with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
@@ -216,7 +219,7 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
 
         family.description = description
 
-        if hint != 'none':
+        if hint is not None:
             label_metadata = f'nc-{relativistic}-{version}_{functional}_{protocol}'
             url_metadata = f'{URL_PSEUDODOJO_METADATA_BASE}/{metadata_urls[label_metadata]}'
             filepath_metadata = os.path.join(dirpath, 'metadata.json')

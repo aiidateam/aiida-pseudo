@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Subclass of `PseudoPotentialFamily` designed to represent an PseudoDojo configuration."""
+"""Subclass of `PseudoPotentialCutoffFamily` designed to represent an PseudoDojo configuration."""
 from collections import namedtuple
 from typing import Sequence
 
-from .pseudo import PseudoPotentialFamily
+from .pseudo_cutoff import PseudoPotentialCutoffFamily
 from .psml import PsmlFamily
 from .psp8 import Psp8Family
 from .upf import UpfFamily
@@ -17,10 +17,10 @@ PseudoDojoConfiguration = namedtuple(
 )
 
 
-class PseudoDojoFamily(PseudoPotentialFamily):
-    """Subclass of `PseudoPotentialFamily` designed to represent an PseudoDojo configuration.
+class PseudoDojoFamily(PseudoPotentialCutoffFamily):
+    """Subclass of `PseudoPotentialCutoffFamily` designed to represent an PseudoDojo configuration.
 
-    The `PseudoDojoFamily` is essentially a `PseudoPotentialFamily` with some additional constraints.
+    The `PseudoDojoFamily` is essentially a `PseudoPotentialCutoffFamily` with some additional constraints.
     It can only be used to contain the pseudo potentials and corresponding metadata of an official
     PseudoDojo configuration.
     """

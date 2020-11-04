@@ -3,6 +3,7 @@
 from collections import namedtuple
 from typing import Sequence
 
+from .pseudo_cutoff import PseudoPotentialCutoffFamily
 from .upf import UpfFamily
 
 __all__ = ('SsspConfiguration', 'SsspFamily')
@@ -10,8 +11,8 @@ __all__ = ('SsspConfiguration', 'SsspFamily')
 SsspConfiguration = namedtuple('SsspConfiguration', ['version', 'functional', 'protocol'])
 
 
-class SsspFamily(UpfFamily):
-    """Subclass of `UpfFamily` designed to represent an SSSP configuration.
+class SsspFamily(PseudoPotentialCutoffFamily, UpfFamily):
+    """Subclass of `PseudoPotentialCutoffFamily` and `UpfFamily` designed to represent an SSSP configuration.
 
     The `SsspFamily` is essentially a `UpfFamily` with some additional constraints. It can only be used to contain the
     pseudo potentials and corresponding metadata of an official SSSP configuration.

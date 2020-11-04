@@ -8,16 +8,12 @@ from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
 __all__ = (
-    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'HINT', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE',
-    'ARCHIVE_FORMAT'
+    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'CUTOFF_STRINGENCY', 'PSEUDO_FORMAT', 'TRACEBACK',
+    'FAMILY_TYPE', 'ARCHIVE_FORMAT'
 )
 
 VERSION = OverridableOption(
-    '-v',
-    '--version',
-    type=click.STRING,
-    required=False,
-    help='Select the version of the SSSP or PseudoDojo configuration.'
+    '-v', '--version', type=click.STRING, required=False, help='Select the version of the installed configuration.'
 )
 
 FUNCTIONAL = OverridableOption(
@@ -25,7 +21,7 @@ FUNCTIONAL = OverridableOption(
     '--functional',
     type=click.STRING,
     required=False,
-    help='Select the functional of the SSSP or PseudoDojo configuration.'
+    help='Select the functional of the installed configuration.'
 )
 
 RELATIVISTIC = OverridableOption(
@@ -33,23 +29,19 @@ RELATIVISTIC = OverridableOption(
     '--relativistic',
     type=click.STRING,
     required=False,
-    help='Select the type of relativistic effects included in the PseudoDojo configuration.'
+    help='Select the type of relativistic effects included in the installed configuration.'
 )
 
 PROTOCOL = OverridableOption(
-    '-p',
-    '--protocol',
-    type=click.STRING,
-    required=False,
-    help='Select the protocol of the SSSP or PseudoDojo configuration.'
+    '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the installed configuration.'
 )
 
-HINT = OverridableOption(
+CUTOFF_STRINGENCY = OverridableOption(
     '-c',
-    '--hint',
+    '--cutoff-stringency',
     type=click.STRING,
     required=False,
-    help='Select the stringency of energy cutoff hints of the PseudoDojo configuration.'
+    help='Select the stringency of energy cutoff hints of the installed configuration.'
 )
 
 PSEUDO_FORMAT = OverridableOption(
@@ -57,7 +49,7 @@ PSEUDO_FORMAT = OverridableOption(
     '--pseudo-format',
     type=click.STRING,
     required=True,
-    help='Select the pseudopotential file format of the PseudoDojo configuration.'
+    help='Select the pseudopotential file format of the installed configuration.'
 )
 
 TRACEBACK = OverridableOption(

@@ -148,11 +148,11 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 @options.FUNCTIONAL(type=click.Choice(['pbe', 'pbesol', 'lda']), default='pbe')
 @options.RELATIVISTIC(type=click.Choice(['sr', 'sr3plus', 'fr']), default='sr')
 @options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard')
-@options.HINT(type=click.Choice(['low', 'normal', 'high', None]), default=None)
+@options.CUTOFF_STRINGENCY(type=click.Choice(['low', 'normal', 'high', 'none']), default=None)
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml']), default='psp8')
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, pseudo_format, traceback):
+def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, cutoff_stringency, pseudo_format, traceback):
     """Install a PseudoDojo configuration.
 
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
@@ -180,10 +180,15 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
         # 'nc-fr-04_pbe_stringent': 'ONCVPSP-PBE-FR-PDv0.4/stringent.djson'  # missing elements
     }
 
-    configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, hint, pseudo_format)
+    if cutoff_stringency == 'none':
+        cutoff_stringency = None
+
+    configuration = PseudoDojoConfiguration(
+        version, functional, relativistic, protocol, cutoff_stringency, pseudo_format
+    )
     label = PseudoDojoFamily.format_configuration_label(configuration)
-    description = f'PseudoDojo v{version} {functional} {relativistic} {protocol} {hint} {pseudo_format} ' + \
-        f'installed with aiida-pseudo v{__version__}'
+    description = f'PseudoDojo v{version} {functional} {relativistic} {protocol} {cutoff_stringency} ' + \
+        f'{pseudo_format} installed with aiida-pseudo v{__version__}'
 
     if pseudo_format not in pseudo_format_families:
         echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format')
@@ -219,7 +224,7 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
 
         family.description = description
 
-        if hint is not None:
+        if cutoff_stringency is not None:
             label_metadata = f'nc-{relativistic}-{version}_{functional}_{protocol}'
             url_metadata = f'{URL_PSEUDODOJO_METADATA_BASE}/{metadata_urls[label_metadata]}'
             filepath_metadata = os.path.join(dirpath, 'metadata.json')
@@ -244,8 +249,8 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, hint, p
 
                 # All supported PseudoDojo potentials are NC, so we take dual as 8.0
                 cutoffs[element] = {
-                    'cutoff_wfc': values['hints'][hint]['ecut'],
-                    'cutoff_rho': values['hints'][hint]['ecut'] * 8.0
+                    'cutoff_wfc': values['hints'][cutoff_stringency]['ecut'],
+                    'cutoff_rho': values['hints'][cutoff_stringency]['ecut'] * 8.0
                 }
 
             family.set_cutoffs(cutoffs)

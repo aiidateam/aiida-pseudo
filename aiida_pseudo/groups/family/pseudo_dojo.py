@@ -13,7 +13,7 @@ __all__ = (
 )
 
 PseudoDojoConfiguration = namedtuple(
-    'PseudoDojoConfiguration', ['version', 'functional', 'relativistic', 'protocol', 'hint', 'format']
+    'PseudoDojoConfiguration', ['version', 'functional', 'relativistic', 'protocol', 'format']
 )
 
 
@@ -25,7 +25,7 @@ class PseudoDojoFamily(PseudoPotentialCutoffFamily):
     PseudoDojo configuration.
     """
 
-    label_template = 'PseudoDojo/{version}/{functional}/{relativistic}/{protocol}/{hint}/{format}'
+    label_template = 'PseudoDojo/{version}/{functional}/{relativistic}/{protocol}/{format}'
 
     @classmethod
     def get_valid_labels(cls) -> Sequence[str]:
@@ -44,7 +44,6 @@ class PseudoDojoFamily(PseudoPotentialCutoffFamily):
             functional=configuration.functional,
             relativistic=configuration.relativistic,
             protocol=configuration.protocol,
-            hint=configuration.hint,
             format=configuration.format
         )
 
@@ -64,55 +63,34 @@ class PseudoDojoPsp8Family(PseudoDojoFamily, Psp8Family):
     PseudoDojo configuration.
     """
 
-    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psp8')
+    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'psp8')
     valid_configurations = (
         # nc-sr-03_pbe
-        PseudoDojoConfiguration('03', 'pbe', 'sr', 'standard', None, 'psp8'),
-        PseudoDojoConfiguration('03', 'pbe', 'sr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('03', 'pbe', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('03', 'pbe', 'sr', 'stringent', 'psp8'),
         # nc-sr-03_pbesol
-        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'standard', None, 'psp8'),
-        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'stringent', 'psp8'),
         # nc-sr-03_lda
-        PseudoDojoConfiguration('03', 'lda', 'sr', 'standard', None, 'psp8'),
-        PseudoDojoConfiguration('03', 'lda', 'sr', 'stringent', None, 'psp8'),
-        # nc-sr-04_pbe_standard
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'low', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', None, 'psp8'),
-        # nc-sr-04_pbe_stringent
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'low', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'normal', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', None, 'psp8'),
-        # nc-sr-04_pbesol_standard
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'low', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'normal', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', None, 'psp8'),
-        # nc-sr-04_pbesol_stringent
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'low', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'normal', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('03', 'lda', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('03', 'lda', 'sr', 'stringent', 'psp8'),
+        # nc-sr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'psp8'),
+        # nc-sr-04_pbesol
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'psp8'),
         # nc-sr-04_lda
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', None, 'psp8'),
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', 'psp8'),
         # nc-sr-04-3plus_pbe
-        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', None, 'psp8'),
-        # nc-fr-04_pbe_standard
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'low', 'psp8'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'normal', 'psp8'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', None, 'psp8'),
-        # nc-fr-04_pbe_stringent
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'low', 'psp8'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'normal', 'psp8'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'high', 'psp8'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', 'psp8'),
+        # nc-fr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'psp8'),
         # nc-fr-04_pbesol
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', None, 'psp8'),
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', None, 'psp8'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', 'psp8'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', 'psp8'),
     )
 
 
@@ -124,55 +102,34 @@ class PseudoDojoUpfFamily(PseudoDojoFamily, UpfFamily):
     PseudoDojo configuration.
     """
 
-    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'upf')
+    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'upf')
     valid_configurations = (
         # nc-sr-03_pbe
-        PseudoDojoConfiguration('03', 'pbe', 'sr', 'standard', None, 'upf'),
-        PseudoDojoConfiguration('03', 'pbe', 'sr', 'stringent', None, 'upf'),
+        PseudoDojoConfiguration('03', 'pbe', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('03', 'pbe', 'sr', 'stringent', 'upf'),
         # nc-sr-03_pbesol
-        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'standard', None, 'upf'),
-        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'stringent', None, 'upf'),
+        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('03', 'pbesol', 'sr', 'stringent', 'upf'),
         # nc-sr-03_lda
-        PseudoDojoConfiguration('03', 'lda', 'sr', 'standard', None, 'upf'),
-        PseudoDojoConfiguration('03', 'lda', 'sr', 'stringent', None, 'upf'),
-        # nc-sr-04_pbe_standard
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'low', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', None, 'upf'),
-        # nc-sr-04_pbe_stringent
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'low', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'normal', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', None, 'upf'),
-        # nc-sr-04_pbesol_standard
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'low', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'normal', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', None, 'upf'),
-        # nc-sr-04_pbesol_stringent
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'low', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'normal', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', None, 'upf'),
+        PseudoDojoConfiguration('03', 'lda', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('03', 'lda', 'sr', 'stringent', 'upf'),
+        # nc-sr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'upf'),
+        # nc-sr-04_pbesol
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'upf'),
         # nc-sr-04_lda
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', None, 'upf'),
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', None, 'upf'),
-        # nc-sr-04-3plus_pbe_standard
-        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', None, 'upf'),
-        # nc-fr-04_pbe_standard
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'low', 'upf'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'normal', 'upf'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', None, 'upf'),
-        # nc-fr-04_pbe_stringent
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'low', 'upf'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'normal', 'upf'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'high', 'upf'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', None, 'upf'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', 'upf'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', 'upf'),
+        # nc-sr-04-3plus_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', 'upf'),
+        # nc-fr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', 'upf'),
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'upf'),
         # nc-fr-04_pbesol
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', None, 'upf'),
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', None, 'upf'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', 'upf'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', 'upf'),
     )
 
 
@@ -184,44 +141,23 @@ class PseudoDojoPsmlFamily(PseudoDojoFamily, PsmlFamily):
     PseudoDojo configuration.
     """
 
-    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psml')
+    default_configuration = PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'psml')
     valid_configurations = (
-        # nc-sr-04_pbe_standard
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'low', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'normal', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', None, 'psml'),
-        # nc-sr-04_pbe_stringent
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'low', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'normal', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', None, 'psml'),
-        # nc-sr-04_pbesol_standard
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'low', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'normal', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', None, 'psml'),
-        # nc-sr-04_pbesol_standard
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'low', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'normal', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', None, 'psml'),
+        # nc-sr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'standard', 'psml'),
+        PseudoDojoConfiguration('04', 'pbe', 'sr', 'stringent', 'psml'),
+        # nc-sr-04_pbesol
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'standard', 'psml'),
+        PseudoDojoConfiguration('04', 'pbesol', 'sr', 'stringent', 'psml'),
         # nc-sr-04_lda
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', None, 'psml'),
-        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', None, 'psml'),
-        # nc-sr-04-3plus_pbe_standard
-        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', None, 'psml'),
-        # nc-fr-04_pbe_standard
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'low', 'psml'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'normal', 'psml'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr','standard', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', None, 'psml'),
-        # nc-fr-04_pbe_stringent
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'low', 'psml'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'normal', 'psml'),
-        # PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'high', 'psml'),
-        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', None, 'psml'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'standard', 'psml'),
+        PseudoDojoConfiguration('04', 'lda', 'sr', 'stringent', 'psml'),
+        # nc-sr-04-3plus_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'sr3plus', 'standard', 'psml'),
+        # nc-fr-04_pbe
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'standard', 'psml'),
+        PseudoDojoConfiguration('04', 'pbe', 'fr', 'stringent', 'psml'),
         # nc-fr-04_pbesol
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', None, 'psml'),
-        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', None, 'psml'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'standard', 'psml'),
+        PseudoDojoConfiguration('04', 'pbesol', 'fr', 'stringent', 'psml'),
     )

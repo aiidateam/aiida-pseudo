@@ -8,8 +8,7 @@ from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
 __all__ = (
-    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'CUTOFF_STRINGENCY', 'PSEUDO_FORMAT', 'TRACEBACK',
-    'FAMILY_TYPE', 'ARCHIVE_FORMAT'
+    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT'
 )
 
 VERSION = OverridableOption(
@@ -34,14 +33,6 @@ RELATIVISTIC = OverridableOption(
 
 PROTOCOL = OverridableOption(
     '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the installed configuration.'
-)
-
-CUTOFF_STRINGENCY = OverridableOption(
-    '-c',
-    '--cutoff-stringency',
-    type=click.STRING,
-    required=False,
-    help='Select the stringency of energy cutoff hints of the installed configuration.'
 )
 
 PSEUDO_FORMAT = OverridableOption(

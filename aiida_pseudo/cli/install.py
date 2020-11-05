@@ -137,6 +137,6 @@ def cmd_install_sssp(version, functional, protocol, traceback):
             cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
 
         family.description = description
-        family.set_cutoffs(cutoffs)
+        family.set_cutoffs({'normal': cutoffs})
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

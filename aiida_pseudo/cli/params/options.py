@@ -7,18 +7,40 @@ import click
 from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
-__all__ = ('VERSION', 'FUNCTIONAL', 'PROTOCOL', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT')
+__all__ = (
+    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT'
+)
 
 VERSION = OverridableOption(
-    '-v', '--version', type=click.STRING, required=False, help='Select the version of the SSSP configuration.'
+    '-v', '--version', type=click.STRING, required=False, help='Select the version of the installed configuration.'
 )
 
 FUNCTIONAL = OverridableOption(
-    '-f', '--functional', type=click.STRING, required=False, help='Select the functional of the SSSP configuration.'
+    '-x',
+    '--functional',
+    type=click.STRING,
+    required=False,
+    help='Select the functional of the installed configuration.'
+)
+
+RELATIVISTIC = OverridableOption(
+    '-r',
+    '--relativistic',
+    type=click.STRING,
+    required=False,
+    help='Select the type of relativistic effects included in the installed configuration.'
 )
 
 PROTOCOL = OverridableOption(
-    '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the SSSP configuration.'
+    '-p', '--protocol', type=click.STRING, required=False, help='Select the protocol of the installed configuration.'
+)
+
+PSEUDO_FORMAT = OverridableOption(
+    '-f',
+    '--pseudo-format',
+    type=click.STRING,
+    required=True,
+    help='Select the pseudopotential file format of the installed configuration.'
 )
 
 TRACEBACK = OverridableOption(

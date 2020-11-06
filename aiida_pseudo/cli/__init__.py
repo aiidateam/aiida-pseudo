@@ -7,6 +7,6 @@ import click_completion
 click_completion.init()
 
 from .root import cmd_root
-from .install import cmd_install, cmd_install_family, cmd_install_sssp
+from .install import cmd_install, cmd_install_family, cmd_install_sssp, cmd_install_pseudo_dojo
 from .list import cmd_list
 from .show import cmd_show

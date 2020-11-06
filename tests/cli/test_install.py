@@ -4,7 +4,7 @@ import pytest
 
 from aiida.orm import QueryBuilder
 
-from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp
+from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp, cmd_install_pseudo_dojo
 from aiida_pseudo.groups.family import PseudoPotentialFamily, UpfFamily
 
 
@@ -83,4 +83,23 @@ def test_install_sssp(run_cli_command):
     assert 'Pseudo metadata md5: 0d5d6c2c840383c7c4fc3a99b5dc3001' in family.description
 
     result = run_cli_command(cmd_install_sssp, raises=SystemExit)
+    assert 'is already installed' in result.output
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_install_pseudo_dojo(run_cli_command):
+    """Test the `aiida-pseudo install pseudo-dojo` command."""
+    from aiida_pseudo import __version__
+    from aiida_pseudo.groups.family import PseudoDojoFamily
+
+    result = run_cli_command(cmd_install_pseudo_dojo)
+    assert 'installed `PseudoDojo/' in result.output
+    assert QueryBuilder().append(PseudoDojoFamily).count() == 1
+
+    family = QueryBuilder().append(PseudoDojoFamily).one()[0]
+    assert family.get_cutoffs is not None
+    assert f'PseudoDojo v04 pbe sr standard psp8 installed with aiida-pseudo v{__version__}' in family.description
+    assert 'Archive pseudos md5: a43737369e8a0a4417ccf364397298b3' in family.description
+
+    result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
     assert 'is already installed' in result.output

@@ -27,6 +27,10 @@
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
+            "pseudo.family.pseudo_dojo = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoFamily",
+            "pseudo.family.pseudo_dojo.psml = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoPsmlFamily",
+            "pseudo.family.pseudo_dojo.psp8 = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoPsp8Family",
+            "pseudo.family.pseudo_dojo.upf = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoUpfFamily",
             "pseudo.family.psf = aiida_pseudo.groups.family.psf:PsfFamily",
             "pseudo.family.psml = aiida_pseudo.groups.family.psml:PsmlFamily",
             "pseudo.family.psp8 = aiida_pseudo.groups.family.psp8:Psp8Family",

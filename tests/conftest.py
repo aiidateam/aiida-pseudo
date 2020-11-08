@@ -125,6 +125,9 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         :param elements: optional list of elements to include instead of all the available ones
         :return: the pseudo family
         """
+        if elements is not None:
+            elements = {re.sub('[0-9]+', '', element) for element in elements}
+
         dirpath = filepath_pseudos('upf')
         for pseudo in os.listdir(dirpath):
             if elements is None or any([pseudo.startswith(element) for element in elements]):

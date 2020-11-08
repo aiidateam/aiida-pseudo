@@ -360,3 +360,16 @@ def test_get_pseudos_structure(get_pseudo_family, generate_structure):
     assert isinstance(pseudos, dict)
     for element in elements:
         assert isinstance(pseudos[element], PseudoPotentialData)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_pseudos_structure_kinds(get_pseudo_family, generate_structure):
+    """Test the `PseudoPotentialFamily.get_pseudos` for ``StructureData`` with kind names including digits."""
+    elements = ('Ar1', 'Ar2')
+    structure = generate_structure(elements)
+    family = get_pseudo_family(elements=elements)
+
+    pseudos = family.get_pseudos(structure=structure)
+    assert isinstance(pseudos, dict)
+    for element in elements:
+        assert isinstance(pseudos[element], PseudoPotentialData)

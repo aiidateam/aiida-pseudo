@@ -6,6 +6,7 @@ import pytest
 
 from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import UpfData
+from aiida_pseudo.data.pseudo.upf import parse_z_valence
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -38,3 +39,21 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
 
         with pytest.raises(ModificationNotAllowed):
             pseudo.set_file(handle)
+
+
+@pytest.mark.parametrize(
+    'content', (
+        'z_valence="1"',
+        'z_valence="1.0"',
+        'z_valence="1.000"',
+        'z_valence="1.00E+01"',
+        'z_valence="1500."',
+        "z_valence='1.0'",
+        'z_valence="    1"',
+        'z_valence="1    "',
+        '1.0     Z valence',
+    )
+)
+def test_parse_z_valence(content):
+    """Test the ``parse_z_valence`` method."""
+    assert parse_z_valence(content)

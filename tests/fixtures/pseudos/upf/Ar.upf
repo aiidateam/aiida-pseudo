@@ -8,6 +8,7 @@
         author="sphuber"
         date="200411"
         element="Ar"
+        z_valence="1.0"
         pseudo_type="NC"
     />
 </UPF>

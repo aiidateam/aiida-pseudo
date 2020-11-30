@@ -248,12 +248,17 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
                     echo.echo_critical(msg)
 
                 for stringency, element_cutoffs in values['hints'].items():
+<<<<<<< HEAD
 
                     if cutoffs.get(stringency, None) is None:
                         cutoffs[stringency] = {}
 
                     # All supported PseudoDojo potentials are NC, so we take dual of 8.0
                     cutoffs[stringency][element] = {
+=======
+                    # All supported PseudoDojo potentials are NC, so we take dual of 8.0
+                    cutoffs.setdefault(stringency, {})[element] = {
+>>>>>>> d6a98e1ad2a167565a9180268f41b387cd8fc6d7
                         'cutoff_wfc': element_cutoffs['ecut'],
                         'cutoff_rho': element_cutoffs['ecut'] * 8.0
                     }

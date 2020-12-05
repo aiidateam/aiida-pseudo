@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
-"""Subclass of `UpfFamily` designed to represent an SSSP configuration."""
+"""Subclass of ``PseudoPotentialFamily`` designed to represent an SSSP configuration."""
 from collections import namedtuple
 from typing import Sequence
 
-from .upf import UpfFamily
+from aiida_pseudo.data.pseudo import UpfData
+from ..mixins import RecommendedCutoffMixin
+from .pseudo import PseudoPotentialFamily
 
 __all__ = ('SsspConfiguration', 'SsspFamily')
 
 SsspConfiguration = namedtuple('SsspConfiguration', ['version', 'functional', 'protocol'])
 
 
-class SsspFamily(UpfFamily):
-    """Subclass of `UpfFamily` designed to represent an SSSP configuration.
+class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
+    """Subclass of ``PseudoPotentialFamily`` designed to represent an SSSP configuration.
 
-    The `SsspFamily` is essentially a `UpfFamily` with some additional constraints. It can only be used to contain the
-    pseudo potentials and corresponding metadata of an official SSSP configuration.
+    The ``SsspFamily`` is essentially a ``PseudoPotentialFamily`` with some additional constraints. It can only be used
+    to contain the pseudo potentials and corresponding metadata of an official SSSP configuration.
     """
+
+    _pseudo_type = UpfData
 
     label_template = 'SSSP/{version}/{functional}/{protocol}'
     default_configuration = SsspConfiguration('1.1', 'PBE', 'efficiency')

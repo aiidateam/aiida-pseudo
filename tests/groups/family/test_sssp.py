@@ -51,3 +51,20 @@ def test_constructor():
     label = SsspFamily.format_configuration_label(SsspFamily.default_configuration)
     family = SsspFamily(label=label)
     assert isinstance(family, SsspFamily)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_create_from_folder(filepath_pseudos):
+    """Test the `SsspFamily.create_from_folder` class method."""
+    family = SsspFamily.create_from_folder(filepath_pseudos('upf'), 'SSSP/1.1/PBE/efficiency')
+    assert isinstance(family, SsspFamily)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_create_from_folder_duplicate(filepath_pseudos):
+    """Test that `SsspFamily.create_from_folder` raises for duplicate label."""
+    label = 'SSSP/1.1/PBE/efficiency'
+    SsspFamily(label=label).store()
+
+    with pytest.raises(ValueError, match=r'the SsspFamily `.*` already exists'):
+        SsspFamily.create_from_folder(filepath_pseudos('upf'), label)

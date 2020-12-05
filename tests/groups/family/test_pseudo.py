@@ -83,12 +83,12 @@ def test_create_from_folder_nested(filepath_pseudos, tmpdir):
 @pytest.mark.parametrize('deduplicate', (True, False))
 def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
     """Test the `PseudoPotentialFamily.create_from_folder` class method."""
-    from aiida_pseudo.groups.family.upf import UpfFamily
+    from aiida_pseudo.groups.family.sssp import SsspFamily
 
-    # We create an existing `PseudoPotentialFamily` as well as a `UpfFamily` to test that the deduplication mechanism
+    # We create an existing `PseudoPotentialFamily` as well as a `SsspFamily` to test that the deduplication mechanism
     # will only ever check for pseudo potentials of the exact same type and not allow subclasses
     original = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'original_family')
-    UpfFamily.create_from_folder(filepath_pseudos(), 'upf_family')
+    SsspFamily.create_from_folder(filepath_pseudos(), 'SSSP/1.0/PBE/efficiency')
 
     family = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'duplicate_family', deduplicate=deduplicate)
 

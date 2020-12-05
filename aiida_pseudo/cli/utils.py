@@ -36,11 +36,11 @@ def create_family_from_archive(cls, label, filepath_archive, fmt=None):
 
     .. warning:: the archive should not contain any subdirectories, but just the pseudo potential files.
 
-    :param cls: the class to use, e.g., `UpfFamily` or `SsspFamily`
+    :param cls: the class to use, e.g. ``SsspFamily``
     :param label: the label for the new family
     :param filepath: absolute filepath to the .tar.gz archive containing the pseudo potentials.
     :param filepath: optional absolute filepath to the .json file containing the pseudo potentials metadata.
-    :param fmt: the format of the archive, if not specified will attempt to guess based on extension of `filepath`
+    :param fmt: the format of the archive, if not specified will attempt to guess based on extension of ``filepath``
     :return: newly created family
     :raises OSError: if the archive could not be unpacked or pseudos in it could not be parsed into a family
     """

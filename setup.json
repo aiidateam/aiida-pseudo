@@ -27,11 +27,7 @@
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
-            "pseudo.family.psf = aiida_pseudo.groups.family.psf:PsfFamily",
-            "pseudo.family.psml = aiida_pseudo.groups.family.psml:PsmlFamily",
-            "pseudo.family.psp8 = aiida_pseudo.groups.family.psp8:Psp8Family",
-            "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily",
-            "pseudo.family.upf = aiida_pseudo.groups.family.upf:UpfFamily"
+            "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily"
         ]
     },
     "python_requires": ">=3.6",

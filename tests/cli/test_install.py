@@ -5,7 +5,7 @@ import pytest
 from aiida.orm import QueryBuilder
 
 from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp
-from aiida_pseudo.groups.family import PseudoPotentialFamily, UpfFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily, SsspFamily
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -33,35 +33,17 @@ def test_install_family_url(run_cli_command):
     When a URL is passed, the parameter converts it into a `http.client.HTTPResponse`, which is not trivial to mock so
     instead we use an actual URL, which is slow, but is anyway already tested indirectly in `test_install_sssp`.
     """
-    label = 'family'
+    label = 'SSSP/1.0/PBE/efficiency'
     description = 'description'
     filepath_archive = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/SSSP_1.0_PBE_efficiency.tar.gz'
-    options = ['-D', description, filepath_archive, label, '-T', 'pseudo.family.upf']
+    options = ['-D', description, filepath_archive, label, '-T', 'pseudo.family.sssp']
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
-    assert UpfFamily.objects.count() == 1
+    assert SsspFamily.objects.count() == 1
 
-    family = UpfFamily.objects.get(label=label)
-    assert family.__class__ is UpfFamily
-    assert family.description == description
-    assert len(family.pseudos) != 0
-
-
-@pytest.mark.usefixtures('clear_db')
-def test_install_family_upf(run_cli_command, get_pseudo_archive):
-    """Test `aiida-pseudo install family` to install a `UpfFamily`."""
-    label = 'family'
-    description = 'description'
-    filepath_archive = next(get_pseudo_archive())
-    options = ['-D', description, '-T', 'pseudo.family.upf', filepath_archive, label]
-
-    result = run_cli_command(cmd_install_family, options)
-    assert f'installed `{label}`' in result.output
-    assert UpfFamily.objects.count() == 1
-
-    family = UpfFamily.objects.get(label=label)
-    assert family.__class__ is UpfFamily
+    family = SsspFamily.objects.get(label=label)
+    assert family.__class__ is SsspFamily
     assert family.description == description
     assert len(family.pseudos) != 0
 
@@ -70,7 +52,6 @@ def test_install_family_upf(run_cli_command, get_pseudo_archive):
 def test_install_sssp(run_cli_command):
     """Test the `aiida-pseudo install sssp` command."""
     from aiida_pseudo import __version__
-    from aiida_pseudo.groups.family import SsspFamily
 
     result = run_cli_command(cmd_install_sssp)
     assert 'installed `SSSP/' in result.output

@@ -3,7 +3,7 @@
 """Tests for the command `aiida-pseudo list`."""
 from aiida_pseudo.cli import cmd_list
 from aiida_pseudo.cli.list import PROJECTIONS_VALID
-from aiida_pseudo.groups.family import PseudoPotentialFamily, SsspFamily, UpfFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily, SsspFamily
 
 
 def test_list(clear_db, run_cli_command, get_pseudo_family):
@@ -41,21 +41,26 @@ def test_list_project(clear_db, run_cli_command, get_pseudo_family):
 
 
 def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
-    """Test the filtering options `--version`, `--functional` and `--protocol`."""
-    family_upf = get_pseudo_family(label='UPF', cls=UpfFamily)
+    """Test the filtering option `-T`."""
+    family_base = get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
     family_sssp = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=SsspFamily)
 
     assert PseudoPotentialFamily.objects.count() == 2
 
     result = run_cli_command(cmd_list, ['--raw'])
     assert len(result.output_lines) == 2
-    assert family_upf.label in result.output
+    assert family_base.label in result.output
     assert family_sssp.label in result.output
 
     result = run_cli_command(cmd_list, ['--raw', '-T', 'pseudo.family.sssp'])
     assert len(result.output_lines) == 1
-    assert family_upf.label not in result.output
+    assert family_base.label not in result.output
     assert family_sssp.label in result.output
 
-    result = run_cli_command(cmd_list, ['--raw', '-T', 'pseudo.family'])
+
+def test_list_filter_no_result(clear_db, run_cli_command, get_pseudo_family):
+    """Test the filtering option `-T` for a type for which no families exist."""
+    get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
+
+    result = run_cli_command(cmd_list, ['--raw', '-T', 'pseudo.family.sssp'])
     assert 'no pseudo potential families found that match the filtering criteria.' in result.output

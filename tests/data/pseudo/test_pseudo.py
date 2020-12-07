@@ -9,7 +9,7 @@ from aiida.common.exceptions import ModificationNotAllowed, StoringNotAllowed
 from aiida.common.links import LinkType
 from aiida.orm import CalcJobNode
 
-from aiida_pseudo.data.pseudo import PseudoPotentialData
+from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -103,3 +103,40 @@ def test_store_indirect():
     node = CalcJobNode()
     node.add_incoming(pseudo, link_type=LinkType.INPUT_CALC, link_label='pseudo')
     node.store_all()
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_or_create(get_pseudo_potential_data):
+    """Test the ``PseudoPotentialData.get_or_create`` classmethod."""
+    upf = get_pseudo_potential_data(entry_point='upf')
+    stream = io.BytesIO(upf.get_content().encode('utf-8'))
+
+    original = PseudoPotentialData.get_or_create(stream)
+    original.element = upf.element
+    assert isinstance(original, PseudoPotentialData)
+    assert not original.is_stored
+
+    # Need to store it so it can actually be loaded from it by the ``get_or_create`` method
+    original.store()
+
+    # Return the stream to initial state and call again, which should return the same node.
+    stream.seek(0)
+    duplicate = PseudoPotentialData.get_or_create(stream)
+    assert isinstance(duplicate, PseudoPotentialData)
+    assert duplicate.is_stored
+    assert duplicate.uuid == original.uuid
+
+    # If the content is different, we should get a different node.
+    stream.seek(0)
+    different_content = PseudoPotentialData.get_or_create(io.BytesIO(b'different'))
+    different_content.element = upf.element
+    assert isinstance(different_content, PseudoPotentialData)
+    assert not different_content.is_stored
+    assert different_content.uuid != original.uuid
+
+    # If the class is different, even if it is a subclass, we should get a different node even if content is identical
+    stream.seek(0)
+    different_class = UpfData.get_or_create(stream)
+    assert isinstance(different_class, PseudoPotentialData)
+    assert not different_class.is_stored
+    assert different_class.uuid != original.uuid

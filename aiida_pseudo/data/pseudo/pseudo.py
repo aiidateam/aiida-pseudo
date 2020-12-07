@@ -2,21 +2,41 @@
 """Base class for data types representing pseudo potentials."""
 import typing
 
+from aiida import orm
+from aiida import plugins
 from aiida.common.constants import elements
 from aiida.common.exceptions import StoringNotAllowed
 from aiida.common.files import md5_from_filelike
-from aiida.plugins import DataFactory
-
-SingleFileData = DataFactory('singlefile')  # pylint: disable=invalid-name
 
 __all__ = ('PseudoPotentialData',)
 
 
-class PseudoPotentialData(SingleFileData):
+class PseudoPotentialData(plugins.DataFactory('singlefile')):
     """Base class for data types representing pseudo potentials."""
 
     _key_element = 'element'
     _key_md5 = 'md5'
+
+    @classmethod
+    def get_or_create(cls, stream: typing.BinaryIO, filename: str = None):
+        """Get pseudopotenial data node from database with matching md5 checksum or create a new one if not existent.
+
+        :param stream: a filelike object with the binary content of the file.
+        :param filename: optional explicit filename to give to the file stored in the repository.
+        :return: instance of ``PseudoPotentialData``, stored if taken from database, unstored otherwise.
+        """
+        query = orm.QueryBuilder()
+        query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': md5_from_filelike(stream)})
+
+        existing = query.first()
+
+        if existing:
+            pseudo = existing[0]
+        else:
+            stream.seek(0)
+            pseudo = cls(stream, filename)
+
+        return pseudo
 
     @classmethod
     def get_entry_point_name(cls):

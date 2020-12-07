@@ -182,6 +182,24 @@ class PseudoPotentialFamily(Group):
 
         super().add_nodes(nodes)
 
+    def remove_nodes(self, nodes):
+        """Remove a pseudopotential or a set of pseudopotentials from the family.
+
+        :param nodes: a single or list of ``PseudoPotentialData`` instances or subclasses thereof.
+        """
+        super().remove_nodes(nodes)
+
+        if not isinstance(nodes, (list, tuple)):
+            nodes = (nodes,)
+
+        removed = [node.pk for node in nodes]
+        self._pseudos = {pseudo.element: pseudo for pseudo in self.pseudos.values() if pseudo.pk not in removed}
+
+    def clear(self):
+        """Remove all the pseudopotentials from this family."""
+        super().clear()
+        self._pseudos = None
+
     @property
     def pseudos(self):
         """Return the dictionary of pseudo potentials of this family indexed on the element symbol.

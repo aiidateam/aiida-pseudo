@@ -268,6 +268,51 @@ def test_add_nodes_duplicate_element(get_pseudo_family, get_pseudo_potential_dat
 
 
 @pytest.mark.usefixtures('clear_db')
+def test_remove_nodes(get_pseudo_family):
+    """Test the ``PseudoPotentialFamily.remove_nodes`` method."""
+    elements = ('Ar', 'He', 'Kr')
+    family = get_pseudo_family(elements=elements)
+    pseudos = family.get_pseudos(elements=elements)
+
+    # Removing a single node
+    pseudo = pseudos.pop('Ar')
+    family.remove_nodes(pseudo)
+    assert family.pseudos == pseudos
+
+    # Removing multiple nodes
+    family.remove_nodes(list(pseudos.values()))
+    assert family.pseudos == {}
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_remove_nodes_not_existing(get_pseudo_family, get_pseudo_potential_data):
+    """Test the ``PseudoPotentialFamily.remove_nodes`` method works even when passing a non-existing pseudo.
+
+    The implementation of the ``remove_nodes`` method of the ``Group`` base class does not raise when passing a node
+    that is not contained within the group but will silently ignore it. Make sure that the corresponding element is not
+    accidentally still removed by the ``PseudoPotentialFamily.remove_nodes`` implementation.
+    """
+    element = 'Ar'
+    family = get_pseudo_family(elements=(element,))
+    pseudo = get_pseudo_potential_data(element).store()
+
+    # The node ``pseudo`` is not actually contained within the family and so no pseudopotentials should be removed
+    family.remove_nodes(pseudo)
+    assert tuple(family.pseudos.keys()) == ('Ar',)
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_clear(get_pseudo_family):
+    """Test the ``PseudoPotentialFamily.clear`` method."""
+    family = get_pseudo_family(elements=('Ar', 'He', 'Kr'))
+    assert family.pseudos is not None
+
+    family.clear()
+    assert family.pseudos == {}
+    assert family.count() == 0
+
+
+@pytest.mark.usefixtures('clear_db')
 def test_pseudos(get_pseudo_potential_data):
     """Test the `PseudoPotentialFamily.pseudos` property."""
     pseudos = {

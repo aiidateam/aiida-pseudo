@@ -25,6 +25,7 @@ class PseudoPotentialFamily(Group):
     hosted by setting ``_pseudo_types`` to a tuple of ``PseudoPotentialData`` subclasses.
     """
 
+    _key_pseudo_type = '_pseudo_type'
     _pseudo_types = (PseudoPotentialData,)
     _pseudos = None
 
@@ -174,6 +175,26 @@ class PseudoPotentialFamily(Group):
 
         return family
 
+    @property
+    def pseudo_type(self):
+        """Return the type of the pseudopotentials that are hosted by this family.
+
+        :return: the pseudopotential type or ``None`` if none has been set yet.
+        """
+        return self.get_extra(self._key_pseudo_type, None)
+
+    def update_pseudo_type(self):
+        """Update the pseudo type, stored as an extra, based on the current nodes in the family."""
+        pseudo_types = {pseudo.__class__ for pseudo in self.pseudos.values()}
+
+        if pseudo_types:
+            assert len(pseudo_types) == 1, 'Family contains pseudopotential data nodes of various types.'
+            entry_point_name = tuple(pseudo_types)[0].get_entry_point_name()
+        else:
+            entry_point_name = None
+
+        self.set_extra(self._key_pseudo_type, entry_point_name)
+
     def add_nodes(self, nodes):
         """Add a node or a set of nodes to the family.
 
@@ -203,6 +224,7 @@ class PseudoPotentialFamily(Group):
             pseudos[pseudo.element] = pseudo
 
         self.pseudos.update(pseudos)
+        self.update_pseudo_type()
 
         super().add_nodes(nodes)
 
@@ -218,11 +240,13 @@ class PseudoPotentialFamily(Group):
 
         removed = [node.pk for node in nodes]
         self._pseudos = {pseudo.element: pseudo for pseudo in self.pseudos.values() if pseudo.pk not in removed}
+        self.update_pseudo_type()
 
     def clear(self):
         """Remove all the pseudopotentials from this family."""
         super().clear()
         self._pseudos = None
+        self.update_pseudo_type()
 
     @property
     def pseudos(self):

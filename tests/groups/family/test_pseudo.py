@@ -38,6 +38,26 @@ def test_pseudo_types_validation(pseudo_types):
 
 
 @pytest.mark.usefixtures('clear_db')
+def test_pseudo_type(get_pseudo_potential_data):
+    """Test ``PseudoPotentialFamily.pseudo_type`` property."""
+    family = PseudoPotentialFamily(label='label').store()
+    assert family.pseudo_type is None
+
+    pseudo = get_pseudo_potential_data('Ar').store()
+    family.add_nodes((pseudo,))
+    assert family.pseudo_type == pseudo.get_entry_point_name()
+
+    family.clear()
+    assert family.pseudo_type is None
+
+    family.add_nodes((pseudo,))
+    assert family.pseudo_type == pseudo.get_entry_point_name()
+
+    family.remove_nodes(pseudo)
+    assert family.pseudo_type is None
+
+
+@pytest.mark.usefixtures('clear_db')
 def test_construct():
     """Test the construction of `PseudoPotentialFamily` works."""
     label = 'label'

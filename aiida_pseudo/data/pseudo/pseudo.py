@@ -19,6 +19,16 @@ class PseudoPotentialData(SingleFileData):
     _key_md5 = 'md5'
 
     @classmethod
+    def get_entry_point_name(cls):
+        """Return the entry point name associated with this data class.
+
+        :return: the entry point name.
+        """
+        from aiida.plugins.entry_point import get_entry_point_from_class
+        _, entry_point = get_entry_point_from_class(cls.__module__, cls.__name__)
+        return entry_point.name
+
+    @classmethod
     def validate_element(cls, element: str):
         """Validate the given element symbol.
 

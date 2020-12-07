@@ -18,21 +18,22 @@ def test_type_string():
     assert PseudoPotentialFamily._type_string == 'pseudo.family'  # pylint: disable=protected-access
 
 
-def test_pseudo_type():
-    """Test the `PseudoPotentialFamily.pseudo_type` method."""
-    assert PseudoPotentialFamily.pseudo_type is PseudoPotentialData
+def test_pseudo_types():
+    """Test the `PseudoPotentialFamily.pseudo_types` method."""
+    assert PseudoPotentialFamily.pseudo_types == (PseudoPotentialData,)
 
 
 @pytest.mark.filterwarnings('ignore:no registered entry point for')
-def test_pseudo_type_validation():
-    """Test that the constructor raises if `_pseudo_type` is not a subclass of `PseudoPotentialData`."""
+@pytest.mark.parametrize('pseudo_types', (None, (), int))
+def test_pseudo_types_validation(pseudo_types):
+    """Test constructor raises if ``_pseudo_types`` is not a tuple with subclasses of ``PseudoPotentialData``."""
 
     class CustomFamily(PseudoPotentialFamily):
-        """Test subclass that intentionally defines incorrect type for `_pseudo_type`."""
+        """Test subclass that intentionally defines incorrect type for ``_pseudo_types``."""
 
-        _pseudo_type = int
+        _pseudo_types = pseudo_types
 
-    with pytest.raises(RuntimeError, match=r'`.*` is not a subclass of `PseudoPotentialData`.'):
+    with pytest.raises(RuntimeError, match=r'.* should be a tuple of `PseudoPotentialData` subclasses.'):
         CustomFamily(label='custom')
 
 
@@ -83,12 +84,13 @@ def test_create_from_folder_nested(filepath_pseudos, tmpdir):
 @pytest.mark.parametrize('deduplicate', (True, False))
 def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
     """Test the `PseudoPotentialFamily.create_from_folder` class method."""
+    from aiida_pseudo.data.pseudo.upf import UpfData
     from aiida_pseudo.groups.family.sssp import SsspFamily
 
     # We create an existing `PseudoPotentialFamily` as well as a `SsspFamily` to test that the deduplication mechanism
     # will only ever check for pseudo potentials of the exact same type and not allow subclasses
     original = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'original_family')
-    SsspFamily.create_from_folder(filepath_pseudos(), 'SSSP/1.0/PBE/efficiency')
+    SsspFamily.create_from_folder(filepath_pseudos(), 'SSSP/1.0/PBE/efficiency', pseudo_type=UpfData)
 
     family = PseudoPotentialFamily.create_from_folder(filepath_pseudos(), 'duplicate_family', deduplicate=deduplicate)
 
@@ -100,10 +102,10 @@ def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
     family_pseudos = {pseudo.pk for pseudo in family.pseudos.values()}
 
     if deduplicate:
-        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_type, subclassing=False).count() == pseudo_count
+        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_types, subclassing=False).count() == pseudo_count
         assert not original_pseudos.difference(family_pseudos)
     else:
-        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_type, subclassing=False).count() == pseudo_count * 2
+        assert QueryBuilder().append(PseudoPotentialFamily.pseudo_types, subclassing=False).count() == pseudo_count * 2
         assert not original_pseudos.intersection(family_pseudos)
 
 
@@ -179,6 +181,27 @@ def test_parse_pseudos_from_directory_non_file_nested(tmpdir):
         PseudoPotentialFamily.parse_pseudos_from_directory(str(tmpdir))
 
 
+@pytest.mark.filterwarnings('ignore:no registered entry point for `SomeFamily` so its instances will not be storable.')
+def test_parse_pseudos_from_directory_incorrect_pseudo_type(tmpdir):
+    """Test the `PseudoPotentialFamily.parse_pseudos_from_directory` for invalid ``pseudo_type`` arguments.
+
+    It should be in ``cls._pseudo_types`` and if not explicitly defined, ``cls._pseudo_types`` should only contain a
+    single element.
+    """
+    from aiida_pseudo.data.pseudo import PsfData, PsmlData, UpfData
+
+    class SomeFamily(PseudoPotentialFamily):
+        """Dummy pseudo family class that defines two supported pseudopotential types."""
+
+        _pseudo_types = (PsfData, UpfData)
+
+    with pytest.raises(ValueError, match=r'.* supports more than one type, so `pseudo_type` needs to be explicitly .*'):
+        SomeFamily.parse_pseudos_from_directory(str(tmpdir))
+
+    with pytest.raises(ValueError, match=r'`.*` is not supported by `.*`'):
+        SomeFamily.parse_pseudos_from_directory(str(tmpdir), pseudo_type=PsmlData)
+
+
 @pytest.mark.usefixtures('clear_db')
 def test_add_nodes(get_pseudo_family, get_pseudo_potential_data):
     """Test that `PseudoPotentialFamily.add_nodes` method."""
@@ -231,13 +254,15 @@ def test_add_nodes_unstored(get_pseudo_family, nodes_unstored):
 @pytest.fixture
 def nodes_incorrect_type(get_pseudo_potential_data, request):
     """Dynamic fixture returning instances of `UpfData` either isolated or as a list."""
+    from aiida.orm import Data
+
     if request.param == 'single':
-        return get_pseudo_potential_data(entry_point='upf').store()
+        return Data().store()
 
     if request.param == 'tuple':
-        return (get_pseudo_potential_data(entry_point='upf').store(),)
+        return (Data().store(),)
 
-    return [get_pseudo_potential_data().store(), get_pseudo_potential_data(entry_point='upf').store()]
+    return [get_pseudo_potential_data().store(), Data().store()]
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -251,7 +276,7 @@ def test_add_nodes_incorrect_type(get_pseudo_family, nodes_incorrect_type):
     family = get_pseudo_family()
     count = family.count()
 
-    with pytest.raises(TypeError, match=r'only nodes of type `.*` can be added'):
+    with pytest.raises(TypeError, match=r'only nodes of types `.*` can be added'):
         family.add_nodes(nodes_incorrect_type)
 
     assert family.count() == count

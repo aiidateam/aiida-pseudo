@@ -119,7 +119,12 @@ def get_pseudo_potential_data(filepath_pseudos):
 def get_pseudo_family(tmpdir, filepath_pseudos):
     """Return a factory for a `PseudoPotentialFamily` instance."""
 
-    def _get_pseudo_family(label='family', cls=PseudoPotentialFamily, elements=None) -> PseudoPotentialFamily:
+    def _get_pseudo_family(
+        label='family',
+        cls=PseudoPotentialFamily,
+        pseudo_type=PseudoPotentialData,
+        elements=None
+    ) -> PseudoPotentialFamily:
         """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
 
         :param elements: optional list of elements to include instead of all the available ones
@@ -128,12 +133,19 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         if elements is not None:
             elements = {re.sub('[0-9]+', '', element) for element in elements}
 
-        dirpath = filepath_pseudos('upf')
+        if pseudo_type is PseudoPotentialData:
+            # There is no actual pseudopotential file fixtures for the base class, so default back to `.upf` files
+            extension = 'upf'
+        else:
+            extension = pseudo_type.get_entry_point_name()[len('pseudo.'):]
+
+        dirpath = filepath_pseudos(extension)
+
         for pseudo in os.listdir(dirpath):
             if elements is None or any([pseudo.startswith(element) for element in elements]):
                 shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmpdir), pseudo))
 
-        return cls.create_from_folder(str(tmpdir), label)
+        return cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
 
     return _get_pseudo_family
 

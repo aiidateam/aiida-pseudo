@@ -3,12 +3,18 @@
 """Tests for the `SsspFamily` class."""
 import pytest
 
+from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
 
 
 def test_type_string(clear_db):
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
     assert SsspFamily._type_string == 'pseudo.family.sssp'  # pylint: disable=protected-access
+
+
+def test_pseudo_types():
+    """Test the `SsspFamily.pseudo_types` method."""
+    assert SsspFamily.pseudo_types == (UpfData,)
 
 
 def test_default_configuration():
@@ -56,7 +62,7 @@ def test_constructor():
 @pytest.mark.usefixtures('clear_db')
 def test_create_from_folder(filepath_pseudos):
     """Test the `SsspFamily.create_from_folder` class method."""
-    family = SsspFamily.create_from_folder(filepath_pseudos('upf'), 'SSSP/1.1/PBE/efficiency')
+    family = SsspFamily.create_from_folder(filepath_pseudos('upf'), 'SSSP/1.1/PBE/efficiency', pseudo_type=UpfData)
     assert isinstance(family, SsspFamily)
 
 

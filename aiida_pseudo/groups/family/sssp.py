@@ -19,7 +19,7 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
     to contain the pseudo potentials and corresponding metadata of an official SSSP configuration.
     """
 
-    _pseudo_type = UpfData
+    _pseudo_types = (UpfData,)
 
     label_template = 'SSSP/{version}/{functional}/{protocol}'
     default_configuration = SsspConfiguration('1.1', 'PBE', 'efficiency')

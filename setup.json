@@ -20,6 +20,7 @@
         ],
         "aiida.data": [
             "pseudo = aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData",
+            "pseudo.jthxml = aiida_pseudo.data.pseudo.jthxml:JthXmlData",
             "pseudo.psf = aiida_pseudo.data.pseudo.psf:PsfData",
             "pseudo.psml = aiida_pseudo.data.pseudo.psml:PsmlData",
             "pseudo.psp8 = aiida_pseudo.data.pseudo.psp8:Psp8Data",

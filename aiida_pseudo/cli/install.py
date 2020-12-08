@@ -84,6 +84,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     from aiida.orm import Group, QueryBuilder
 
     from aiida_pseudo import __version__
+    from aiida_pseudo.common import units
     from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
     from .utils import attempt, create_family_from_archive
 
@@ -134,7 +135,11 @@ def cmd_install_sssp(version, functional, protocol, traceback):
                 msg = f"md5 of pseudo for element {element} does not match that of the metadata {values['md5']}"
                 echo.echo_critical(msg)
 
-            cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
+            # Cutoffs are in Rydberg but need to be stored in the family in electronvolt.
+            cutoffs[element] = {
+                'cutoff_wfc': values['cutoff_wfc'] * units.RY_TO_EV,
+                'cutoff_rho': values['cutoff_rho'] * units.RY_TO_EV,
+            }
 
         family.description = description
         family.set_cutoffs({'normal': cutoffs})

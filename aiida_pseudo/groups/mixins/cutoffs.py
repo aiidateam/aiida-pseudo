@@ -14,7 +14,7 @@ class RecommendedCutoffMixin:
     """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras.
 
     This class assumes that the cutoffs apply to a plane-wave based code and as such the cutoffs pertain to the wave
-    functions and the charge density.
+    functions and the charge density. The units have to be in electronvolt.
     """
 
     _key_cutoffs = '_cutoffs'
@@ -96,6 +96,8 @@ class RecommendedCutoffMixin:
 
     def set_cutoffs(self, cutoffs: dict, default_stringency: str = None) -> None:
         """Set the recommended cutoffs for the pseudos in this family.
+
+        .. note:: units of the cutoffs should be in electronvolt.
 
         :param cutoffs: dictionary with recommended cutoffs. Format: one or multiple sets of recommended cutoffs can be
             specified where each key represents a stringency set, e.g. ``low`` or ``normal``. For each stringency, a

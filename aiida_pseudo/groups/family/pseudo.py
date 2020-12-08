@@ -56,7 +56,39 @@ class PseudoPotentialFamily(Group):
         return cls._pseudo_types
 
     @classmethod
-    def parse_pseudos_from_directory(cls, dirpath, pseudo_type=None):
+    def _validate_pseudo_type(cls, pseudo_type):
+        """Validate the ``pseudo_type`` passed to ``parse_pseudos_from_directory``.
+
+        :return: the pseudo type to be used.
+        """
+        if pseudo_type is None and len(cls._pseudo_types) > 1:
+            raise ValueError(f'`{cls}` supports more than one type, so `pseudo_type` needs to be explicitly passed.')
+
+        pseudo_type = pseudo_type or cls._pseudo_types[0]
+
+        if all(not issubclass(pseudo_type, supported_type) for supported_type in cls._pseudo_types):
+            raise ValueError(f'`{pseudo_type}` is not supported by `{cls}`.')
+
+        return pseudo_type
+
+    @classmethod
+    def _validate_dirpath(cls, dirpath):
+        """Validate the ``dirpath`` passed to ``parse_pseudos_from_directory``.
+
+        :return: the directory path to be used.
+        """
+        if not os.path.isdir(dirpath):
+            raise ValueError(f'`{dirpath}` is not a directory')
+
+        dirpath_contents = os.listdir(dirpath)
+
+        if len(dirpath_contents) == 1 and os.path.isdir(os.path.join(dirpath, dirpath_contents[0])):
+            dirpath = os.path.join(dirpath, dirpath_contents[0])
+
+        return dirpath
+
+    @classmethod
+    def parse_pseudos_from_directory(cls, dirpath, pseudo_type=None, deduplicate=True):
         """Parse the pseudo potential files in the given directory into a list of data nodes.
 
         .. note:: The directory pointed to by `dirpath` should only contain pseudo potential files. Optionally, it can
@@ -68,6 +100,8 @@ class PseudoPotentialFamily(Group):
         :param pseudo_type: subclass of ``PseudoPotentialData`` to be used for the parsed pseudos. If not specified and
             the family only defines a single supported pseudo type in ``_pseudo_types`` then that will be used otherwise
             a ``ValueError`` is raised.
+        :param deduplicate: if True, will scan database for existing pseudo potentials of same type and with the same
+            md5 checksum, and use that instead of the parsed one.
         :return: list of data nodes
         :raises ValueError: if ``dirpath`` is not a directory or contains anything other than files.
         :raises ValueError: if ``dirpath`` contains multiple pseudo potentials for the same element.
@@ -77,23 +111,9 @@ class PseudoPotentialFamily(Group):
         """
         from aiida.common.exceptions import ParsingError
 
-        if pseudo_type is None and len(cls._pseudo_types) > 1:
-            raise ValueError(f'`{cls}` supports more than one type, so `pseudo_type` needs to be explicitly passed.')
-
-        pseudo_type = pseudo_type or cls._pseudo_types[0]
-
-        if all(not issubclass(pseudo_type, supported_type) for supported_type in cls._pseudo_types):
-            raise ValueError(f'`{pseudo_type}` is not supported by `{cls}`.')
-
         pseudos = []
-
-        if not os.path.isdir(dirpath):
-            raise ValueError(f'`{dirpath}` is not a directory')
-
-        dirpath_contents = os.listdir(dirpath)
-
-        if len(dirpath_contents) == 1 and os.path.isdir(os.path.join(dirpath, dirpath_contents[0])):
-            dirpath = os.path.join(dirpath, dirpath_contents[0])
+        dirpath = cls._validate_dirpath(dirpath)
+        pseudo_type = cls._validate_pseudo_type(pseudo_type)
 
         for filename in os.listdir(dirpath):
             filepath = os.path.join(dirpath, filename)
@@ -103,7 +123,10 @@ class PseudoPotentialFamily(Group):
 
             with open(filepath, 'rb') as handle:
                 try:
-                    pseudo = pseudo_type(handle, filename=filename)
+                    if deduplicate:
+                        pseudo = pseudo_type.get_or_create(handle, filename=filename)
+                    else:
+                        pseudo = pseudo_type(handle, filename=filename)
                 except ParsingError as exception:
                     raise ParsingError(f'failed to parse `{filepath}`: {exception}') from exception
 
@@ -156,22 +179,12 @@ class PseudoPotentialFamily(Group):
         else:
             raise ValueError(f'the {cls.__name__} `{label}` already exists')
 
-        parsed_pseudos = cls.parse_pseudos_from_directory(dirpath, pseudo_type)
-        family_pseudos = []
-
-        for pseudo in parsed_pseudos:
-            if deduplicate:
-                query = QueryBuilder()
-                query.append(pseudo.__class__, subclassing=False, filters={'attributes.md5': pseudo.md5})
-                existing = query.first()
-                if existing:
-                    pseudo = existing[0]
-            family_pseudos.append(pseudo)
+        pseudos = cls.parse_pseudos_from_directory(dirpath, pseudo_type, deduplicate=deduplicate)
 
         # Only store the ``Group`` and the pseudo nodes now, such that we don't have to worry about the clean up in the
         # case that an exception is raised during creating them.
         family.store()
-        family.add_nodes([pseudo.store() for pseudo in family_pseudos])
+        family.add_nodes([pseudo.store() for pseudo in pseudos])
 
         return family
 

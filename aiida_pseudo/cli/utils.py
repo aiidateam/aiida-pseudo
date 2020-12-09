@@ -31,16 +31,18 @@ def attempt(message, exception_types=Exception, include_traceback=False):
         echo.echo_highlight(' [OK]', color='success', bold=True)
 
 
-def create_family_from_archive(cls, label, filepath_archive, fmt=None):
+def create_family_from_archive(cls, label, filepath_archive, fmt=None, pseudo_type=None):
     """Construct a new pseudo family instance from a tar.gz archive.
 
     .. warning:: the archive should not contain any subdirectories, but just the pseudo potential files.
 
-    :param cls: the class to use, e.g. ``SsspFamily``
+    :param cls: the pseudopotential family class to use, e.g. ``SsspFamily``
     :param label: the label for the new family
-    :param filepath: absolute filepath to the .tar.gz archive containing the pseudo potentials.
-    :param filepath: optional absolute filepath to the .json file containing the pseudo potentials metadata.
+    :param filepath_archive: absolute filepath to the .tar.gz archive containing the pseudo potentials
     :param fmt: the format of the archive, if not specified will attempt to guess based on extension of ``filepath``
+    :param pseudo_type: subclass of ``PseudoPotentialData`` to be used for the parsed pseudos. If not specified and
+        the family only defines a single supported pseudo type in ``_pseudo_types`` then that will be used otherwise
+        a ``ValueError`` is raised.
     :return: newly created family
     :raises OSError: if the archive could not be unpacked or pseudos in it could not be parsed into a family
     """
@@ -55,7 +57,7 @@ def create_family_from_archive(cls, label, filepath_archive, fmt=None):
             raise OSError(f'failed to unpack the archive `{filepath_archive}`: {exception}') from exception
 
         try:
-            family = cls.create_from_folder(dirpath, label)
+            family = cls.create_from_folder(dirpath, label, pseudo_type=pseudo_type)
         except ValueError as exception:
             raise OSError(f'failed to parse pseudos from `{dirpath}`: {exception}') from exception
 

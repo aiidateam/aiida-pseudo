@@ -28,6 +28,7 @@
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
+            "pseudo.family.pseudo_dojo = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoFamily",
             "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily"
         ]
     },

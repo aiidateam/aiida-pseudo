@@ -66,9 +66,9 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
 
 
 @cmd_install.command('sssp')
-@options.VERSION(type=click.Choice(['1.0', '1.1']), default='1.1')
-@options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE')
-@options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency')
+@options.VERSION(type=click.Choice(['1.0', '1.1']), default='1.1', show_default=True)
+@options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
+@options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
 @options.TRACEBACK()
 @decorators.with_dbenv()
 def cmd_install_sssp(version, functional, protocol, traceback):
@@ -143,5 +143,95 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 
         family.description = description
         family.set_cutoffs({'normal': cutoffs})
+
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
+
+
+@cmd_install.command('pseudo-dojo')
+@options.VERSION(type=click.Choice(['0.3', '0.4', '1.0']), default='0.4', show_default=True)
+@options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol', 'LDA']), default='PBE', show_default=True)
+@options.RELATIVISTIC(type=click.Choice(['SR', 'SR3plus', 'FR']), default='SR', show_default=True)
+@options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard', show_default=True)
+@options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml', 'jthxml']), default='psp8', show_default=True)
+@options.DEFAULT_STRINGENCY(type=click.Choice(['low', 'normal', 'high']), default='normal', show_default=True)
+@options.TRACEBACK()
+@decorators.with_dbenv()
+def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_format, default_stringency, traceback):
+    """Install a PseudoDojo configuration.
+
+    The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
+    `PseudoDojoFamily` subclass instance based on the specified pseudopotential format.
+    """
+    # pylint: disable=too-many-locals,too-many-arguments,too-many-statements
+    import requests
+
+    from aiida.common.files import md5_file
+    from aiida.orm import Group, QueryBuilder
+    from aiida_pseudo import __version__
+    from aiida_pseudo.data.pseudo import JthXmlData, Psp8Data, PsmlData, UpfData
+    from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
+
+    from .utils import attempt, create_family_from_archive
+
+    pseudo_type_mapping = {
+        'jthxml': JthXmlData,
+        'psp8': Psp8Data,
+        'psml': PsmlData,
+        'upf': UpfData,
+    }
+
+    try:
+        pseudo_type = pseudo_type_mapping[pseudo_format]
+    except KeyError:
+        echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format')
+
+    configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
+    label = PseudoDojoFamily.format_configuration_label(configuration)
+    description = 'PseudoDojo v{} {} {} {} {} installed with aiida-pseudo v{}'.format(*configuration, __version__)
+
+    if configuration not in PseudoDojoFamily.valid_configurations:
+        echo.echo_critical('{} {} {} {} {} is not a valid PseudoDojo configuration'.format(*configuration))
+
+    if QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
+        echo.echo_critical(f'{PseudoDojoFamily.__name__}<{label}> is already installed')
+
+    with tempfile.TemporaryDirectory() as dirpath:
+
+        url_archive = PseudoDojoFamily.get_url_archive(label)
+        url_metadata = PseudoDojoFamily.get_url_metadata(label)
+
+        filepath_archive = os.path.join(dirpath, 'archive.tgz')
+        filepath_metadata = os.path.join(dirpath, 'metadata.tgz')
+
+        with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
+            response = requests.get(url_archive)
+            response.raise_for_status()
+            with open(filepath_archive, 'wb') as handle:
+                handle.write(response.content)
+                handle.flush()
+                description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+
+        with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
+            family = create_family_from_archive(PseudoDojoFamily, label, filepath_archive, pseudo_type=pseudo_type)
+
+        with attempt('downloading selected pseudo potentials metadata archive... ', include_traceback=traceback):
+            response = requests.get(url_metadata)
+            response.raise_for_status()
+            with open(filepath_metadata, 'wb') as handle:
+                handle.write(response.content)
+                handle.flush()
+                description += f'\nPseudo metadata archive md5: {md5_file(filepath_metadata)}'
+
+        with attempt('unpacking metadata archive and parsing metadata...', include_traceback=traceback):
+            md5s, cutoffs = PseudoDojoFamily.parse_djrepos_from_archive(filepath_metadata, pseudo_type=pseudo_type)
+
+        for element, md5 in md5s.items():
+            if family.get_pseudo(element).md5 != md5:
+                Group.objects.delete(family.pk)
+                msg = f'md5 of pseudo for element {element} does not match that of the metadata {md5}'
+                echo.echo_critical(msg)
+
+        family.description = description
+        family.set_cutoffs(cutoffs, default_stringency=default_stringency)
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

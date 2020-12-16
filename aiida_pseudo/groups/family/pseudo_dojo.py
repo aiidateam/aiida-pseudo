@@ -33,34 +33,22 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
     default_configuration = PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'psp8')
     # yapf: disable
     valid_configurations = (
-        PseudoDojoConfiguration('0.3', 'PBE', 'SR', 'standard', 'psp8'),
-        # PseudoDojoConfiguration('0.3', 'PBE', 'SR', 'stringent', 'psp8'),  # missing cutoffs
-        PseudoDojoConfiguration('0.3', 'PBEsol', 'SR', 'standard', 'psp8'),
-        PseudoDojoConfiguration('0.3', 'PBEsol', 'SR', 'stringent', 'psp8'),
-        # PseudoDojoConfiguration('0.3', 'LDA', 'SR', 'standard', 'psp8'),  # missing cutoffs
-        PseudoDojoConfiguration('0.3', 'LDA', 'SR', 'stringent', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'stringent', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'stringent', 'psp8'),
-        # PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'psp8'),  # md5 for F not matching
+        PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'stringent', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR3plus', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'stringent', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'stringent', 'psp8'),
-        PseudoDojoConfiguration('0.3', 'PBE', 'SR', 'standard', 'upf'),
-        # PseudoDojoConfiguration('0.3', 'PBE', 'SR', 'stringent', 'upf'),  # missing cutoffs
-        PseudoDojoConfiguration('0.3', 'PBEsol', 'SR', 'standard', 'upf'),
-        PseudoDojoConfiguration('0.3', 'PBEsol', 'SR', 'stringent', 'upf'),
-        PseudoDojoConfiguration('0.3', 'LDA', 'SR', 'standard', 'upf'),
-        PseudoDojoConfiguration('0.3', 'LDA', 'SR', 'stringent', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'stringent', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'standard', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'stringent', 'upf'),
-        # PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'upf'),  # md5 for F not matching
+        PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'upf'),
         PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'stringent', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR3plus', 'standard', 'upf'),
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'standard', 'upf'),
@@ -71,7 +59,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'stringent', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'SR', 'stringent', 'psml'),
-        # PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'psml'),  # md5 for F not matching
+        PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'LDA', 'SR', 'stringent', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR3plus', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'standard', 'psml'),
@@ -87,12 +75,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
     url_base = 'http://www.pseudo-dojo.org/pseudos/'
     urls = {
-        'PseudoDojo/0.3/PBE/SR/standard/psp8': 'nc-sr_pbe_standard_psp8',
-        'PseudoDojo/0.3/PBE/SR/stringent/psp8': 'nc-sr_pbe_stringent_psp8',
-        'PseudoDojo/0.3/PBEsol/SR/standard/psp8': 'nc-sr_pbesol_standard_psp8',
-        'PseudoDojo/0.3/PBEsol/SR/stringent/psp8': 'nc-sr_pbesol_stringent_psp8',
-        'PseudoDojo/0.3/LDA/SR/standard/psp8': 'nc-sr_pw_standard_psp8',
-        'PseudoDojo/0.3/LDA/SR/stringent/psp8': 'nc-sr_pw_stringent_psp8',
         'PseudoDojo/0.4/PBE/SR/standard/psp8': 'nc-sr-04_pbe_standard_psp8',
         'PseudoDojo/0.4/PBE/SR/stringent/psp8': 'nc-sr-04_pbe_stringent_psp8',
         'PseudoDojo/0.4/PBEsol/SR/standard/psp8': 'nc-sr-04_pbesol_standard_psp8',
@@ -104,12 +86,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         'PseudoDojo/0.4/PBE/FR/stringent/psp8': 'nc-fr-04_pbe_stringent_psp8',
         'PseudoDojo/0.4/PBEsol/FR/standard/psp8': 'nc-fr-04_pbesol_standard_psp8',
         'PseudoDojo/0.4/PBEsol/FR/stringent/psp8': 'nc-fr-04_pbesol_stringent_psp8',
-        'PseudoDojo/0.3/PBE/SR/standard/upf': 'nc-sr_pbe_standard_upf',
-        'PseudoDojo/0.3/PBE/SR/stringent/upf': 'nc-sr_pbe_stringent_upf',
-        'PseudoDojo/0.3/PBEsol/SR/standard/upf': 'nc-sr_pbesol_standard_upf',
-        'PseudoDojo/0.3/PBEsol/SR/stringent/upf': 'nc-sr_pbesol_stringent_upf',
-        'PseudoDojo/0.3/LDA/SR/standard/upf': 'nc-sr_pw_standard_upf',
-        'PseudoDojo/0.3/LDA/SR/stringent/upf': 'nc-sr_pw_stringent_upf',
         'PseudoDojo/0.4/PBE/SR/standard/upf': 'nc-sr-04_pbe_standard_upf',
         'PseudoDojo/0.4/PBE/SR/stringent/upf': 'nc-sr-04_pbe_stringent_upf',
         'PseudoDojo/0.4/PBEsol/SR/standard/upf': 'nc-sr-04_pbesol_standard_upf',

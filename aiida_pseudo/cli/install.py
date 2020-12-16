@@ -148,7 +148,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 
 
 @cmd_install.command('pseudo-dojo')
-@options.VERSION(type=click.Choice(['0.3', '0.4', '1.0']), default='0.4', show_default=True)
+@options.VERSION(type=click.Choice(['0.4', '1.0']), default='0.4', show_default=True)
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol', 'LDA']), default='PBE', show_default=True)
 @options.RELATIVISTIC(type=click.Choice(['SR', 'SR3plus', 'FR']), default='SR', show_default=True)
 @options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard', show_default=True)

@@ -66,10 +66,10 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'stringent', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'stringent', 'psml'),
-        # PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),  # paw families have placeholder cutoffs
-        # PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
-        # PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
-        # PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
+        PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
     )
     # yapf: enable
 

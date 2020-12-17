@@ -231,6 +231,19 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
                 msg = f'md5 of pseudo for element {element} does not match that of the metadata {md5}'
                 echo.echo_critical(msg)
 
+        elements_to_remove = []
+        for stringency, str_cutoff in cutoffs.items():
+            for element, cutoff in str_cutoff.items():
+                if cutoff['cutoff_wfc'] <= 0 or cutoff['cutoff_rho'] <= 0:
+                    elements_to_remove.append(element)
+        for element in set(elements_to_remove):
+            for stringency in cutoffs:
+                _ = cutoffs[stringency].pop(element)
+            pseudo = family.get_pseudo(element)
+            family.remove_nodes(pseudo)
+            msg = f'invalid cutoffs for element {element}, removing its pseudo (pk: {pseudo.pk}) from the family'
+            echo.echo_warning(msg)
+
         family.description = description
         family.set_cutoffs(cutoffs, default_stringency=default_stringency)
 

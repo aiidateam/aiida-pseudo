@@ -231,6 +231,23 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
                 msg = f'md5 of pseudo for element {element} does not match that of the metadata {md5}'
                 echo.echo_critical(msg)
 
+        adjusted_cutoff_elements = []
+        for stringency, str_cutoffs in cutoffs.items():
+            max_cutoff_wfc = max([str_cutoffs[element]['cutoff_wfc'] for element in str_cutoffs])
+            max_cutoff_rho = max([str_cutoffs[element]['cutoff_rho'] for element in str_cutoffs])
+            for element, cutoff in str_cutoffs.items():
+                if cutoff['cutoff_wfc'] <= 0:
+                    cutoffs[stringency][element]['cutoff_wfc'] = max_cutoff_wfc
+                    adjusted_cutoff_elements.append(element)
+                if cutoff['cutoff_rho'] <= 0:
+                    cutoffs[stringency][element]['cutoff_rho'] = max_cutoff_rho
+                    adjusted_cutoff_elements.append(element)
+
+        for element in set(adjusted_cutoff_elements):
+            msg = f'element {element} had invalid cutoff(s) which were modified to the maximum cutoff value of the ' \
+                'same stringency'
+            echo.echo_warning(msg)
+
         family.description = description
         family.set_cutoffs(cutoffs, default_stringency=default_stringency)
 

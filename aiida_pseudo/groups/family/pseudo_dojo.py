@@ -206,7 +206,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         :returns: cutoffs dictionary (in eV) where keys are stringency levels and values are
             {'cutoff_wfc': ..., 'cutoff_rho': ...}
         """
-        dual_mapping = {UpfData: 8.0, Psp8Data: 8.0, PsmlData: 8.0, JthXmlData: 2.0}
+        dual_mapping = {UpfData: 4.0, Psp8Data: 4.0, PsmlData: 4.0, JthXmlData: 2.0}
 
         try:
             dual = dual_mapping[pseudo_type]

@@ -237,15 +237,15 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
             max_cutoff_rho = max([str_cutoffs[element]['cutoff_rho'] for element in str_cutoffs])
             for element, cutoff in str_cutoffs.items():
                 if cutoff['cutoff_wfc'] <= 0:
-                    cutoffs[stringency][element]['cutoff_wfc'] = max_cutoff_wfc
+                    cutoffs[stringency][element]['cutoff_wfc'] = max_cutoff_wfc * 2.0
                     adjusted_cutoff_elements.append(element)
                 if cutoff['cutoff_rho'] <= 0:
-                    cutoffs[stringency][element]['cutoff_rho'] = max_cutoff_rho
+                    cutoffs[stringency][element]['cutoff_rho'] = max_cutoff_rho * 2.0
                     adjusted_cutoff_elements.append(element)
 
         for element in set(adjusted_cutoff_elements):
-            msg = f'element {element} had invalid cutoff(s) which were modified to the maximum cutoff value of the ' \
-                'same stringency'
+            msg = f'element {element} had invalid cutoff(s) which were modified to two times the maximum cutoff ' \
+                'value of the same stringency'
             echo.echo_warning(msg)
 
         family.description = description

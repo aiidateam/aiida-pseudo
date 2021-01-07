@@ -196,7 +196,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         """Collect and organize the suggested cutoffs (hints) from a DJREPO file.
 
         DJREPO files only provide a kinetic energy cutoff, so for pseudo types which contain norm-conserving pseudos
-        from PseudoDojo, we use a dual of 8.0 to generate the charge density (rho) cutoff.
+        from PseudoDojo, we use a dual of 4.0 to generate the charge density (rho) cutoff.
 
         For PAW potentials from PseudoDojo (which are assumed to be JthXmlData), a dual of 2.0 is used.
 
@@ -206,7 +206,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         :returns: cutoffs dictionary (in eV) where keys are stringency levels and values are
             {'cutoff_wfc': ..., 'cutoff_rho': ...}
         """
-        dual_mapping = {UpfData: 8.0, Psp8Data: 8.0, PsmlData: 8.0, JthXmlData: 2.0}
+        dual_mapping = {UpfData: 4.0, Psp8Data: 4.0, PsmlData: 4.0, JthXmlData: 2.0}
 
         try:
             dual = dual_mapping[pseudo_type]

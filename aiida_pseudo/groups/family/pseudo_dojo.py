@@ -66,10 +66,10 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'stringent', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'stringent', 'psml'),
-        # PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),  # paw families have placeholder cutoffs
-        # PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
-        # PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
-        # PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
+        PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
     )
     # yapf: enable
 
@@ -206,7 +206,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         :returns: cutoffs dictionary (in eV) where keys are stringency levels and values are
             {'cutoff_wfc': ..., 'cutoff_rho': ...}
         """
-        dual_mapping = {UpfData: 8.0, Psp8Data: 8.0, PsmlData: 8.0, JthXmlData: 2.0}
+        dual_mapping = {UpfData: 4.0, Psp8Data: 4.0, PsmlData: 4.0, JthXmlData: 2.0}
 
         try:
             dual = dual_mapping[pseudo_type]

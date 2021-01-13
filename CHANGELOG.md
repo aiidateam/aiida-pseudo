@@ -1,5 +1,12 @@
 # Change log
 
+## 0.5.0
+
+### Changes
+- PseudoDojo: remove support for `v0.3` and enable fixed `v0.4` families [[#39]](https://github.com/aiidateam/aiida-pseudo/pull/39)
+- PseudoDojo: enable PAW based families and lower dual factors [[#42]](https://github.com/aiidateam/aiida-pseudo/pull/42)
+
+
 ## 0.4.0
 
 This release significantly changes the design of the plugin with respect to how families are subclassed for different pseudopotential formats.

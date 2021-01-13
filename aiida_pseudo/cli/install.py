@@ -241,8 +241,8 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
                 echo.echo_critical(msg)
 
         # The PAW configurations have missing cutoffs for the Lanthanides, which have ben replaced with a placeholder
-        # value of `-1`. We replace these with the maximum cutoff from the same stringency so that these potentials are
-        # still useable, but this should be taken as a _rough_ approximation.
+        # value of `-1`. We replace these with the 1.5 * the maximum cutoff from the same stringency so that these
+        # potentials are still usable, but this should be taken as a _rough_ approximation.
         # We check only the `cutoff_wfc` because `cutoff_rho` is not provided by PseudoDojo and is therefore
         # locally calculated in `PseudoDojoFamily.parse_djrepos_from_archive` as `2.0 * cutoff_wfc` for PAW.
         if configuration in paw_configurations:
@@ -250,16 +250,17 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
             for stringency, str_cutoffs in cutoffs.items():
                 adjusted_cutoffs[stringency] = []
                 max_cutoff_wfc = max([str_cutoffs[element]['cutoff_wfc'] for element in str_cutoffs])
+                filler_cutoff_wfc = max_cutoff_wfc * 1.5
                 for element, cutoff in str_cutoffs.items():
                     if cutoff['cutoff_wfc'] <= 0:
-                        cutoffs[stringency][element]['cutoff_wfc'] = max_cutoff_wfc
-                        cutoffs[stringency][element]['cutoff_rho'] = 2.0 * max_cutoff_wfc
+                        cutoffs[stringency][element]['cutoff_wfc'] = filler_cutoff_wfc
+                        cutoffs[stringency][element]['cutoff_rho'] = 2.0 * filler_cutoff_wfc
                         adjusted_cutoffs[stringency].append(element)
 
             for stringency, elements in adjusted_cutoffs.items():
                 msg = f'stringency `{stringency}` has missing recommended cutoffs for elements ' \
-                    f'{", ".join(elements)}: as a substitute, the maximum cutoff of the stringency was set for these ' \
-                    'elements. USE WITH CAUTION!'
+                    f'{", ".join(elements)}: as a substitute, 1.5 * the maximum cutoff of the stringency ' \
+                    'was set for these elements. USE WITH CAUTION!'
                 echo.echo_warning(msg)
 
         family.description = description

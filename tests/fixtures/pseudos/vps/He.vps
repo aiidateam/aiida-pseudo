@@ -1,0 +1,110 @@
+# generated manually by A. Zadoks for testing purposes from He_PBE19.vps
+
+***************************************************
+                    Input file
+***************************************************
+
+#
+# File Name
+#
+
+System.CurrrentDir    ./             # default=./
+System.Name            He_PBE19
+Log.print              OFF           # ON|OFF
+
+System.UseRestartfile  yes           # NO|YES, default=NO
+System.Restartfile     He_PBE19      # default=null
+
+#
+# Calculation type
+#
+
+eq.type              dirac           # sch|sdirac|dirac
+calc.type             vps            # ALL|VPS|PAO
+xc.type               GGA            # LDA|GGA
+
+#
+# Atom
+#
+
+AtomSpecies             2
+max.occupied.N           1
+total.electron         2.0
+valence.electron       2.0
+<occupied.electrons
+ 1   2.0
+occupied.electrons>
+
+#
+# parameters for solving 1D-differential equations
+#
+
+grid.xmin             -7.8           # default=-7.0 rmin(a.u.)=exp(grid.xmin)
+grid.xmax              3.0           # default= 2.5 rmax(a.u.)=exp(grid.xmax)
+grid.num             10000           # default=4000
+grid.num.output        500           # default=2000
+
+#
+# SCF
+#
+
+scf.maxIter             60           # default=40
+scf.Mixing.Type       Simple         # Simple|GR-Pulay
+scf.Init.Mixing.Weight 0.10          # default=0.300
+scf.Min.Mixing.Weight  0.001         # default=0.001
+scf.Max.Mixing.Weight  0.700         # default=0.800
+scf.Mixing.History      7            # default=5
+scf.Mixing.StartPulay   4            # default=6
+scf.criterion         1.0e-13        # default=1.0e-9
+
+#
+# Pseudo potetial, cutoff (A.U.)
+#
+
+vps.type               MBK           # BHS|TM
+number.vps              4
+<pseudo.NandL
+ 0  1  0  0.80  0.0
+ 1  2  0  1.00 -0.2
+ 2  2  1  0.90  0.0
+ 3  3  2  0.90  0.0
+pseudo.NandL>
+Blochl.projector.num    4            # default=1 which means KB-form
+local.type            polynomial     # Simple|Polynomial
+local.part.vps          0            # default=0
+local.cutoff           1.00          # default=smallest_cutoff_vps
+local.origin.ratio     3.00          # default=3.0
+log.deri.RadF.calc      on           # ON|OFF
+log.deri.MinE          -2.0          # default=-3.0 (Hartree)
+log.deri.MaxE           2.0          # default= 2.0 (Hartree)
+log.deri.num            100          # default=50
+<log.deri.R
+ 0  1.5 1.5
+ 1  1.5 1.5
+ 2  1.5 1.5
+log.deri.R>
+ghost.check             off          # ON|OFF
+
+#
+# Core electron density for partial core correction
+#   pcc.ratio=rho_core/rho_V,
+#   pcc.ratio.origin = rho_core(orgin)/rho_core(ip)
+#
+
+charge.pcc.calc         off          # ON|OFF
+pcc.ratio              0.05          # default=1.0
+pcc.ratio.origin       6.0           # default=6.0
+
+#
+# Pseudo atomic orbitals
+#
+
+maxL.pao                3            # default=2
+num.pao                15            # default=7
+radial.cutoff.pao     8.0            # default=5.0 (Bohr)
+height.of.wall    20000.0            # default=4000.0 (Hartree)
+rising.edge           0.2            # default=0.5(Bohr),r1=rc-rising.edge
+search.LowerE       -3.000           # default=-3.000 (Hartree)
+search.UpperE       60.000           # default=20.000 (Hartree)
+num.of.partition     2000            # default=300
+matching.point.ratio  0.67           # default=0.67

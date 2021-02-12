@@ -6,6 +6,7 @@ import pytest
 
 from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import VpsData
+from aiida_pseudo.data.pseudo.vps import parse_z_valence, parse_xc_type
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -38,3 +39,23 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
 
         with pytest.raises(ModificationNotAllowed):
             pseudo.set_file(handle)
+
+
+@pytest.mark.parametrize(
+    'content', (
+        'valence.electron 1.0',
+        'valence.electron 1',
+        'VALENCE.ELECTRON 1.0',
+        'Valence.Electron 1.0'
+        'valence.electron 1.0 # Z valence',
+    )
+)
+def test_parse_z_valence(content):
+    """Test the ``parse_z_valence`` method."""
+    assert parse_z_valence(content)
+
+
+@pytest.mark.parametrize('content', ('xc.type LDA', 'Xc.Type LDA', 'xc.type GGA', 'xc.type GGA # GGA|LDA'))
+def test_parse_xc_type(content):
+    """Test the ``parse_xc_type`` method."""
+    assert parse_xc_type(content)

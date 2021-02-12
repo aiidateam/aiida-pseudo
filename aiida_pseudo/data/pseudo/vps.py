@@ -11,7 +11,7 @@ __all__ = ('VpsData',)
 
 PATTERN_FLOAT = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'
 REGEX_ATOMIC_NUMBER = re.compile(r"""\s*AtomSpecies\s*(?P<atomic_number>[\d]{1,3})\s*""", re.I)
-REGEX_VALENCE = re.compile(r"""\s*valence\.electron\s*(?P<valence>""" + PATTERN_FLOAT + r""")\s*""", re.I)
+REGEX_Z_VALENCE = re.compile(r"""\s*valence\.electron\s*(?P<z_valence>""" + PATTERN_FLOAT + r""")\s*""", re.I)
 REGEX_XC_TYPE = re.compile(r"""\s*xc\.type\s*(?P<xc_type>[A-Z]{3})\s*""", re.I)
 
 VALID_XC_TYPES = ('LDA', 'LSDA-CA', 'LSDA-PW', 'GGA-PBE', 'EXX-TEST')
@@ -47,28 +47,28 @@ def parse_element(content: str):
     raise ValueError(f'could not parse the element from the VPS content: {content}')
 
 
-def parse_valence(content: str):
-    """Parse the content of the VPS file to determine the valence.
+def parse_z_valence(content: str):
+    """Parse the content of the VPS file to determine the Z valence.
 
     :param content: the decoded content of the file.
     :return: the number of valence electrons for which the pseudopotential was generated.
     """
-    match = REGEX_VALENCE.search(content)
+    match = REGEX_Z_VALENCE.search(content)
 
     if match:
-        valence = match.group('valence')
+        z_valence = match.group('z_valence')
 
         try:
-            valence = float(valence)
+            z_valence = float(z_valence)
         except ValueError as exception:
-            raise ValueError(f'parsed value for the valence `{valence}` is not a valid number.') from exception
+            raise ValueError(f'parsed value for the Z valence `{z_valence}` is not a valid number.') from exception
 
-        if int(valence) != valence:
-            raise ValueError(f'parsed value for the valence `{valence}` is not an integer')
+        if int(z_valence) != z_valence:
+            raise ValueError(f'parsed value for the Z valence `{z_valence}` is not an integer')
 
-        return int(valence)
+        return int(z_valence)
 
-    raise ValueError(f'could not parse the valence from the VPS content: {content}')
+    raise ValueError(f'could not parse the Z valence from the VPS content: {content}')
 
 
 def parse_xc_type(content: str):
@@ -98,7 +98,7 @@ def parse_xc_type(content: str):
 class VpsData(PseudoPotentialData):
     """Data plugin to represent a pseudo potential in VPS format."""
 
-    _key_valence = 'valence'
+    _key_z_valence = 'z_valence'
     _key_xc_type = 'xc_type'
 
     def set_file(self, stream: BinaryIO, filename: str = None, **kwargs):  # pylint: disable=arguments-differ
@@ -112,22 +112,22 @@ class VpsData(PseudoPotentialData):
 
         content = stream.read().decode('utf-8')
         self.element = parse_element(content)
-        self.valence = parse_valence(content)
+        self.z_valence = parse_z_valence(content)
         self.xc_type = parse_xc_type(content)
 
         stream.seek(0)
         super().set_file(stream, filename, **kwargs)
 
     @property
-    def valence(self) -> Union[int, None]:
-        """Return the valence.
+    def z_valence(self) -> Union[int, None]:
+        """Return the Z valence.
 
-        :return: the valence.
+        :return: the Z valence.
         """
-        return self.get_attribute(self._key_valence, None)
+        return self.get_attribute(self._key_z_valence, None)
 
-    @valence.setter
-    def valence(self, value: int):
+    @z_valence.setter
+    def z_valence(self, value: int):
         """Set the valence.
 
         :param value: the valence.
@@ -136,7 +136,7 @@ class VpsData(PseudoPotentialData):
         if not isinstance(value, int) or value < 0:
             raise ValueError(f'`{value}` is not a positive integer.')
 
-        self.set_attribute(self._key_valence, value)
+        self.set_attribute(self._key_z_valence, value)
 
     @property
     def xc_type(self) -> Union[str, None]:
@@ -156,4 +156,4 @@ class VpsData(PseudoPotentialData):
         if not isinstance(value, str) or value not in VALID_XC_TYPES:
             raise ValueError(f'`{value}` is not a valid OpenMX XcType string.')
 
-        self.set_attribute(self._key_valence, value)
+        self.set_attribute(self._key_xc_type, value)

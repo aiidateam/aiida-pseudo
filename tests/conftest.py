@@ -142,7 +142,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         dirpath = filepath_pseudos(extension)
 
         for pseudo in os.listdir(dirpath):
-            if elements is None or any([pseudo.startswith(element) for element in elements]):
+            if elements is None or any(pseudo.startswith(element) for element in elements):
                 shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmpdir), pseudo))
 
         return cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)

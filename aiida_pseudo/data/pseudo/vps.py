@@ -128,9 +128,9 @@ class VpsData(PseudoPotentialData):
 
     @z_valence.setter
     def z_valence(self, value: int):
-        """Set the valence.
+        """Set the Z valence.
 
-        :param value: the valence.
+        :param value: the Z valence.
         :raises ValueError: if the value is not a positive integer
         """
         if not isinstance(value, int) or value < 0:
@@ -140,18 +140,18 @@ class VpsData(PseudoPotentialData):
 
     @property
     def xc_type(self) -> Union[str, None]:
-        """Return the xc_type.
+        """Return the exchange-correlation type.
 
-        :return: the xc_type.
+        :return: the exchange-correlation type.
         """
         return self.get_attribute(self._key_xc_type, None)
 
     @xc_type.setter
     def xc_type(self, value: str):
-        """Set the xc_type.
+        """Set the exchange-correlation type.
 
-        :param value: the xc_type.
-        :raises ValueError: if the value is not a valid OpenMX xc_type
+        :param value: the exchange-correlation type.
+        :raises ValueError: if the value is not a valid OpenMX XcType
         """
         if not isinstance(value, str) or value not in VALID_XC_TYPES:
             raise ValueError(f'`{value}` is not a valid OpenMX XcType string.')

@@ -1,0 +1,4 @@
+# generated manually by A. Zadoks for testing purposes from Ne_CA19.vps
+xc.type               GGA            # LDA|GGA
+AtomSpecies             10
+valence.electron       8.0

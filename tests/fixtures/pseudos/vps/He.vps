@@ -1,0 +1,4 @@
+# generated manually by A. Zadoks for testing purposes from He_PBE19.vps
+xc.type               GGA            # LDA|GGA
+AtomSpecies             2
+valence.electron       2.0

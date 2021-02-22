@@ -24,7 +24,8 @@
             "pseudo.psf = aiida_pseudo.data.pseudo.psf:PsfData",
             "pseudo.psml = aiida_pseudo.data.pseudo.psml:PsmlData",
             "pseudo.psp8 = aiida_pseudo.data.pseudo.psp8:Psp8Data",
-            "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData"
+            "pseudo.upf = aiida_pseudo.data.pseudo.upf:UpfData",
+            "pseudo.vps = aiida_pseudo.data.pseudo.vps:VpsData"
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",

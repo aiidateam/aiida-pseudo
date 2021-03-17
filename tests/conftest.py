@@ -12,7 +12,7 @@ import pytest
 from aiida.plugins import DataFactory
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
-from aiida_pseudo.groups.family import PseudoPotentialFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
 
@@ -123,11 +123,17 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         label='family',
         cls=PseudoPotentialFamily,
         pseudo_type=PseudoPotentialData,
-        elements=None
+        elements=None,
+        cutoffs=None,
+        default_stringency=None
     ) -> PseudoPotentialFamily:
         """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
 
         :param elements: optional list of elements to include instead of all the available ones
+        :params cutoffs: optional dictionary of cutoffs to specify. Needs to respect the format expected by the method
+            `aiida_pseudo.groups.mixins.cutoffs.RecommendedCutoffMixin.set_cutoffs`.
+        :param default_stringency: string with the default stringency name, if not specified, the first one specified in
+            the ``cutoffs`` argument will be used if specified.
         :return: the pseudo family
         """
         if elements is not None:
@@ -145,7 +151,13 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
             if elements is None or any(pseudo.startswith(element) for element in elements):
                 shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmpdir), pseudo))
 
-        return cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
+        family = cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
+
+        if cutoffs is not None and isinstance(family, CutoffsFamily):
+            default_stringency = default_stringency or list(cutoffs.keys())[0]
+            family.set_cutoffs(cutoffs, default_stringency)
+
+        return family
 
     return _get_pseudo_family
 

@@ -28,7 +28,7 @@ def get_cutoffs():
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoffs_private(get_pseudo_family, get_cutoffs):
-    """Test the ``RecommendedCutoffMixin._get_cutoffs`` method."""
+    """Test the ``CutoffsFamily._get_cutoffs`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family._get_cutoffs() == {}  # pylint: disable=protected-access
 
@@ -37,8 +37,21 @@ def test_get_cutoffs_private(get_pseudo_family, get_cutoffs):
 
 
 @pytest.mark.usefixtures('clear_db')
+def test_validate_cutoffs_unit():
+    """Test the `CutoffsFamily.validate_cutoffs_unit` method."""
+    with pytest.raises(TypeError):
+        CutoffsFamily.validate_cutoffs_unit(10)
+
+    with pytest.raises(ValueError, match=r'`invalid` is not a valid unit.'):
+        CutoffsFamily.validate_cutoffs_unit('invalid')
+
+    with pytest.raises(ValueError, match=r'`watt` is not a valid energy unit.'):
+        CutoffsFamily.validate_cutoffs_unit('watt')
+
+
+@pytest.mark.usefixtures('clear_db')
 def test_validate_stringency(get_pseudo_family, get_cutoffs):
-    """Test the ``RecommendedCutoffMixin.validate_stringency`` method."""
+    """Test the ``CutoffsFamily.validate_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
 
     with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
@@ -56,7 +69,7 @@ def test_validate_stringency(get_pseudo_family, get_cutoffs):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_default_stringency(get_pseudo_family, get_cutoffs):
-    """Test the ``RecommendedCutoffMixin.get_default_stringency`` method."""
+    """Test the ``CutoffsFamily.get_default_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
 
     with pytest.raises(ValueError, match='no default stringency has been defined.'):
@@ -71,7 +84,7 @@ def test_get_default_stringency(get_pseudo_family, get_cutoffs):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoff_stringencies(get_pseudo_family, get_cutoffs):
-    """Test the ``RecommendedCutoffMixin.get_cutoff_stringencies`` method."""
+    """Test the ``CutoffsFamily.get_cutoff_stringencies`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family.get_cutoff_stringencies() == ()
 
@@ -84,7 +97,7 @@ def test_get_cutoff_stringencies(get_pseudo_family, get_cutoffs):
 
 @pytest.mark.usefixtures('clear_db')
 def test_set_cutoffs(get_pseudo_family):
-    """Test the `RecommendedCutoffMixin.set_cutoffs` method."""
+    """Test the `CutoffsFamily.set_cutoffs` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
     cutoffs = {'default': {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}}
@@ -119,8 +132,20 @@ def test_set_cutoffs(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
+def test_set_cutoffs_unit_default(get_pseudo_family):
+    """Test the ``CutoffsFamily.set_cutoffs`` sets a default unit if not specified."""
+    elements = ['Ar']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+    values = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    cutoffs = {'default': values}
+
+    family.set_cutoffs(cutoffs)
+    assert family.get_cutoffs_unit() == CutoffsFamily.DEFAULT_UNIT
+
+
+@pytest.mark.usefixtures('clear_db')
 def test_set_cutoffs_auto_default(get_pseudo_family):
-    """Test the `RecommendedCutoffMixin.set_cutoffs` method when not specifying explicit default.
+    """Test the ``CutoffsFamily.set_cutoffs`` method when not specifying explicit default.
 
     If the cutoffs specified only contain a single set, the `default_stringency` is determined automatically.
     """
@@ -139,7 +164,7 @@ def test_set_cutoffs_auto_default(get_pseudo_family):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoffs(get_pseudo_family):
-    """Test the `RecommendedCutoffMixin.get_cutoffs` method."""
+    """Test the `CutoffsFamily.get_cutoffs` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
     cutoffs = {'default': {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}}
@@ -157,7 +182,7 @@ def test_get_cutoffs(get_pseudo_family):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
-    """Test the `RecommendedCutoffMixin.get_recommended_cutoffs` method."""
+    """Test the `CutoffsFamily.get_recommended_cutoffs` method."""
     elements = ['Ar', 'He']
     cutoffs = {
         'default': {
@@ -171,8 +196,13 @@ def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
             },
         }
     }
-    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
-    family.set_cutoffs(cutoffs, 'default')
+    family = get_pseudo_family(
+        label='SSSP/1.0/PBE/efficiency',
+        cls=CutoffsFamily,
+        elements=elements,
+        cutoffs=cutoffs,
+        default_stringency='default'
+    )
     structure = generate_structure(elements=elements)
 
     with pytest.raises(ValueError):
@@ -201,3 +231,51 @@ def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
     expected = cutoffs['default']['He']
     structure = generate_structure(elements=['He1', 'He2'])
     assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_recommended_cutoffs_unit(get_pseudo_family):
+    """Test the ``CutoffsFamily.get_recommended_cutoffs`` method with the ``unit`` argument."""
+    elements = ['Ar', 'He']
+    unit = 'Eh'
+    cutoffs = {
+        'default': {
+            'Ar': {
+                'cutoff_wfc': 1.0,
+                'cutoff_rho': 2.0
+            },
+            'He': {
+                'cutoff_wfc': 3.0,
+                'cutoff_rho': 8.0
+            },
+        }
+    }
+    family = get_pseudo_family(
+        label='SSSP/1.0/PBE/efficiency',
+        cls=CutoffsFamily,
+        elements=elements,
+        cutoffs=cutoffs,
+        default_stringency='default',
+        unit=unit
+    )
+
+    cutoffs_ar = cutoffs['default']['Ar']
+
+    expected = (cutoffs_ar['cutoff_wfc'], cutoffs_ar['cutoff_rho'])
+    assert family.get_recommended_cutoffs(elements='Ar') == expected
+
+    expected = (cutoffs_ar['cutoff_wfc'] * 2, cutoffs_ar['cutoff_rho'] * 2)
+    assert family.get_recommended_cutoffs(elements='Ar', unit='Ry') == expected
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_cutoffs_unit(get_pseudo_family, get_cutoffs):
+    """Test the `CutoffsFamily.get_cutoffs_unit` method."""
+    family = get_pseudo_family(cls=CutoffsFamily)
+    assert family.get_cutoffs_unit() == 'eV'
+
+    family.set_cutoffs(get_cutoffs(family), unit='Ry')
+    assert family.get_cutoffs_unit() == 'Ry'
+
+    family.set_cutoffs(get_cutoffs(family), unit='Eh')
+    assert family.get_cutoffs_unit() == 'Eh'

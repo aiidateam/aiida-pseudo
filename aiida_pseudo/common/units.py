@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Module with constants for unit conversions."""
+from pint import UnitRegistry
 
-RY_TO_EV = 13.6056917253  # Taken from `qe_tools.constants` v2.0
-HA_TO_EV = RY_TO_EV * 2.0
+# This unit registry singleton should be used to construct new quantities with a unit and to convert them to other units
+U = UnitRegistry()

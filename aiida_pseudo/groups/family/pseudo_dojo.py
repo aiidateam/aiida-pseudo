@@ -9,7 +9,6 @@ from typing import Sequence
 
 from aiida.common.exceptions import ParsingError
 
-from aiida_pseudo.common import units
 from aiida_pseudo.data.pseudo import UpfData, PsmlData, Psp8Data, JthXmlData
 from ..mixins import RecommendedCutoffMixin
 from .pseudo import PseudoPotentialFamily
@@ -232,9 +231,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
             except KeyError as exception:
                 raise ParsingError(f'stringency `{stringency}` is not defined in the djrepo `hints`') from exception
 
-            ecutwfc = ecutwfc * units.HA_TO_EV
-            ecutrho = ecutwfc * dual
-            cutoffs[stringency] = {'cutoff_wfc': ecutwfc, 'cutoff_rho': ecutrho}
+            cutoffs[stringency] = {'cutoff_wfc': ecutwfc, 'cutoff_rho': ecutwfc * dual}
 
         return cutoffs
 

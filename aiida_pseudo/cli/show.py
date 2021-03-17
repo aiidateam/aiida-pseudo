@@ -6,12 +6,12 @@ from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
 
 from ..groups.mixins import RecommendedCutoffMixin
-from .params import PseudoPotentialFamilyParam, options
+from .params import arguments, options
 from .root import cmd_root
 
 
 @cmd_root.command('show')
-@click.argument('family', type=PseudoPotentialFamilyParam(sub_classes=('aiida.groups:pseudo.family',)))
+@arguments.PSEUDO_POTENTIAL_FAMILY()
 @options.STRINGENCY()
 @options_core.RAW()
 @decorators.with_dbenv()

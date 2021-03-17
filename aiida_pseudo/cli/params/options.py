@@ -8,8 +8,8 @@ from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam
 
 __all__ = (
-    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'DEFAULT_STRINGENCY', 'TRACEBACK',
-    'FAMILY_TYPE', 'ARCHIVE_FORMAT'
+    'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'STRINGENCY', 'DEFAULT_STRINGENCY',
+    'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT'
 )
 
 VERSION = OverridableOption(

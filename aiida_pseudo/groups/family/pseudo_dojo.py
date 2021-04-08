@@ -271,6 +271,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
             if not os.path.isfile(filepath):
                 raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file')
 
+            # Some of the djrepo archives contain extraneous files. Here we skip files with unsupported extensions.
             if filename.split('.')[-1] not in cls._pseudo_repo_file_extensions:
                 warnings.warn(f'filename {filename} does not have a supported extension. Skipping...')
                 continue

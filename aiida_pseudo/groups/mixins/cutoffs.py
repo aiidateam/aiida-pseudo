@@ -167,6 +167,7 @@ class RecommendedCutoffMixin:
         :param elements: single or tuple of elements.
         :param structure: a ``StructureData`` node.
         :param stringency: optional stringency if different from the default.
+        :param unit: string definition of a unit of energy as recognized by the ``UnitRegistry`` of the ``pint`` lib.
         :return: tuple of recommended wavefunction and density cutoff.
         :raises ValueError: if the requested stringency is not defined for this family.
         :raises ValueError: if optional unit specified is invalid.

@@ -38,7 +38,7 @@ def test_get_cutoffs_private(get_pseudo_family, get_cutoffs):
 
 @pytest.mark.usefixtures('clear_db')
 def test_validate_cutoffs_unit():
-    """Test the `CutoffsFamily.validate_cutoffs_unit` method."""
+    """Test the ``CutoffsFamily.validate_cutoffs_unit`` method."""
     with pytest.raises(TypeError):
         CutoffsFamily.validate_cutoffs_unit(10)
 
@@ -97,7 +97,7 @@ def test_get_cutoff_stringencies(get_pseudo_family, get_cutoffs):
 
 @pytest.mark.usefixtures('clear_db')
 def test_set_cutoffs(get_pseudo_family):
-    """Test the `CutoffsFamily.set_cutoffs` method."""
+    """Test the ``CutoffsFamily.set_cutoffs`` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
     cutoffs = {'default': {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}}
@@ -164,7 +164,7 @@ def test_set_cutoffs_auto_default(get_pseudo_family):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoffs(get_pseudo_family):
-    """Test the `CutoffsFamily.get_cutoffs` method."""
+    """Test the ``CutoffsFamily.get_cutoffs`` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
     cutoffs = {'default': {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}}
@@ -182,7 +182,7 @@ def test_get_cutoffs(get_pseudo_family):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
-    """Test the `CutoffsFamily.get_recommended_cutoffs` method."""
+    """Test the ``CutoffsFamily.get_recommended_cutoffs`` method."""
     elements = ['Ar', 'He']
     cutoffs = {
         'default': {
@@ -270,7 +270,7 @@ def test_get_recommended_cutoffs_unit(get_pseudo_family):
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoffs_unit(get_pseudo_family, get_cutoffs):
-    """Test the `CutoffsFamily.get_cutoffs_unit` method."""
+    """Test the ``CutoffsFamily.get_cutoffs_unit`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family.get_cutoffs_unit() == 'eV'
 

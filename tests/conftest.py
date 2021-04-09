@@ -117,7 +117,7 @@ def get_pseudo_potential_data(filepath_pseudos):
 
 @pytest.fixture
 def get_pseudo_family(tmpdir, filepath_pseudos):
-    """Return a factory for a `PseudoPotentialFamily` instance."""
+    """Return a factory for a ``PseudoPotentialFamily`` instance."""
 
     def _get_pseudo_family(
         label='family',

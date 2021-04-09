@@ -1,6 +1,6 @@
 # `aiida-pseudo`
 
-AiiDA plugin that simplifies working with pseudo potentials.
+AiiDA plugin that simplifies working with pseudopotentials.
 
 [![PyPI version](https://badge.fury.io/py/aiida-pseudo.svg)](https://badge.fury.io/py/aiida-pseudo)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/aiida-pseudo.svg)](https://pypi.python.org/pypi/aiida-pseudo/)
@@ -16,6 +16,7 @@ For example, to install a configuration of the [SSSP](https://www.materialscloud
     aiida-pseudo install sssp
 
 The version, functional, and protocol can be controlled with various options; use `aiida-pseudo install sssp --help` to see their description.
+If you are experiencing problems with this automated install method, see the [Troubleshooting section](#troubleshooting) below for help.
 Installed pseudopotential families can be listed using:
 
     aiida-pseudo list
@@ -140,3 +141,39 @@ family = load_group('SSSP/1.1/PBE/efficiency')
 cutoffs = family.get_recommended_cutoffs(elements=('Ga', 'As'))  # From a tuple or list of element symbols
 cutoffs = family.get_recommended_cutoffs(structure=load_node(<IDENTIFIER>))  # From a `StructureData` node
 ```
+
+
+## Troubleshooting
+
+### The automated install commands fail
+These failures are often due to unstable internet connections causing the download of the pseudopotential archive from the web to fail.
+In this case, it is possible to install the family manually from an archive that is already available on the local file system.
+To install a pseudopotential family manually, run the following command:
+```
+aiida-pseudo install family <ARCHIVE> <LABEL>
+```
+where `<ARCHIVE>` should be replaced with the pseudopotential archive and `<LABEL>` with the label to give to the family.
+The command will attempt to automatically detect the compression format of the archive.
+If this fails, you can specify the format manually with the `--archive-format/-F` option, for example, for a `.tar.gz` archive:
+```
+aiida-pseudo install family <ARCHIVE> <LABEL> -F gztar
+```
+By default, the command will create a family of the base pseudopotential family type.
+If you want to create a more specific family, for example an `SsspFamily`, or a `PseudoDojoFamily`, you can provide the corresponding entry point to the `--family-type/-T` option:
+```
+aiida-pseudo install family <ARCHIVE> <LABEL> -T pseudo.family.sssp
+```
+or
+```
+aiida-pseudo install family <ARCHIVE> <LABEL> -T pseudo.family.pseudo_dojo
+```
+The available pseudopotential family classes can be listed with the command:
+```
+verdi plugin list aiida.groups
+```
+Any entry point that starts with `pseudo.family.` can potentially be used, depending on the type of pseudopotential archive.
+
+
+| :exclamation: Warning      |
+|:---------------------------|
+| The functionality of some plugins, such as the workflow protocols of `aiida-quantumespresso`, may rely on recommended cutoffs to be defined for the pseudopotential family. Unlike the automated install methods for those family types, this manual method will not define recommended cutoffs and as a result it may not be usable for these specific functionalities. Recommended cutoffs can be manually defined for existing pseudopotential families using the `aiida-pseudo family cutoffs set` command. |

@@ -72,3 +72,13 @@ FAMILY_TYPE = OverridableOption(
 ARCHIVE_FORMAT = OverridableOption(
     '-F', '--archive-format', type=click.Choice([fmt[0] for fmt in shutil.get_archive_formats()])
 )
+
+UNIT = OverridableOption(
+    '-u',
+    '--unit',
+    type=click.STRING,
+    required=False,
+    default='eV',
+    show_default=True,
+    help='Specify the energy unit of the cutoffs. Must be recognized by the ``UnitRegistry`` of the ``pint`` library.'
+)

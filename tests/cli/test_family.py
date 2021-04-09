@@ -48,6 +48,18 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, tmp_path):
     assert stringency in family.get_cutoff_stringencies()
     assert family.get_cutoffs(stringency) == cutoffs[stringency]
 
+    # Invalid unit
+    unit = 'GME stock'
+    result = run_cli_command(
+        cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit], raises=True
+    )
+    assert 'Error: Invalid value for UNIT:' in result.output
+
+    # Correct unit
+    unit = 'hartree'
+    result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit])
+    assert family.get_cutoffs_unit() == unit
+
 
 def test_family_show(clear_db, run_cli_command, get_pseudo_family):
     """Test the `aiida-pseudo show` command."""

@@ -113,7 +113,7 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_
 
 @pytest.mark.usefixtures('clear_db')
 def test_install_family(run_cli_command, get_pseudo_archive):
-    """Test `aiida-pseudo install family`."""
+    """Test ``aiida-pseudo install family``."""
     label = 'family'
     description = 'description'
     filepath_archive = next(get_pseudo_archive())
@@ -131,10 +131,10 @@ def test_install_family(run_cli_command, get_pseudo_archive):
 
 @pytest.mark.usefixtures('clear_db')
 def test_install_family_url(run_cli_command):
-    """Test `aiida-pseudo install family` when installing from a URL.
+    """Test ``aiida-pseudo install family`` when installing from a URL.
 
-    When a URL is passed, the parameter converts it into a `http.client.HTTPResponse`, which is not trivial to mock so
-    instead we use an actual URL, which is slow, but is anyway already tested indirectly in `test_install_sssp`.
+    When a URL is passed, the parameter converts it into a ``http.client.HTTPResponse``, which is not trivial to mock so
+    instead we use an actual URL, which is slow, but is anyway already tested indirectly in ``test_install_sssp``.
     """
     label = 'SSSP/1.0/PBE/efficiency'
     description = 'description'
@@ -153,7 +153,7 @@ def test_install_family_url(run_cli_command):
 
 @pytest.mark.usefixtures('clear_db')
 def test_install_sssp(run_cli_command):
-    """Test the `aiida-pseudo install sssp` command."""
+    """Test the ``aiida-pseudo install sssp`` command."""
     from aiida_pseudo import __version__
 
     result = run_cli_command(cmd_install_sssp)
@@ -172,7 +172,7 @@ def test_install_sssp(run_cli_command):
 
 @pytest.mark.usefixtures('clear_db')
 def test_install_pseudo_dojo(run_cli_command):
-    """Test the `aiida-pseudo install pseudo-dojo` command."""
+    """Test the ``aiida-pseudo install pseudo-dojo`` command."""
     from aiida_pseudo import __version__
 
     result = run_cli_command(cmd_install_pseudo_dojo)
@@ -234,3 +234,74 @@ def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo
 
     family = PseudoDojoFamily.objects.get(label=label)
     assert family.label == label
+
+
+@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+def test_install_sssp_download_only(run_monkeypatched_install_sssp):
+    """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option."""
+    options = ['--download-only']
+    result = run_monkeypatched_install_sssp(options=options)
+
+    assert SsspFamily.objects.count() == 0
+    assert 'written to the current directory.' in result.output
+
+
+@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_pseudo_family):
+    """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option.
+
+    The files should be downloadable even if the corresponding configuration is already installed.
+    """
+    from aiida_pseudo.data.pseudo.upf import UpfData
+
+    version = '1.1'
+    functional = 'PBEsol'
+    protocol = 'precision'
+
+    # Generate a family with the same label as we will install through the CLI
+    label = SsspFamily.format_configuration_label(SsspConfiguration(version, functional, protocol))
+    get_pseudo_family(cls=SsspFamily, pseudo_type=UpfData, label=label)
+
+    options = ['--download-only', '-v', version, '-x', functional, '-p', protocol]
+    result = run_monkeypatched_install_sssp(options=options)
+
+    assert SsspFamily.objects.count() == 1
+    assert 'written to the current directory.' in result.output
+
+
+@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo):
+    """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--download-only`` option."""
+    options = ['--download-only']
+    result = run_monkeypatched_install_pseudo_dojo(options=options)
+
+    assert PseudoDojoFamily.objects.count() == 0
+    assert 'written to the current directory.' in result.output
+
+
+@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseudo_dojo, get_pseudo_family):
+    """Test the ``aiida-pseudo install pseudo_dojo`` command with the ``--download-only`` option.
+
+    The files should be downloadable even if the corresponding configuration is already installed.
+    """
+    from aiida_pseudo.data.pseudo.upf import UpfData
+
+    version = '1.0'
+    functional = 'LDA'
+    relativistic = 'SR'
+    protocol = 'stringent'
+    pseudo_format = 'jthxml'
+
+    # Generate a family with the same label as we will install through the CLI
+    configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
+    label = PseudoDojoFamily.format_configuration_label(configuration)
+    get_pseudo_family(cls=PseudoDojoFamily, pseudo_type=UpfData, label=label)
+
+    options = [
+        '--download-only', '-v', version, '-x', functional, '-r', relativistic, '-p', protocol, '-f', pseudo_format
+    ]
+    result = run_monkeypatched_install_pseudo_dojo(options=options)
+
+    assert PseudoDojoFamily.objects.count() == 1
+    assert 'written to the current directory.' in result.output

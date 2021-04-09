@@ -4,6 +4,7 @@ import collections
 import json
 import os
 import re
+import warnings
 from typing import Sequence
 
 from aiida.common.exceptions import ParsingError
@@ -28,6 +29,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
     """
 
     _pseudo_types = (UpfData, PsmlData, Psp8Data, JthXmlData)
+    _pseudo_repo_file_extensions = ('djrepo',)
 
     label_template = 'PseudoDojo/{version}/{functional}/{relativistic}/{protocol}/{pseudo_format}'
     default_configuration = PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'psp8')
@@ -268,6 +270,11 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
             if not os.path.isfile(filepath):
                 raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file')
+
+            # Some of the djrepo archives contain extraneous files. Here we skip files with unsupported extensions.
+            if filename.split('.')[-1] not in cls._pseudo_repo_file_extensions:
+                warnings.warn(f'filename {filename} does not have a supported extension. Skipping...')
+                continue
 
             try:
                 with open(filepath, 'r') as handle:

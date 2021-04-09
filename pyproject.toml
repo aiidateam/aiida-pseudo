@@ -10,4 +10,5 @@ disable = [
     'bad-continuation',
     'duplicate-code',
     'import-outside-toplevel',
+    'too-many-arguments',
 ]

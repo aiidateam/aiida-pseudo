@@ -44,6 +44,10 @@ PSEUDO_FORMAT = OverridableOption(
     help='Select the pseudopotential file format of the installed configuration.'
 )
 
+STRINGENCY = OverridableOption(
+    '-s', '--stringency', type=click.STRING, required=False, help='Stringency level for the recommended cutoffs.'
+)
+
 DEFAULT_STRINGENCY = OverridableOption(
     '-s',
     '--default-stringency',

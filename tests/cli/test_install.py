@@ -1,11 +1,114 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=redefined-outer-name
 """Tests for `aiida-pseudo install`."""
+import json
+import pathlib
+
 import pytest
 
 from aiida.orm import QueryBuilder
 
+from aiida_pseudo.cli import install
 from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp, cmd_install_pseudo_dojo
-from aiida_pseudo.groups.family import PseudoPotentialFamily, SsspFamily, PseudoDojoFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily
+from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoFamily, PseudoDojoConfiguration
+from aiida_pseudo.groups.family.sssp import SsspFamily, SsspConfiguration
+
+
+@pytest.fixture
+def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, monkeypatch, tmpdir):
+    """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_sssp`` method and call the install cmd."""
+
+    def download_sssp(
+        configuration: SsspConfiguration,
+        filepath_archive: pathlib.Path,
+        filepath_metadata: pathlib.Path,
+        traceback: bool = False
+    ) -> None:
+        # pylint: disable=unused-argument
+        """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
+
+        :param configuration: the SSSP configuration to download.
+        :param filepath_archive: absolute filepath to write the pseudopotential archive to.
+        :param filepath_metadata: absolute filepath to write the metadata file to.
+        :param traceback: boolean, if true, print the traceback when an exception occurs.
+        """
+        import hashlib
+        import shutil
+
+        element = 'Ar'
+        pseudo = get_pseudo_potential_data(element)
+        filepath = tmpdir / pseudo.filename
+
+        with pseudo.open(mode='rb') as handle:
+            md5 = hashlib.md5(handle.read()).hexdigest()
+            handle.seek(0)
+            filepath.write_binary(handle.read())
+
+        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmpdir, base_dir='.')
+        shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
+
+        with open(filepath_metadata, 'w') as handle:
+            data = {element: {'md5': md5, 'cutoff_wfc': 60.0, 'cutoff_rho': 240.0}}
+            json.dump(data, handle)
+            handle.flush()
+
+    def _run_monkeypatched_install_sssp(options=None, raises=None):
+        monkeypatch.setattr(install, 'download_sssp', download_sssp)
+        return run_cli_command(cmd_install_sssp, options, raises)
+
+    return _run_monkeypatched_install_sssp
+
+
+@pytest.fixture
+def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_data, monkeypatch, tmpdir):
+    """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_pseudo_dojo`` method and call the install cmd."""
+
+    def download_pseudo_dojo(
+        configuration: PseudoDojoConfiguration,
+        filepath_archive: pathlib.Path,
+        filepath_metadata: pathlib.Path,
+        traceback: bool = False
+    ) -> None:
+        # pylint: disable=unused-argument
+        """Download the pseudopotential archive and metadata for a PseudoDojo configuration to a path on disk.
+
+        :param configuration: the PseudoDojo configuration to download.
+        :param filepath_archive: absolute filepath to write the pseudopotential archive to.
+        :param filepath_metadata: absolute filepath to write the metadata archive to.
+        :param traceback: boolean, if true, print the traceback when an exception occurs.
+        """
+        import hashlib
+        import shutil
+
+        element = 'Ar'
+        pseudo = get_pseudo_potential_data(element, entry_point='jthxml')
+        filepath = tmpdir / pseudo.filename
+
+        with pseudo.open(mode='rb') as handle:
+            md5 = hashlib.md5(handle.read()).hexdigest()
+            handle.seek(0)
+            filepath.write_binary(handle.read())
+
+        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmpdir, base_dir='.')
+        shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
+
+        data = {'hints': {'high': {'ecut': 20.00}, 'low': {'ecut': 20.00}, 'normal': {'ecut': 20.00}}, 'md5': md5}
+
+        filepath_djrepo = tmpdir / f'{element}.djrepo'
+
+        with open(filepath_djrepo, 'w') as handle:
+            json.dump(data, handle)
+            handle.flush()
+
+        filename_metadata = shutil.make_archive('tempmetadata', 'gztar', root_dir=tmpdir, base_dir='.')
+        shutil.move(pathlib.Path.cwd() / filename_metadata, filepath_metadata)
+
+    def _run_monkeypatched_install_pseudo_dojo(options=None, raises=None):
+        monkeypatch.setattr(install, 'download_pseudo_dojo', download_pseudo_dojo)
+        return run_cli_command(cmd_install_pseudo_dojo, options, raises)
+
+    return _run_monkeypatched_install_pseudo_dojo
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -80,7 +183,54 @@ def test_install_pseudo_dojo(run_cli_command):
     assert family.get_cutoffs is not None
     assert f'PseudoDojo v0.4 PBE SR standard psp8 installed with aiida-pseudo v{__version__}' in family.description
     assert 'Archive pseudos md5: a43737369e8a0a4417ccf364397298b3' in family.description
-    assert 'Pseudo metadata archive md5: d0c0057f16cb905bb2d43382146ffad2' in family.description
+    assert 'Pseudo metadata md5: d0c0057f16cb905bb2d43382146ffad2' in family.description
 
     result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
     assert 'is already installed' in result.output
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_install_sssp_monkeypatched(run_monkeypatched_install_sssp):
+    """Test the ``aiida-pseudo install sssp`` command with a monkeypatched download function.
+
+    This circumvents the actual download from Materials Cloud archive and substitutes it with a simple archive of a
+    single pseudo potential. We are merely verifying that the various configuration options are respected and are
+    reflected in the label of the created family.
+    """
+    version = '1.1'
+    functional = 'PBEsol'
+    protocol = 'precision'
+    configuration = SsspConfiguration(version, functional, protocol)
+    label = SsspFamily.format_configuration_label(configuration)
+
+    options = ['-v', version, '-x', functional, '-p', protocol]
+    result = run_monkeypatched_install_sssp(options=options)
+    assert f'installed `{label}`' in result.output
+    assert SsspFamily.objects.count() == 1
+
+    family = SsspFamily.objects.get(label=label)
+    assert family.label == label
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo):
+    """Test the ``aiida-pseudo install pseudo-dojo`` command with a monkeypatched download function.
+
+    This circumvents the actual download from the Pseudo Dojo website and substitutes it with a simple archive of a
+    single pseudo potential. We are merely verifying that the various configuration options are respected and are
+    reflected in the label of the created family.
+    """
+    version = '1.0'
+    functional = 'LDA'
+    protocol = 'stringent'
+    pseudo_format = 'jthxml'
+    configuration = PseudoDojoConfiguration(version, functional, 'SR', protocol, pseudo_format)
+    label = PseudoDojoFamily.format_configuration_label(configuration)
+
+    options = ['-v', version, '-x', functional, '-p', protocol, '-f', pseudo_format]
+    result = run_monkeypatched_install_pseudo_dojo(options=options)
+    assert f'installed `{label}`' in result.output
+    assert PseudoDojoFamily.objects.count() == 1
+
+    family = PseudoDojoFamily.objects.get(label=label)
+    assert family.label == label

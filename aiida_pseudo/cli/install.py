@@ -2,6 +2,7 @@
 """Command to install a pseudo potential family."""
 import json
 import os
+import pathlib
 import shutil
 import tempfile
 
@@ -11,10 +12,9 @@ from aiida.cmdline.utils import decorators, echo
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.params import types
 
+from aiida_pseudo.groups.family import PseudoDojoConfiguration, SsspConfiguration
 from .params import options
 from .root import cmd_root
-
-URL_SSSP_BASE = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/'
 
 
 @cmd_root.group('install')
@@ -65,6 +65,80 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
     echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
 
 
+def download_sssp(
+    configuration: SsspConfiguration,
+    filepath_archive: pathlib.Path,
+    filepath_metadata: pathlib.Path,
+    traceback: bool = False
+) -> None:
+    """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
+
+    :param configuration: the SSSP configuration to download.
+    :param filepath_archive: absolute filepath to write the pseudopotential archive to.
+    :param filepath_metadata: absolute filepath to write the metadata file to.
+    :param traceback: boolean, if true, print the traceback when an exception occurs.
+    """
+    import requests
+
+    from aiida_pseudo.groups.family import SsspFamily
+    from .utils import attempt
+
+    url_sssp_base = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/'
+    url_archive = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'tar.gz')}"
+    url_metadata = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'json')}"
+
+    with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
+        response = requests.get(url_archive)
+        response.raise_for_status()
+        with open(filepath_archive, 'wb') as handle:
+            handle.write(response.content)
+            handle.flush()
+
+    with attempt('downloading selected pseudo potentials metadata... ', include_traceback=traceback):
+        response = requests.get(url_metadata)
+        response.raise_for_status()
+        with open(filepath_metadata, 'wb') as handle:
+            handle.write(response.content)
+            handle.flush()
+
+
+def download_pseudo_dojo(
+    configuration: SsspConfiguration,
+    filepath_archive: pathlib.Path,
+    filepath_metadata: pathlib.Path,
+    traceback: bool = False
+) -> None:
+    """Download the pseudopotential archive and metadata for a PseudoDojo configuration to a path on disk.
+
+    :param configuration: the PseudoDojo configuration to download.
+    :param filepath_archive: absolute filepath to write the pseudopotential archive to.
+    :param filepath_metadata: absolute filepath to write the metadata archive to.
+    :param traceback: boolean, if true, print the traceback when an exception occurs.
+    """
+    import requests
+
+    from aiida_pseudo.groups.family import PseudoDojoFamily
+    from .utils import attempt
+
+    label = PseudoDojoFamily.format_configuration_label(configuration)
+    url_archive = PseudoDojoFamily.get_url_archive(label)
+    url_metadata = PseudoDojoFamily.get_url_metadata(label)
+
+    with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
+        response = requests.get(url_archive)
+        response.raise_for_status()
+        with open(filepath_archive, 'wb') as handle:
+            handle.write(response.content)
+            handle.flush()
+
+    with attempt('downloading selected pseudo potentials metadata archive... ', include_traceback=traceback):
+        response = requests.get(url_metadata)
+        response.raise_for_status()
+        with open(filepath_metadata, 'wb') as handle:
+            handle.write(response.content)
+            handle.flush()
+
+
 @cmd_install.command('sssp')
 @options.VERSION(type=click.Choice(['1.0', '1.1']), default='1.1', show_default=True)
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
@@ -78,13 +152,11 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     `SsspFamily`.
     """
     # pylint: disable=too-many-locals
-    import requests
-
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
 
     from aiida_pseudo import __version__
-    from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
+    from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt, create_family_from_archive
 
     configuration = SsspConfiguration(version, functional, protocol)
@@ -99,29 +171,18 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        url_archive = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.tar.gz'
-        filepath_archive = os.path.join(dirpath, 'archive.tar.gz')
+        dirpath = pathlib.Path(dirpath)
+        filepath_archive = dirpath / 'archive.tar.gz'
+        filepath_metadata = dirpath / 'metadata.json'
 
-        url_metadata = f'{URL_SSSP_BASE}/SSSP_{version}_{functional}_{protocol}.json'
-        filepath_metadata = os.path.join(dirpath, 'metadata.json')
+        download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
-        with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
-            response = requests.get(url_archive)
-            response.raise_for_status()
-            with open(filepath_archive, 'wb') as handle:
-                handle.write(response.content)
-                handle.flush()
-                description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+        with open(filepath_metadata, 'rb') as handle:
+            handle.seek(0)
+            metadata = json.load(handle)
 
-        with attempt('downloading selected pseudo potentials metadata... ', include_traceback=traceback):
-            response = requests.get(url_metadata)
-            response.raise_for_status()
-            with open(filepath_metadata, 'a+b') as handle:
-                handle.write(response.content)
-                handle.flush()
-                handle.seek(0)
-                metadata = json.load(handle)
-                description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
+        description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+        description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(SsspFamily, label, filepath_archive)
@@ -134,7 +195,6 @@ def cmd_install_sssp(version, functional, protocol, traceback):
                 msg = f"md5 of pseudo for element {element} does not match that of the metadata {values['md5']}"
                 echo.echo_critical(msg)
 
-            # Cutoffs are in Rydberg but need to be stored in the family in electronvolt.
             cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
 
         family.description = description
@@ -158,14 +218,12 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
     `PseudoDojoFamily` subclass instance based on the specified pseudopotential format.
     """
-    # pylint: disable=too-many-locals,too-many-arguments,too-many-statements
-    import requests
-
+    # pylint: disable=too-many-locals,too-many-arguments
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
     from aiida_pseudo import __version__
     from aiida_pseudo.data.pseudo import JthXmlData, Psp8Data, PsmlData, UpfData
-    from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
+    from aiida_pseudo.groups.family import PseudoDojoFamily
 
     from .utils import attempt, create_family_from_archive
 
@@ -202,30 +260,17 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        url_archive = PseudoDojoFamily.get_url_archive(label)
-        url_metadata = PseudoDojoFamily.get_url_metadata(label)
+        dirpath = pathlib.Path(dirpath)
+        filepath_archive = dirpath / 'archive.tgz'
+        filepath_metadata = dirpath / 'metadata.tgz'
 
-        filepath_archive = os.path.join(dirpath, 'archive.tgz')
-        filepath_metadata = os.path.join(dirpath, 'metadata.tgz')
+        download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
-        with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
-            response = requests.get(url_archive)
-            response.raise_for_status()
-            with open(filepath_archive, 'wb') as handle:
-                handle.write(response.content)
-                handle.flush()
-                description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+        description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+        description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(PseudoDojoFamily, label, filepath_archive, pseudo_type=pseudo_type)
-
-        with attempt('downloading selected pseudo potentials metadata archive... ', include_traceback=traceback):
-            response = requests.get(url_metadata)
-            response.raise_for_status()
-            with open(filepath_metadata, 'wb') as handle:
-                handle.write(response.content)
-                handle.flush()
-                description += f'\nPseudo metadata archive md5: {md5_file(filepath_metadata)}'
 
         with attempt('unpacking metadata archive and parsing metadata...', include_traceback=traceback):
             md5s, cutoffs = PseudoDojoFamily.parse_djrepos_from_archive(filepath_metadata, pseudo_type=pseudo_type)

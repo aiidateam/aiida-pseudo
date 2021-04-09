@@ -117,7 +117,7 @@ def get_pseudo_potential_data(filepath_pseudos):
 
 @pytest.fixture
 def get_pseudo_family(tmpdir, filepath_pseudos):
-    """Return a factory for a `PseudoPotentialFamily` instance."""
+    """Return a factory for a ``PseudoPotentialFamily`` instance."""
 
     def _get_pseudo_family(
         label='family',
@@ -125,6 +125,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         pseudo_type=PseudoPotentialData,
         elements=None,
         cutoffs=None,
+        unit=None,
         default_stringency=None
     ) -> PseudoPotentialFamily:
         """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
@@ -132,6 +133,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         :param elements: optional list of elements to include instead of all the available ones
         :params cutoffs: optional dictionary of cutoffs to specify. Needs to respect the format expected by the method
             `aiida_pseudo.groups.mixins.cutoffs.RecommendedCutoffMixin.set_cutoffs`.
+        :param unit: string definition of a unit of energy as recognized by the ``UnitRegistry`` of the ``pint`` lib.
         :param default_stringency: string with the default stringency name, if not specified, the first one specified in
             the ``cutoffs`` argument will be used if specified.
         :return: the pseudo family
@@ -155,7 +157,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 
         if cutoffs is not None and isinstance(family, CutoffsFamily):
             default_stringency = default_stringency or list(cutoffs.keys())[0]
-            family.set_cutoffs(cutoffs, default_stringency)
+            family.set_cutoffs(cutoffs, default_stringency, unit)
 
         return family
 

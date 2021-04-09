@@ -84,7 +84,6 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     from aiida.orm import Group, QueryBuilder
 
     from aiida_pseudo import __version__
-    from aiida_pseudo.common import units
     from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
     from .utils import attempt, create_family_from_archive
 
@@ -136,13 +135,10 @@ def cmd_install_sssp(version, functional, protocol, traceback):
                 echo.echo_critical(msg)
 
             # Cutoffs are in Rydberg but need to be stored in the family in electronvolt.
-            cutoffs[element] = {
-                'cutoff_wfc': values['cutoff_wfc'] * units.RY_TO_EV,
-                'cutoff_rho': values['cutoff_rho'] * units.RY_TO_EV,
-            }
+            cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
 
         family.description = description
-        family.set_cutoffs({'normal': cutoffs})
+        family.set_cutoffs({'normal': cutoffs}, unit='Ry')
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
 
@@ -264,6 +260,6 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
                 echo.echo_warning(msg)
 
         family.description = description
-        family.set_cutoffs(cutoffs, default_stringency=default_stringency)
+        family.set_cutoffs(cutoffs, default_stringency=default_stringency, unit='Eh')
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

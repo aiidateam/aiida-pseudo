@@ -55,8 +55,9 @@ def cmd_family_cutoffs():
 @arguments.PSEUDO_POTENTIAL_FAMILY()
 @click.argument('cutoffs', type=click.File(mode='rb'))
 @options.STRINGENCY(required=True)
+@options.UNIT()
 @decorators.with_dbenv()
-def cmd_family_cutoffs_set(family, cutoffs, stringency):  # noqa: D301
+def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
     """Set the recommended cutoffs for a pseudo potential family.
 
     The cutoffs should be provided as a JSON file through the argument `CUTOFFS` which should have the structure:
@@ -70,10 +71,15 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency):  # noqa: D301
             ...
         }
 
-    where the cutoffs are expected to be in electronvolt.
+    where the cutoffs are expected to be in electronvolt by default.
     """
     if not isinstance(family, RecommendedCutoffMixin):
         raise click.BadParameter(f'family `{family}` does not support recommended cutoffs to be set.')
+
+    try:
+        family.validate_cutoffs_unit(unit)
+    except ValueError as exception:
+        raise click.BadParameter(f'{exception}', param_hint='UNIT')
 
     try:
         data = json.load(cutoffs)
@@ -81,7 +87,7 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency):  # noqa: D301
         raise click.BadParameter(f'`{cutoffs.name}` contains invalid JSON: {exception}', param_hint='CUTOFFS')
 
     try:
-        family.set_cutoffs({stringency: data})
+        family.set_cutoffs({stringency: data}, unit=unit)
     except ValueError as exception:
         raise click.BadParameter(f'`{cutoffs.name}` contains invalid cutoffs: {exception}', param_hint='CUTOFFS')
 

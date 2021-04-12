@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Command line interface utilities."""
 from contextlib import contextmanager
+from pathlib import Path
 
 from aiida.cmdline.utils import echo
 
@@ -31,7 +32,7 @@ def attempt(message, exception_types=Exception, include_traceback=False):
         echo.echo_highlight(' [OK]', color='success', bold=True)
 
 
-def create_family_from_archive(cls, label, filepath_archive, fmt=None, pseudo_type=None):
+def create_family_from_archive(cls, label, filepath_archive: Path, fmt=None, pseudo_type=None):
     """Construct a new pseudo family instance from a tar.gz archive.
 
     .. warning:: the archive should not contain any subdirectories, but just the pseudo potential files.

@@ -5,6 +5,8 @@ import json
 import os
 import re
 import warnings
+
+from pathlib import Path
 from typing import Sequence
 
 from aiida.common.exceptions import ParsingError
@@ -314,7 +316,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         return md5s, cutoffs
 
     @classmethod
-    def parse_djrepos_from_archive(cls, filepath_metadata, fmt=None, pseudo_type=None):
+    def parse_djrepos_from_archive(cls, filepath_metadata: Path, fmt=None, pseudo_type=None):
         """Parse metadata from a djrepo .tgz archive.
 
         .. warning:: the archive should not contain any subdirectories, but just the djrepo files.

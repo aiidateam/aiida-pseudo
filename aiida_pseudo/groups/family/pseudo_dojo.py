@@ -333,7 +333,8 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
         with tempfile.TemporaryDirectory() as dirpath:
             try:
-                shutil.unpack_archive(filepath_metadata, dirpath, format=fmt)
+                # In Python 3.6 the ``unpack_archive`` method does not yet support ``pathlib.Path`` objects.
+                shutil.unpack_archive(str(filepath_metadata), dirpath, format=fmt)
             except shutil.ReadError as exception:
                 raise OSError(
                     f'failed to unpack the metadata archive `{filepath_metadata}`: {exception}'

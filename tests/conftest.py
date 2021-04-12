@@ -102,7 +102,8 @@ def get_pseudo_potential_data(filepath_pseudos):
         """
         if entry_point is None:
             cls = DataFactory('pseudo')
-            pseudo = cls(io.BytesIO(b'content'), f'{element}.pseudo')
+            content = f'<UPF version="2.0.1"><PP_HEADER\nelement="{element}"\nz_valence="4.0"\n/></UPF>\n'
+            pseudo = cls(io.BytesIO(content.encode('utf-8')), f'{element}.pseudo')
             pseudo.element = element
         else:
             cls = DataFactory(f'pseudo.{entry_point}')

@@ -22,6 +22,7 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
     _pseudo_types = (UpfData,)
 
     label_template = 'SSSP/{version}/{functional}/{protocol}'
+    filename_template = 'SSSP_{version}_{functional}_{protocol}'
     default_configuration = SsspConfiguration('1.1', 'PBE', 'efficiency')
     valid_configurations = (
         SsspConfiguration('1.0', 'PBE', 'efficiency'),
@@ -47,6 +48,18 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         return cls.label_template.format(
             version=configuration.version, functional=configuration.functional, protocol=configuration.protocol
         )
+
+    @classmethod
+    def format_configuration_filename(cls, configuration: SsspConfiguration, extension: str) -> str:
+        """Format the filename for a file of a particular SSSP configuration as it is available from MC Archive.
+
+        :param configuration: the SSSP configuration.
+        :param extension: the filename extension without the leading dot.
+        :return: filename
+        """
+        return cls.filename_template.format(
+            version=configuration.version, functional=configuration.functional, protocol=configuration.protocol
+        ) + f'.{extension}'
 
     def __init__(self, label=None, **kwargs):
         """Construct a new instance, validating that the label matches the required format."""

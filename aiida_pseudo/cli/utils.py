@@ -52,7 +52,8 @@ def create_family_from_archive(cls, label, filepath_archive, fmt=None, pseudo_ty
     with tempfile.TemporaryDirectory() as dirpath:
 
         try:
-            shutil.unpack_archive(filepath_archive, dirpath, format=fmt)
+            # In Python 3.6 the ``unpack_archive`` method does not yet support ``pathlib.Path`` objects.
+            shutil.unpack_archive(str(filepath_archive), dirpath, format=fmt)
         except shutil.ReadError as exception:
             raise OSError(f'failed to unpack the archive `{filepath_archive}`: {exception}') from exception
 

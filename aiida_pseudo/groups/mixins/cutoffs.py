@@ -98,7 +98,7 @@ class RecommendedCutoffMixin:
         """
         return self.get_extra(self._key_cutoffs, {})
 
-    def _get_cutoffs_unit_dict(self) -> str:
+    def _get_cutoffs_unit_dict(self) -> dict:
         """Return the cutoffs units for each of the stringencies.
 
         :return: the cutoffs units extra or an empty dictionary if it has not yet been set.
@@ -119,14 +119,14 @@ class RecommendedCutoffMixin:
     def set_default_stringency(self, default_stringency: str) -> None:
         """Set the default stringency for the recommended cutoffs.
 
-        :param default_stringency: the default stringency to be used when ``get_recommended_cutoffs`` is called. If is
+        :param default_stringency: the default stringency to be used when ``get_recommended_cutoffs`` is called. It is
             possible to not specify this if and only if the cutoffs only contain a single stringency set. That one will
             then automatically be set as default.
         :raises ValueError: if the provided default stringency is not in the tuple of available cutoff stringencies for
             the pseudo family.
         """
         if default_stringency not in self.get_cutoff_stringencies():
-            raise ValueError('provided default stringency not in tuple of available cutoff stringencies.')
+            raise ValueError(f'provided default stringency not in tuple of available cutoff stringencies: {self.get_cutoff_stringencies}.')
 
         self.set_extra(self._key_default_stringency, default_stringency)
 
@@ -140,7 +140,7 @@ class RecommendedCutoffMixin:
     def set_cutoffs(self, cutoffs: dict, stringency: str, unit: str = None) -> None:
         """Set the recommended cutoffs for the pseudos in this family and a specified stringency.
 
-        .. note: If there is only one stringency defined for the pseudo family, this method will automatically set this
+        .. note: If, after the cutoffs have been set, there is only one stringency defined for the pseudo family, this method will automatically set this
             as the default. Use the ``set_default_stringency`` method to change the default when setting multiple
             stringencies.
 
@@ -193,8 +193,8 @@ class RecommendedCutoffMixin:
             raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
 
     def get_cutoffs_unit(self, stringency: str = None) -> str:
-        """Return the cutoffs unit.
-
+        """Return the cutoffs unit for the specified or family default stringency.
+:param stringency: optional stringency for which to retrieve the unit. If not specified, the default stringency of the family is uses.
         :return: the string representation of the unit of the cutoffs.
         """
         stringency = stringency or self.get_default_stringency()

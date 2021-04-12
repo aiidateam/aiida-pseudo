@@ -13,7 +13,7 @@ from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
 
 
 @pytest.fixture
-def generate_cutoffs_dict(tmp_path):
+def generate_cutoffs_dict():
     """Return a dictionary of cutoffs for a given family."""
 
     def _generate_cutoffs_dict(family, stringencies=('normal',)):
@@ -31,7 +31,7 @@ def generate_cutoffs_dict(tmp_path):
 
 
 @pytest.fixture
-def generate_cutoffs(tmp_path):
+def generate_cutoffs():
     """Return a dictionary of cutoffs for a given family."""
 
     def _generate_cutoffs(family):

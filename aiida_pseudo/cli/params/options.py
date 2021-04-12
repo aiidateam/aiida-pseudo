@@ -9,7 +9,7 @@ from .types import PseudoPotentialFamilyTypeParam
 
 __all__ = (
     'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'STRINGENCY', 'DEFAULT_STRINGENCY',
-    'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT'
+    'TRACEBACK', 'FAMILY_TYPE', 'ARCHIVE_FORMAT', 'UNIT', 'DOWNLOAD_ONLY'
 )
 
 VERSION = OverridableOption(
@@ -81,4 +81,13 @@ UNIT = OverridableOption(
     default='eV',
     show_default=True,
     help='Specify the energy unit of the cutoffs. Must be recognized by the ``UnitRegistry`` of the ``pint`` library.'
+)
+
+DOWNLOAD_ONLY = OverridableOption(
+    '--download-only',
+    is_flag=True,
+    help=(
+        'Only download the pseudopotential files to the current working directory, without installing the '
+        'pseudopotential family.'
+    )
 )

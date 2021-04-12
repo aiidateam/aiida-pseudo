@@ -30,6 +30,13 @@ def ctx():
 
 
 @pytest.fixture
+def chtmpdir(tmpdir):
+    """Change the current working directory to a temporary directory."""
+    with tmpdir.as_cwd():
+        yield
+
+
+@pytest.fixture
 def run_cli_command():
     """Run a `click` command with the given options.
 

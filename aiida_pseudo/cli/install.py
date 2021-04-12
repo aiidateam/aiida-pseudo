@@ -59,7 +59,7 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
         handle.flush()
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
-            family = create_family_from_archive(family_type, label, handle.name, fmt=archive_format)
+            family = create_family_from_archive(family_type, label, pathlib.Path(handle.name), fmt=archive_format)
 
     family.description = description
     echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
@@ -143,9 +143,10 @@ def download_pseudo_dojo(
 @options.VERSION(type=click.Choice(['1.0', '1.1']), default='1.1', show_default=True)
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
 @options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
+@options.DOWNLOAD_ONLY()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_sssp(version, functional, protocol, traceback):
+def cmd_install_sssp(version, functional, protocol, download_only, traceback):
     """Install an SSSP configuration.
 
     The SSSP configuration will be automatically downloaded from the Materials Cloud Archive entry to create a new
@@ -166,7 +167,7 @@ def cmd_install_sssp(version, functional, protocol, traceback):
     if configuration not in SsspFamily.valid_configurations:
         echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
 
-    if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
+    if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
         echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
 
     with tempfile.TemporaryDirectory() as dirpath:
@@ -177,12 +178,23 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 
         download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
+        description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
+        description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
+
+        if download_only:
+            for filepath in [filepath_archive, filepath_metadata]:
+                filepath_target = pathlib.Path.cwd() / filepath.name
+                if filepath_target.exists():
+                    echo.echo_warning(f'the file `{filepath_target}` already exists, skipping.')
+                else:
+                    # Cannot use ``pathlib.Path.rename`` because this will fail if it moves across file systems.
+                    shutil.move(filepath, filepath_target)
+                    echo.echo_success(f'`{filepath_target.name}` written to the current directory.')
+            return
+
         with open(filepath_metadata, 'rb') as handle:
             handle.seek(0)
             metadata = json.load(handle)
-
-        description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
-        description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(SsspFamily, label, filepath_archive)
@@ -210,15 +222,18 @@ def cmd_install_sssp(version, functional, protocol, traceback):
 @options.PROTOCOL(type=click.Choice(['standard', 'stringent']), default='standard', show_default=True)
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml', 'jthxml']), default='psp8', show_default=True)
 @options.DEFAULT_STRINGENCY(type=click.Choice(['low', 'normal', 'high']), default='normal', show_default=True)
+@options.DOWNLOAD_ONLY()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_format, default_stringency, traceback):
+def cmd_install_pseudo_dojo(
+    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, traceback
+):
     """Install a PseudoDojo configuration.
 
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
     `PseudoDojoFamily` subclass instance based on the specified pseudopotential format.
     """
-    # pylint: disable=too-many-locals,too-many-arguments
+    # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
     from aiida_pseudo import __version__
@@ -255,7 +270,7 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
     if configuration not in PseudoDojoFamily.valid_configurations:
         echo.echo_critical('{} {} {} {} {} is not a valid PseudoDojo configuration'.format(*configuration))
 
-    if QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
+    if not download_only and QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
         echo.echo_critical(f'{PseudoDojoFamily.__name__}<{label}> is already installed')
 
     with tempfile.TemporaryDirectory() as dirpath:
@@ -268,6 +283,17 @@ def cmd_install_pseudo_dojo(version, functional, relativistic, protocol, pseudo_
 
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
+
+        if download_only:
+            for filepath in [filepath_archive, filepath_metadata]:
+                filepath_target = pathlib.Path.cwd() / filepath.name
+                if filepath_target.exists():
+                    echo.echo_warning(f'the file `{filepath_target}` already exists, skipping.')
+                else:
+                    # Cannot use ``pathlib.Path.rename`` because this will fail if it moves across file systems.
+                    shutil.move(filepath, filepath_target)
+                    echo.echo_success(f'`{filepath_target.name}` written to the current directory.')
+            return
 
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(PseudoDojoFamily, label, filepath_archive, pseudo_type=pseudo_type)

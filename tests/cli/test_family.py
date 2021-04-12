@@ -89,10 +89,8 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     stringency = 'normal'
     cutoffs = generate_cutoffs(family)
 
-    # Currently, the CLI checks that the unit set matches the one already set on the family, because only a single
-    # unit can be used at a time. This limitation will soon be removed though, at which point, this family should have
-    # eV as a unit, such that the test of the CLI call to set it to hartree actually tests that the unit is changed.
-    family.set_cutoffs(cutoffs, stringency, 'hartree')
+    # We explicitly set the unit to the default (eV) in case this is changed in the future to hartree.
+    family.set_cutoffs(cutoffs, stringency, 'eV')
 
     filepath = tmp_path / 'cutoffs.json'
     filepath.write_text(json.dumps(cutoffs))

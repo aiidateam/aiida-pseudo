@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras."""
-from typing import Union
-
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory
 
@@ -105,10 +103,10 @@ class RecommendedCutoffMixin:
         """
         return self.get_extra(self._key_cutoffs_unit, {})
 
-    def get_default_stringency(self) -> Union[str, None]:
+    def get_default_stringency(self) -> str:
         """Return the default stringency if defined.
 
-        :return: the default stringency or ``None`` if no cutoffs have been defined for this family.
+        :return: the default stringency.
         :raises ValueError: if default stringency has not been defined.
         """
         try:
@@ -119,14 +117,15 @@ class RecommendedCutoffMixin:
     def set_default_stringency(self, default_stringency: str) -> None:
         """Set the default stringency for the recommended cutoffs.
 
-        :param default_stringency: the default stringency to be used when ``get_recommended_cutoffs`` is called. It is
-            possible to not specify this if and only if the cutoffs only contain a single stringency set. That one will
-            then automatically be set as default.
+        :param default_stringency: the default stringency to be used for the recommended cutoffs.
         :raises ValueError: if the provided default stringency is not in the tuple of available cutoff stringencies for
             the pseudo family.
         """
         if default_stringency not in self.get_cutoff_stringencies():
-            raise ValueError(f'provided default stringency not in tuple of available cutoff stringencies: {self.get_cutoff_stringencies}.')
+            raise ValueError(
+                'provided default stringency not in tuple of available cutoff stringencies: '
+                f'{self.get_cutoff_stringencies()}.'
+            )
 
         self.set_extra(self._key_default_stringency, default_stringency)
 
@@ -140,9 +139,9 @@ class RecommendedCutoffMixin:
     def set_cutoffs(self, cutoffs: dict, stringency: str, unit: str = None) -> None:
         """Set the recommended cutoffs for the pseudos in this family and a specified stringency.
 
-        .. note: If, after the cutoffs have been set, there is only one stringency defined for the pseudo family, this method will automatically set this
-            as the default. Use the ``set_default_stringency`` method to change the default when setting multiple
-            stringencies.
+        .. note: If, after the cutoffs have been set, there is only one stringency defined for the pseudo family, this
+            method will automatically set this as the default. Use the ``set_default_stringency`` method to change the
+            default when setting multiple stringencies.
 
         :param cutoffs: dictionary with recommended cutoffs. Format: set of recommended cutoffs written as a
             dictionary that maps each element for which the family contains a pseudopotential to a dictionary that
@@ -178,11 +177,12 @@ class RecommendedCutoffMixin:
         if len(cutoffs_dict) == 1:
             self.set_default_stringency(stringency)
 
-    def get_cutoffs(self, stringency=None) -> Union[dict, None]:
+    def get_cutoffs(self, stringency=None) -> dict:
         """Return a set of cutoffs for the given stringency.
 
-        :param stringency: optional stringency if different from the default.
-        :return: the cutoffs or ``None`` if no cutoffs whatsoever have been defined for this family.
+        :param stringency: optional stringency for which to retrieve the cutoffs. If not specified, the default
+            stringency of the family is used.
+        :raises ValueError: if no stringency is specified and no default stringency is defined for the family.
         :raises ValueError: if the requested stringency is not defined for this family.
         """
         stringency = stringency or self.get_default_stringency()
@@ -192,10 +192,35 @@ class RecommendedCutoffMixin:
         except KeyError as exception:
             raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
 
+    def delete_cutoffs(self, stringency) -> None:
+        """Delete the recommended cutoffs for a specified stringency.
+
+        :param stringency: stringency for which to delete the cutoffs.
+        :raises ValueError: if the requested stringency is not defined for this family.
+        """
+        if stringency not in self.get_cutoff_stringencies():
+            raise ValueError(f'stringency `{stringency}` is not defined for this family.')
+
+        cutoffs_dict = self._get_cutoffs_dict()
+        cutoffs_dict.pop(stringency)
+
+        cutoffs_unit_dict = self._get_cutoffs_unit_dict()
+        cutoffs_unit_dict.pop(stringency)
+
+        self.set_extra(self._key_cutoffs, cutoffs_dict)
+        self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+
+        if stringency == self.get_default_stringency():
+            self.delete_extra('_default_stringency')
+
     def get_cutoffs_unit(self, stringency: str = None) -> str:
         """Return the cutoffs unit for the specified or family default stringency.
-:param stringency: optional stringency for which to retrieve the unit. If not specified, the default stringency of the family is uses.
+
+        :param stringency: optional stringency for which to retrieve the unit. If not specified, the default stringency
+            of the family is used.
         :return: the string representation of the unit of the cutoffs.
+        :raises ValueError: if no stringency is specified and no default stringency is defined for the family.
+        :raises ValueError: if the requested stringency is not defined for this family.
         """
         stringency = stringency or self.get_default_stringency()
 

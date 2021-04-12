@@ -30,37 +30,38 @@ class RecommendedCutoffMixin:
         """Validate a cutoff dictionary for a given set of elements.
 
         :param elements: set of elements for which to validate the cutoffs dictionary.
-        :param cutoffs: dictionary with recommended cutoffs. Format: multiple sets of recommended cutoffs can be
-            specified where the key represents the stringency, e.g. ``low`` or ``normal``. For each stringency, a
-            dictionary should be defined that for each element symbols for which the family contains a pseudopotential,
-            two values are specified, ``cutoff_wfc`` and ``cutoff_rho``, containing a float value with the recommended
-            cutoff to be used for the wave functions and charge density, respectively.
+        :param cutoffs: dictionary with recommended cutoffs. Format: set of recommended cutoffs written as a
+            dictionary that maps each element for which the family contains a pseudopotential to a dictionary that
+            specifies the ``cutoff_wfc`` and ``cutoff_rho`` keys, corresponding a float value with the recommended
+            cutoff to be used for the wave functions and charge density, respectively. For example:
+
+                {
+                    "Ag": {
+                        "cutoff_wfc": 50.0,
+                        "cutoff_rho": 200.0
+                    },
+                    ...
+                }
         :raises ValueError: if the set of elements and those defined in the cutoffs do not match exactly, or if the
             cutoffs dictionary has an invalid format.
         """
         elements_family = set(elements)
 
-        for stringency, cutoffs_sub in cutoffs.items():
+        elements_cutoffs = set(cutoffs.keys())
+        elements_diff = elements_family ^ elements_cutoffs
 
-            elements_cutoffs = set(cutoffs_sub.keys())
-            elements_diff = elements_family ^ elements_cutoffs
+        if elements_family < elements_cutoffs:
+            raise ValueError(f'cutoffs defined for unsupported elements: {elements_diff}')
 
-            if elements_family < elements_cutoffs:
-                raise ValueError(f'cutoffs defined for unsupported elements: {elements_diff}')
+        if elements_family > elements_cutoffs:
+            raise ValueError(f'cutoffs not defined for all family elements: {elements_diff}')
 
-            if elements_family > elements_cutoffs:
-                raise ValueError(f'cutoffs not defined for all family elements: {elements_diff}')
+        for element, values in cutoffs.items():
+            if set(values.keys()) != {'cutoff_wfc', 'cutoff_rho'}:
+                raise ValueError(f'invalid cutoff keys for element {element}: {values}')
 
-            for element, values in cutoffs_sub.items():
-                if set(values.keys()) != {'cutoff_wfc', 'cutoff_rho'}:
-                    raise ValueError(
-                        f'invalid cutoff keys for stringency `{stringency}` and element {element}: {values}'
-                    )
-
-                if any(not isinstance(cutoff, (int, float)) for cutoff in values.values()):
-                    raise ValueError(
-                        f'invalid cutoff values for stringency `{stringency}` and element {element}: {values}'
-                    )
+            if any(not isinstance(cutoff, (int, float)) for cutoff in values.values()):
+                raise ValueError(f'invalid cutoff values for element {element}: {values}')
 
     @staticmethod
     def validate_cutoffs_unit(unit: str) -> None:
@@ -90,60 +91,92 @@ class RecommendedCutoffMixin:
         if stringency not in self.get_cutoff_stringencies():
             raise ValueError(f'stringency `{stringency}` is not defined for this family.')
 
-    def _get_cutoffs(self) -> dict:
-        """Return the cutoffs dictionary.
+    def _get_cutoffs_dict(self) -> dict:
+        """Return the cutoffs dictionary that maps the stringencies to the recommended cutoffs.
 
         :return: the cutoffs extra or an empty dictionary if it has not yet been set.
         """
         return self.get_extra(self._key_cutoffs, {})
 
+    def _get_cutoffs_unit_dict(self) -> str:
+        """Return the cutoffs units for each of the stringencies.
+
+        :return: the cutoffs units extra or an empty dictionary if it has not yet been set.
+        """
+        return self.get_extra(self._key_cutoffs_unit, {})
+
     def get_default_stringency(self) -> Union[str, None]:
         """Return the default stringency if defined.
 
         :return: the default stringency or ``None`` if no cutoffs have been defined for this family.
-        :raises ValueError: if not default stringency has been defined.
+        :raises ValueError: if default stringency has not been defined.
         """
         try:
             return self.get_extra(self._key_default_stringency)
         except AttributeError as exception:
             raise ValueError('no default stringency has been defined.') from exception
 
+    def set_default_stringency(self, default_stringency: str) -> None:
+        """Set the default stringency for the recommended cutoffs.
+
+        :param default_stringency: the default stringency to be used when ``get_recommended_cutoffs`` is called. If is
+            possible to not specify this if and only if the cutoffs only contain a single stringency set. That one will
+            then automatically be set as default.
+        :raises ValueError: if the provided default stringency is not in the tuple of available cutoff stringencies for
+            the pseudo family.
+        """
+        if default_stringency not in self.get_cutoff_stringencies():
+            raise ValueError('provided default stringency not in tuple of available cutoff stringencies.')
+
+        self.set_extra(self._key_default_stringency, default_stringency)
+
     def get_cutoff_stringencies(self) -> tuple:
         """Return a tuple of the available cutoff stringencies.
 
         :return: the tuple of stringencies that are defined for this family.
         """
-        return tuple(self._get_cutoffs().keys())
+        return tuple(self._get_cutoffs_dict().keys())
 
-    def set_cutoffs(self, cutoffs: dict, default_stringency: str = None, unit: str = None) -> None:
-        """Set the recommended cutoffs for the pseudos in this family.
+    def set_cutoffs(self, cutoffs: dict, stringency: str, unit: str = None) -> None:
+        """Set the recommended cutoffs for the pseudos in this family and a specified stringency.
 
-        .. note:: units of the cutoffs should be in electronvolt.
+        .. note: If there is only one stringency defined for the pseudo family, this method will automatically set this
+            as the default. Use the ``set_default_stringency`` method to change the default when setting multiple
+            stringencies.
 
-        :param cutoffs: dictionary with recommended cutoffs. Format: one or multiple sets of recommended cutoffs can be
-            specified where each key represents a stringency set, e.g. ``low`` or ``normal``. For each stringency, a
-            dictionary should be defined that for each element symbols for which the family contains a pseudopotential,
-            two values are specified, ``cutoff_wfc`` and ``cutoff_rho``, containing a float value with the recommended
-            cutoff to be used for the wave functions and charge density, respectively.
-        :param default_stringency: the default stringency to be used when ``get_recommended_cutoffs`` is called. If is
-            possible to not specify this if and only if the cutoffs only contain a single stringency set. That one will
-            then automatically be set as default.
+        :param cutoffs: dictionary with recommended cutoffs. Format: set of recommended cutoffs written as a
+            dictionary that maps each element for which the family contains a pseudopotential to a dictionary that
+            specifies the ``cutoff_wfc`` and ``cutoff_rho`` keys, corresponding a float value with the recommended
+            cutoff to be used for the wave functions and charge density, respectively. For example:
+
+                {
+                    "Ag": {
+                        "cutoff_wfc": 50.0,
+                        "cutoff_rho": 200.0
+                    },
+                    ...
+                }
+
+        :param stringency: the stringency corresponding to the provided cutoffs.
         :param unit: string definition of a unit of energy as recognized by the ``UnitRegistry`` of the ``pint`` lib.
-        :raises ValueError: if the cutoffs have an invalid format or the default stringency is invalid.
+            Defaults to electronvolt.
+        :raises ValueError: if the cutoffs have an invalid format or the unit is not a valid energy unit.
         """
         unit = unit or self.DEFAULT_UNIT
 
         self.validate_cutoffs(set(self.elements), cutoffs)
         self.validate_cutoffs_unit(unit)
 
-        if default_stringency is None and len(cutoffs) != 1:
-            raise ValueError('have to explicitly specify a default stringency when specifying multiple cutoff sets.')
+        cutoffs_dict = self._get_cutoffs_dict()
+        cutoffs_dict[stringency] = cutoffs
 
-        default_stringency = default_stringency or list(cutoffs.keys())[0]
+        cutoffs_unit_dict = self._get_cutoffs_unit_dict()
+        cutoffs_unit_dict[stringency] = unit
 
-        self.set_extra(self._key_cutoffs, cutoffs)
-        self.set_extra(self._key_cutoffs_unit, unit)
-        self.set_extra(self._key_default_stringency, default_stringency)
+        self.set_extra(self._key_cutoffs, cutoffs_dict)
+        self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+        if len(cutoffs_dict) == 1:
+            self.set_default_stringency(stringency)
 
     def get_cutoffs(self, stringency=None) -> Union[dict, None]:
         """Return a set of cutoffs for the given stringency.
@@ -155,7 +188,19 @@ class RecommendedCutoffMixin:
         stringency = stringency or self.get_default_stringency()
 
         try:
-            return self._get_cutoffs()[stringency]
+            return self._get_cutoffs_dict()[stringency]
+        except KeyError as exception:
+            raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
+
+    def get_cutoffs_unit(self, stringency: str = None) -> str:
+        """Return the cutoffs unit.
+
+        :return: the string representation of the unit of the cutoffs.
+        """
+        stringency = stringency or self.get_default_stringency()
+
+        try:
+            return self._get_cutoffs_unit_dict()[stringency]
         except KeyError as exception:
             raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
 
@@ -190,12 +235,12 @@ class RecommendedCutoffMixin:
 
         cutoffs_wfc = []
         cutoffs_rho = []
-        cutoffs = self.get_cutoffs(stringency=stringency)
+        cutoffs = self.get_cutoffs(stringency)
 
         for element in symbols:
 
             if unit is not None:
-                current_unit = self.get_cutoffs_unit()
+                current_unit = self.get_cutoffs_unit(stringency)
                 values = {k: U.Quantity(v, current_unit).to(unit).to_tuple()[0] for k, v in cutoffs[element].items()}
             else:
                 values = cutoffs[element]
@@ -204,10 +249,3 @@ class RecommendedCutoffMixin:
             cutoffs_rho.append(values['cutoff_rho'])
 
         return (max(cutoffs_wfc), max(cutoffs_rho))
-
-    def get_cutoffs_unit(self) -> str:
-        """Return the cutoffs unit.
-
-        :return: the string representation of the unit of the cutoffs.
-        """
-        return self.get_extra(self._key_cutoffs_unit, self.DEFAULT_UNIT)

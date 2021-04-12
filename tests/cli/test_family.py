@@ -12,40 +12,6 @@ from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
 from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
 
 
-@pytest.fixture
-def generate_cutoffs_dict():
-    """Return a dictionary of cutoffs for a given family."""
-
-    def _generate_cutoffs_dict(family, stringencies=('normal',)):
-        """Return a dictionary of cutoffs for a given family."""
-        cutoffs_dict = {}
-
-        for stringency in stringencies:
-            cutoffs_dict[stringency] = {}
-            for element in family.elements:
-                cutoffs_dict[stringency][element] = {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0}
-
-        return cutoffs_dict
-
-    return _generate_cutoffs_dict
-
-
-@pytest.fixture
-def generate_cutoffs():
-    """Return a dictionary of cutoffs for a given family."""
-
-    def _generate_cutoffs(family):
-        """Return a dictionary of cutoffs for a given family."""
-        cutoffs = {}
-
-        for element in family.elements:
-            cutoffs[element] = {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0}
-
-        return cutoffs
-
-    return _generate_cutoffs
-
-
 @pytest.mark.usefixtures('clear_db')
 def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs_dict, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command."""

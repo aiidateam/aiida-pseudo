@@ -124,6 +124,33 @@ def get_pseudo_potential_data(filepath_pseudos):
 
 
 @pytest.fixture
+def generate_cutoffs():
+    """Return a dictionary of cutoffs for all elements in a given family."""
+
+    def _generate_cutoffs(family):
+        """Return a dictionary of cutoffs for a given family."""
+        return {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in family.elements}
+
+    return _generate_cutoffs
+
+
+@pytest.fixture
+def generate_cutoffs_dict(generate_cutoffs):
+    """Return a dictionary of cutoffs for a given family with specified stringencies."""
+
+    def _generate_cutoffs_dict(family, stringencies=('normal',)):
+        """Return a dictionary of cutoffs for a given family."""
+        cutoffs_dict = {}
+
+        for stringency in stringencies:
+            cutoffs_dict[stringency] = generate_cutoffs(family)
+
+        return cutoffs_dict
+
+    return _generate_cutoffs_dict
+
+
+@pytest.fixture
 def get_pseudo_family(tmpdir, filepath_pseudos):
     """Return a factory for a ``PseudoPotentialFamily`` instance."""
 

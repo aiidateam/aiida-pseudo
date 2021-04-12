@@ -8,33 +8,15 @@ import pytest
 from aiida_pseudo.groups.family import CutoffsFamily
 
 
-@pytest.fixture
-def get_cutoffs_dict():
-    """Return a cutoffs dictionary."""
-
-    def _get_cutoffs_dict(family, stringencies=('default',)):
-        cutoffs = {}
-
-        for element in family.elements:
-            cutoffs[element] = {
-                'cutoff_wfc': 1.0,
-                'cutoff_rho': 2.0,
-            }
-
-        return {stringency: cutoffs for stringency in stringencies}
-
-    return _get_cutoffs_dict
-
-
 @pytest.mark.usefixtures('clear_db')
-def test_get_cutoffs_private(get_pseudo_family, get_cutoffs_dict):
+def test_get_cutoffs_private(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsFamily._get_cutoffs_dict`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family._get_cutoffs_dict() == {}  # pylint: disable=protected-access
 
-    for stringency, cutoffs in get_cutoffs_dict(family).items():
+    for stringency, cutoffs in generate_cutoffs_dict(family).items():
         family.set_cutoffs(cutoffs, stringency)
-    assert family._get_cutoffs_dict() == get_cutoffs_dict(family)  # pylint: disable=protected-access
+    assert family._get_cutoffs_dict() == generate_cutoffs_dict(family)  # pylint: disable=protected-access
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -51,16 +33,16 @@ def test_validate_cutoffs_unit():
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_validate_stringency(get_pseudo_family, get_cutoffs_dict):
+def test_validate_stringency(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.validate_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
 
     with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
         family.validate_stringency('default')
 
-    cutoffs_dict = get_cutoffs_dict(family)
-    stringency = list(cutoffs_dict.keys())[0]
-    family.set_cutoffs(cutoffs_dict[stringency], stringency)
+    cutoffs = generate_cutoffs(family)
+    stringency = 'default'
+    family.set_cutoffs(cutoffs, stringency)
 
     with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
         family.validate_stringency(stringency + 'non-existing')
@@ -69,42 +51,42 @@ def test_validate_stringency(get_pseudo_family, get_cutoffs_dict):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_default_stringency(get_pseudo_family, get_cutoffs_dict):
+def test_get_default_stringency(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.get_default_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
 
     with pytest.raises(ValueError, match='no default stringency has been defined.'):
         family.get_default_stringency()
 
-    cutoffs_dict = get_cutoffs_dict(family)
-    stringency = list(cutoffs_dict.keys())[0]
-    family.set_cutoffs(cutoffs_dict[stringency], stringency)
+    cutoffs = generate_cutoffs(family)
+    stringency = 'default'
+    family.set_cutoffs(cutoffs, stringency)
 
     assert family.get_default_stringency() == stringency
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_cutoff_stringencies(get_pseudo_family, get_cutoffs_dict):
+def test_get_cutoff_stringencies(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsFamily.get_cutoff_stringencies`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family.get_cutoff_stringencies() == ()
 
     stringencies = ('low', 'normal', 'high')
-    for stringency, cutoffs in get_cutoffs_dict(family, stringencies).items():
+    for stringency, cutoffs in generate_cutoffs_dict(family, stringencies).items():
         family.set_cutoffs(cutoffs, stringency)
 
     assert sorted(family.get_cutoff_stringencies()) == sorted(stringencies)
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_set_cutoffs(get_pseudo_family):
+def test_set_cutoffs(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.set_cutoffs`` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
-    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    cutoffs = generate_cutoffs(family)
     stringency = 'default'
-    family.set_cutoffs(cutoffs, stringency)
 
+    family.set_cutoffs(cutoffs, stringency)
     assert family.get_cutoffs() == cutoffs
     assert family.get_cutoffs(stringency) == cutoffs
 
@@ -135,11 +117,11 @@ def test_set_cutoffs(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_set_cutoffs_unit_default(get_pseudo_family):
+def test_set_cutoffs_unit_default(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.set_cutoffs`` sets a default unit if not specified."""
     elements = ['Ar']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
-    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    cutoffs = generate_cutoffs(family)
     stringency = 'default'
 
     family.set_cutoffs(cutoffs, stringency)
@@ -147,14 +129,14 @@ def test_set_cutoffs_unit_default(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_set_cutoffs_auto_default(get_pseudo_family):
+def test_set_cutoffs_auto_default(get_pseudo_family, generate_cutoffs):
     """Test that the ``CutoffsFamily.set_cutoffs`` method specifies the correct default stringency.
 
     If family only has one stringency specified, the `set_cutoffs` method automatically sets this as the default.
     """
     elements = ['Ar']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
-    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    cutoffs = generate_cutoffs(family)
     stringency = 'default'
 
     family.set_cutoffs(cutoffs, stringency)
@@ -163,11 +145,11 @@ def test_set_cutoffs_auto_default(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_cutoffs(get_pseudo_family):
+def test_get_cutoffs(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.get_cutoffs`` method."""
     elements = ['Ar', 'He']
     family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
-    cutoffs = {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in elements}
+    cutoffs = generate_cutoffs(family)
     stringency = 'default'
 
     with pytest.raises(ValueError, match='no default stringency has been defined.'):
@@ -187,28 +169,14 @@ def test_get_cutoffs(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
+def test_get_recommended_cutoffs(get_pseudo_family, generate_structure, generate_cutoffs):
     """Test the ``CutoffsFamily.get_recommended_cutoffs`` method."""
     elements = ['Ar', 'He']
-    cutoffs_dict = {
-        'default': {
-            'Ar': {
-                'cutoff_wfc': 1.0,
-                'cutoff_rho': 2.0
-            },
-            'He': {
-                'cutoff_wfc': 3.0,
-                'cutoff_rho': 8.0
-            },
-        }
-    }
-    family = get_pseudo_family(
-        label='SSSP/1.0/PBE/efficiency',
-        cls=CutoffsFamily,
-        elements=elements,
-        cutoffs_dict=cutoffs_dict,
-        default_stringency='default'
-    )
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+    cutoffs = generate_cutoffs(family)
+    stringency = 'default'
+    family.set_cutoffs(cutoffs, stringency)
+
     structure = generate_structure(elements=elements)
 
     with pytest.raises(ValueError):
@@ -223,49 +191,33 @@ def test_get_recommended_cutoffs(get_pseudo_family, generate_structure):
     with pytest.raises(TypeError):
         family.get_recommended_cutoffs(elements=None, structure='Ar')
 
-    expected = cutoffs_dict['default']['Ar']
+    expected = cutoffs['Ar']
     assert family.get_recommended_cutoffs(elements='Ar') == (expected['cutoff_wfc'], expected['cutoff_rho'])
     assert family.get_recommended_cutoffs(elements=('Ar',)) == (expected['cutoff_wfc'], expected['cutoff_rho'])
 
-    expected = cutoffs_dict['default']['He']
+    expected = cutoffs['He']
     assert family.get_recommended_cutoffs(elements=('Ar', 'He')) == (expected['cutoff_wfc'], expected['cutoff_rho'])
 
-    expected = cutoffs_dict['default']['He']
+    expected = cutoffs['He']
     assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])
 
     # Try structure with multiple kinds with the same element
-    expected = cutoffs_dict['default']['He']
+    expected = cutoffs['He']
     structure = generate_structure(elements=['He1', 'He2'])
     assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_recommended_cutoffs_unit(get_pseudo_family):
+def test_get_recommended_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.get_recommended_cutoffs`` method with the ``unit`` argument."""
     elements = ['Ar', 'He']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+    cutoffs = generate_cutoffs(family)
+    stringency = 'default'
     unit = 'Eh'
-    cutoffs_dict = {
-        'default': {
-            'Ar': {
-                'cutoff_wfc': 1.0,
-                'cutoff_rho': 2.0
-            },
-            'He': {
-                'cutoff_wfc': 3.0,
-                'cutoff_rho': 8.0
-            },
-        }
-    }
-    family = get_pseudo_family(
-        label='SSSP/1.0/PBE/efficiency',
-        cls=CutoffsFamily,
-        elements=elements,
-        cutoffs_dict=cutoffs_dict,
-        default_stringency='default',
-        unit=unit
-    )
+    family.set_cutoffs(cutoffs, stringency, unit)
 
-    cutoffs_ar = cutoffs_dict['default']['Ar']
+    cutoffs_ar = cutoffs['Ar']
 
     expected = (cutoffs_ar['cutoff_wfc'], cutoffs_ar['cutoff_rho'])
     assert family.get_recommended_cutoffs(elements='Ar') == expected
@@ -275,28 +227,14 @@ def test_get_recommended_cutoffs_unit(get_pseudo_family):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_cutoffs_unit(get_pseudo_family):
+def test_get_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsFamily.get_cutoffs_unit`` method."""
     elements = ['Ar', 'He']
-    cutoffs_dict = {
-        'default': {
-            'Ar': {
-                'cutoff_wfc': 1.0,
-                'cutoff_rho': 2.0
-            },
-            'He': {
-                'cutoff_wfc': 3.0,
-                'cutoff_rho': 8.0
-            },
-        }
-    }
-    family = get_pseudo_family(
-        label='SSSP/1.0/PBE/efficiency',
-        cls=CutoffsFamily,
-        elements=elements,
-        cutoffs_dict=cutoffs_dict,
-        default_stringency='default',
-    )
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+    cutoffs = generate_cutoffs(family)
+    stringency = 'default'
+    family.set_cutoffs(cutoffs, stringency)
+
     assert family.get_cutoffs_unit() == 'eV'
     cutoffs = family.get_cutoffs()
     stringency = family.get_default_stringency()

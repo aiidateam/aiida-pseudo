@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras."""
+import warnings
+
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory
 
@@ -195,6 +197,10 @@ class RecommendedCutoffMixin:
     def delete_cutoffs(self, stringency) -> None:
         """Delete the recommended cutoffs for a specified stringency.
 
+        .. note: If, after the cutoffs have been deleted, there is only one stringency defined for the pseudo family,
+            this method will automatically set this as the default. Use the ``set_default_stringency`` method to change
+            the default in case multiple stringencies are still defined.
+
         :param stringency: stringency for which to delete the cutoffs.
         :raises ValueError: if the requested stringency is not defined for this family.
         """
@@ -210,8 +216,30 @@ class RecommendedCutoffMixin:
         self.set_extra(self._key_cutoffs, cutoffs_dict)
         self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
 
-        if stringency == self.get_default_stringency():
-            self.delete_extra('_default_stringency')
+        warning = ''
+        try:
+            if stringency == self.get_default_stringency():
+                self.delete_extra('_default_stringency')
+                warning += f'`{stringency}` was the default stringency of this family. '
+                assign_new_default = True
+            else:
+                assign_new_default = False
+        except ValueError:
+            assign_new_default = True
+
+        if assign_new_default:
+            if len(cutoffs_dict) == 1:
+                final_stringency = list(cutoffs_dict.keys())[0]
+                self.set_default_stringency(final_stringency)
+                warning += f'Setting `{final_stringency}` as the default since it is now the only defined stringency.'
+            else:
+                warning += (
+                    f'Please set one of {self.get_cutoff_stringencies()} as the new default stringency with the '
+                    '`set_default_stringency` method.'
+                )
+
+        if len(warning) > 0:
+            warnings.warn(warning)
 
     def get_cutoffs_unit(self, stringency: str = None) -> str:
         """Return the cutoffs unit for the specified or family default stringency.

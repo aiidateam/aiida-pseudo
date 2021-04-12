@@ -9,7 +9,7 @@ from aiida_pseudo.groups.family import CutoffsFamily
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_get_cutoffs_private(get_pseudo_family, generate_cutoffs_dict):
+def test_get_cutoffs_dict(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsFamily._get_cutoffs_dict`` method."""
     family = get_pseudo_family(cls=CutoffsFamily)
     assert family._get_cutoffs_dict() == {}  # pylint: disable=protected-access
@@ -17,6 +17,20 @@ def test_get_cutoffs_private(get_pseudo_family, generate_cutoffs_dict):
     for stringency, cutoffs in generate_cutoffs_dict(family).items():
         family.set_cutoffs(cutoffs, stringency)
     assert family._get_cutoffs_dict() == generate_cutoffs_dict(family)  # pylint: disable=protected-access
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_get_cutoffs_unit_dict(get_pseudo_family, generate_cutoffs_dict):
+    """Test the ``CutoffsFamily._get_cutoffs_unit_dict`` method."""
+    family = get_pseudo_family(cls=CutoffsFamily)
+    assert family._get_cutoffs_unit_dict() == {}  # pylint: disable=protected-access
+
+    default_units_dict = {}
+    for stringency, cutoffs in generate_cutoffs_dict(family).items():
+        family.set_cutoffs(cutoffs, stringency)
+        default_units_dict[stringency] = CutoffsFamily.DEFAULT_UNIT
+
+    assert family._get_cutoffs_unit_dict() == default_units_dict  # pylint: disable=protected-access
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -63,6 +77,25 @@ def test_get_default_stringency(get_pseudo_family, generate_cutoffs):
     family.set_cutoffs(cutoffs, stringency)
 
     assert family.get_default_stringency() == stringency
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_set_default_stringency(get_pseudo_family, generate_cutoffs_dict):
+    """Test the ``CutoffsFamily.set_default_stringency`` method."""
+    family = get_pseudo_family(cls=CutoffsFamily)
+    assert family.get_cutoff_stringencies() == ()
+
+    stringencies = ('low', 'normal')
+    for stringency, cutoffs in generate_cutoffs_dict(family, stringencies).items():
+        family.set_cutoffs(cutoffs, stringency)
+
+    assert family.get_default_stringency() == 'low'
+
+    with pytest.raises(ValueError, match='provided default stringency not in tuple of available cutoff stringencies:'):
+        family.set_default_stringency('nonexistent')
+
+    family.set_default_stringency('normal')
+    assert family.get_default_stringency() == 'normal'
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -126,6 +159,31 @@ def test_set_cutoffs_unit_default(get_pseudo_family, generate_cutoffs):
 
     family.set_cutoffs(cutoffs, stringency)
     assert family.get_cutoffs_unit() == CutoffsFamily.DEFAULT_UNIT
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_set_cutoffs_multiple_units(get_pseudo_family, generate_cutoffs):
+    """Test the ``CutoffsFamily.set_cutoffs`` correctly sets separate units for different stringencies."""
+    elements = ['Ar']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+    cutoffs = generate_cutoffs(family)
+
+    cutoffs_unit_dict = {}
+
+    stringency = 'default'
+    unit = 'hartree'
+    family.set_cutoffs(cutoffs, stringency, unit)
+    cutoffs_unit_dict[stringency] = unit
+    assert family.get_cutoffs_unit() == unit
+
+    stringency = 'rydberg'
+    unit = 'Ry'
+    family.set_cutoffs(cutoffs, stringency, unit)
+    cutoffs_unit_dict[stringency] = unit
+    assert family.get_cutoffs_unit(stringency) == unit
+
+    # pylint: disable=protected-access
+    assert family._get_cutoffs_unit_dict() == {'default': 'hartree', 'rydberg': 'Ry'}
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -244,3 +302,29 @@ def test_get_cutoffs_unit(get_pseudo_family, generate_cutoffs):
 
     family.set_cutoffs(cutoffs, stringency, unit='Eh')
     assert family.get_cutoffs_unit() == 'Eh'
+
+
+@pytest.mark.usefixtures('clear_db')
+def test_delete_cutoffs(get_pseudo_family, generate_cutoffs_dict):
+    """Test the ``CutoffsFamily.delete_cutoffs`` method."""
+    elements = ['Ar', 'He']
+    family = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=CutoffsFamily, elements=elements)
+
+    stringencies = ('low', 'normal', 'high')
+    for stringency, cutoffs in generate_cutoffs_dict(family, stringencies).items():
+        family.set_cutoffs(cutoffs, stringency)
+
+    with pytest.raises(ValueError, match='stringency `nonexistent` is not defined for this family.'):
+        family.delete_cutoffs('nonexistent')
+
+    with pytest.warns(UserWarning, match='`low` was the default stringency of this family. Please set'):
+        family.delete_cutoffs('low')
+    assert sorted(family.get_cutoff_stringencies()) == sorted(('normal', 'high'))
+
+    with pytest.raises(ValueError, match='no default stringency has been defined.'):
+        family.get_default_stringency()
+
+    with pytest.warns(UserWarning, match='Setting `high` as the default since it is now the only defined stringency.'):
+        family.delete_cutoffs('normal')
+
+    assert family.get_default_stringency() == 'high'

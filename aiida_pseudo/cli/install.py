@@ -210,7 +210,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
             cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
 
         family.description = description
-        family.set_cutoffs({'normal': cutoffs}, unit='Ry')
+        family.set_cutoffs(cutoffs, 'normal', unit='Ry')
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
 
@@ -331,6 +331,8 @@ def cmd_install_pseudo_dojo(
                 echo.echo_warning(msg)
 
         family.description = description
-        family.set_cutoffs(cutoffs, default_stringency=default_stringency, unit='Eh')
+        for stringency, cutoff_values in cutoffs.items():
+            family.set_cutoffs(cutoff_values, stringency, unit='Eh')
+        family.set_default_stringency(default_stringency)
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

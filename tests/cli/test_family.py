@@ -12,33 +12,16 @@ from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
 from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
 
 
-@pytest.fixture
-def generate_cutoffs(tmp_path):
-    """Return a dictionary of cutoffs for a given family."""
-
-    def _generate_cutoffs(family, stringencies=('normal',)):
-        """Return a dictionary of cutoffs for a given family."""
-        cutoffs = {}
-
-        for stringency in stringencies:
-            cutoffs[stringency] = {}
-            for element in family.elements:
-                cutoffs[stringency][element] = {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0}
-
-        return cutoffs
-
-    return _generate_cutoffs
-
-
 @pytest.mark.usefixtures('clear_db')
-def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs, tmp_path):
+def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs_dict, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command."""
     family = get_pseudo_family(cls=CutoffsFamily)
     stringencies = ('low', 'normal', 'high')
-    cutoffs = generate_cutoffs(family, stringencies=stringencies)
+    cutoffs_dict = generate_cutoffs_dict(family, stringencies=stringencies)
 
     # Set two stringencies
-    family.set_cutoffs({'low': cutoffs['low'], 'normal': cutoffs['normal']}, 'normal')
+    for stringency in ('low', 'normal'):
+        family.set_cutoffs(cutoffs_dict[stringency], stringency)
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
 
     filepath = tmp_path / 'cutoffs.json'
@@ -57,12 +40,12 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
 
     # Set correct stringency
     stringency = 'high'
-    filepath.write_text(json.dumps(cutoffs['high']))
+    filepath.write_text(json.dumps(cutoffs_dict['high']))
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency])
     assert 'Success: set cutoffs for' in result.output
     assert stringency in family.get_cutoff_stringencies()
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal', 'high'])
-    assert family.get_cutoffs(stringency) == cutoffs[stringency]
+    assert family.get_cutoffs(stringency) == cutoffs_dict[stringency]
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -70,15 +53,13 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     """Test the `aiida-pseudo family cutoffs set` command with the ``--unit`` flag."""
     family = get_pseudo_family(cls=CutoffsFamily)
     stringency = 'normal'
-    cutoffs = generate_cutoffs(family, stringencies=(stringency,))
+    cutoffs = generate_cutoffs(family)
 
-    # Currently, the CLI checks that the unit set matches the one already set on the family, because only a single
-    # unit can be used at a time. This limitation will soon be removed though, at which point, this family should have
-    # eV as a unit, such that the test of the CLI call to set it to hartree actually tests that the unit is changed.
-    family.set_cutoffs(cutoffs, unit='hartree', default_stringency=stringency)
+    # We explicitly set the unit to the default (eV) in case this is changed in the future to hartree.
+    family.set_cutoffs(cutoffs, stringency, 'eV')
 
     filepath = tmp_path / 'cutoffs.json'
-    filepath.write_text(json.dumps(cutoffs[stringency]))
+    filepath.write_text(json.dumps(cutoffs))
 
     # Invalid unit
     unit = 'GME stock'
@@ -103,13 +84,14 @@ def test_family_show(clear_db, run_cli_command, get_pseudo_family):
         assert node.filename in result.output
 
 
-def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_family, generate_cutoffs):
+def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_family, generate_cutoffs_dict):
     """Test the `aiida-pseudo show` command for a family with recommended cutoffs."""
     family = get_pseudo_family(cls=CutoffsFamily)
     stringencies = ('normal', 'high')
-    cutoffs = generate_cutoffs(family, stringencies=stringencies)
+    cutoffs_dict = generate_cutoffs_dict(family, stringencies=stringencies)
 
-    family.set_cutoffs(cutoffs, 'normal')
+    for stringency, cutoffs in cutoffs_dict.items():
+        family.set_cutoffs(cutoffs, stringency)
 
     # Test the command prints an error for a non-existing stringency
     result = run_cli_command(cmd_family_show, [family.label, '--stringency', 'non-existing'], raises=True)

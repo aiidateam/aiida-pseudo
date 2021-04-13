@@ -58,7 +58,7 @@ def cmd_family_cutoffs():
 @options.UNIT()
 @decorators.with_dbenv()
 def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
-    """Set the recommended cutoffs for a pseudo potential family.
+    """Set the recommended cutoffs for a pseudo potential family and a specified stringency.
 
     The cutoffs should be provided as a JSON file through the argument `CUTOFFS` which should have the structure:
 
@@ -86,17 +86,8 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
     except ValueError as exception:
         raise click.BadParameter(f'`{cutoffs.name}` contains invalid JSON: {exception}', param_hint='CUTOFFS')
 
-    # This limitation can be removed once ``set_cutoffs`` allows to set additive stringencies and each stringency can
-    # define its own unit.
-    current_unit = family.get_cutoffs_unit()
-    if unit != current_unit:
-        raise click.BadParameter(f'`{unit}` does not match the unit of the family `{current_unit}`', param_hint='UNIT')
-
     try:
-        # This code can also be simplified once ``set_cutoffs`` allows to set individual stringencies additively.
-        current_cutoffs = family._get_cutoffs()  # pylint: disable=protected-access
-        current_cutoffs[stringency] = data
-        family.set_cutoffs(current_cutoffs, default_stringency=family.get_default_stringency(), unit=unit)
+        family.set_cutoffs(data, stringency, unit=unit)
     except ValueError as exception:
         raise click.BadParameter(f'`{cutoffs.name}` contains invalid cutoffs: {exception}', param_hint='CUTOFFS')
 

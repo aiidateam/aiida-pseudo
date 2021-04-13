@@ -124,6 +124,33 @@ def get_pseudo_potential_data(filepath_pseudos):
 
 
 @pytest.fixture
+def generate_cutoffs():
+    """Return a dictionary of cutoffs for all elements in a given family."""
+
+    def _generate_cutoffs(family):
+        """Return a dictionary of cutoffs for a given family."""
+        return {element: {'cutoff_wfc': 1.0, 'cutoff_rho': 2.0} for element in family.elements}
+
+    return _generate_cutoffs
+
+
+@pytest.fixture
+def generate_cutoffs_dict(generate_cutoffs):
+    """Return a dictionary of cutoffs for a given family with specified stringencies."""
+
+    def _generate_cutoffs_dict(family, stringencies=('normal',)):
+        """Return a dictionary of cutoffs for a given family."""
+        cutoffs_dict = {}
+
+        for stringency in stringencies:
+            cutoffs_dict[stringency] = generate_cutoffs(family)
+
+        return cutoffs_dict
+
+    return _generate_cutoffs_dict
+
+
+@pytest.fixture
 def get_pseudo_family(tmpdir, filepath_pseudos):
     """Return a factory for a ``PseudoPotentialFamily`` instance."""
 
@@ -132,15 +159,18 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
         cls=PseudoPotentialFamily,
         pseudo_type=PseudoPotentialData,
         elements=None,
-        cutoffs=None,
+        cutoffs_dict=None,
         unit=None,
         default_stringency=None
     ) -> PseudoPotentialFamily:
         """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
 
         :param elements: optional list of elements to include instead of all the available ones
-        :params cutoffs: optional dictionary of cutoffs to specify. Needs to respect the format expected by the method
-            `aiida_pseudo.groups.mixins.cutoffs.RecommendedCutoffMixin.set_cutoffs`.
+        :params cutoffs_dict: optional dictionary of cutoffs to specify. Format: multiple sets of cutoffs can be
+            specified where the key represents the stringency, e.g. ``low`` or ``normal``. For each stringency, a
+            dictionary should be defined that for each element symbols for which the family contains a pseudopotential,
+            two values are specified, ``cutoff_wfc`` and ``cutoff_rho``, containing a float value with the recommended
+            cutoff to be used for the wave functions and charge density, respectively..
         :param unit: string definition of a unit of energy as recognized by the ``UnitRegistry`` of the ``pint`` lib.
         :param default_stringency: string with the default stringency name, if not specified, the first one specified in
             the ``cutoffs`` argument will be used if specified.
@@ -163,9 +193,11 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 
         family = cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
 
-        if cutoffs is not None and isinstance(family, CutoffsFamily):
-            default_stringency = default_stringency or list(cutoffs.keys())[0]
-            family.set_cutoffs(cutoffs, default_stringency, unit)
+        if cutoffs_dict is not None and isinstance(family, CutoffsFamily):
+            default_stringency = default_stringency or list(cutoffs_dict.keys())[0]
+            for stringency, cutoff_values in cutoffs_dict.items():
+                family.set_cutoffs(cutoff_values, stringency, unit)
+            family.set_default_stringency(default_stringency)
 
         return family
 

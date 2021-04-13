@@ -1,5 +1,32 @@
 # Change log
 
+## 0.6.0
+
+The biggest change in this release is the addition of explicit units for the recommended cutoffs of pseudopotential families that support it.
+Before, the cutoffs always had to be specified in electronvolt, but now it is possible to define cutoffs in a variety of energy units.
+To facilitate that a single family can specify multiple sets of cutoffs at different "stringencies", with optionally different units, the interface of `RecommendedCutoffMixin.set_cutoffs` had to be changed.
+Instead of taking a dictionary with the cutoffs for all stringencies in one go, it now takes the dictionary of cutoffs for a single stringency.
+Pseudopotential families that were installed with `aiida-pseudo>=0.4.0` should continue to function properly.
+
+### Features
+- `RecommendedCutoffMixin`: store the unit of cutoffs in extras [[#57]](https://github.com/aiidateam/aiida-pseudo/pull/57)
+- Add the `VpsData` plugin [[#44]](https://github.com/aiidateam/aiida-pseudo/pull/44)
+- CLI: add recommended cutoffs to `aiida-pseudo show` [[#52]](https://github.com/aiidateam/aiida-pseudo/pull/52)
+- CLI: add the `aiida-pseudo family cutoffs set` command [[#55]](https://github.com/aiidateam/aiida-pseudo/pull/55)[[#67]](https://github.com/aiidateam/aiida-pseudo/pull/67)[[#71]](https://github.com/aiidateam/aiida-pseudo/pull/71)
+- CLI: add `--download-only` option to automatic family install commands [[#65]](https://github.com/aiidateam/aiida-pseudo/pull/65)
+- Docs: add troubleshooting section to the `README.md` [[#60]](https://github.com/aiidateam/aiida-pseudo/pull/60)
+
+### Fixes
+- `PseudoDojoFamily`: skip repo files with unsupported extension [[#48]](https://github.com/aiidateam/aiida-pseudo/pull/48)
+
+### Changes
+- CLI: move `aiida-pseudo show` to `aiida-pseudo family show` [[#58]](https://github.com/aiidateam/aiida-pseudo/pull/58)
+- `RecommendedCutoffMixin`: set only one stringency with `set_cutoffs` [#72]](https://github.com/aiidateam/aiida-pseudo/pull/72)
+
+### Refactoring
+- CLI: refactor download code from automated install commands [[#69]](https://github.com/aiidateam/aiida-pseudo/pull/69)
+
+
 ## 0.5.0
 
 ### Changes

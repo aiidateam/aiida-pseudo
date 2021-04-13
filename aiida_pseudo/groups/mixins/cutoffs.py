@@ -257,8 +257,10 @@ class RecommendedCutoffMixin:
         except KeyError as exception:
             # Workaround to deal with pseudo families installed in v0.5.0 - Set default unit in case it is not in extras
             if stringency in self.get_cutoff_stringencies():
-                self.set_cutoffs(self.get_cutoffs(stringency), stringency, unit=self.DEFAULT_UNIT)
-                return self.DEFAULT_UNIT
+                cutoffs_unit_dict = self._get_cutoffs_unit_dict()
+                cutoffs_unit_dict[stringency] = 'eV'
+                self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+                return 'eV'
             # End of workaround
             raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
 

@@ -5,7 +5,7 @@ import shutil
 import click
 
 from aiida.cmdline.params.options import OverridableOption
-from .types import PseudoPotentialFamilyTypeParam
+from .types import PseudoPotentialFamilyTypeParam, PseudoPotentialTypeParam
 
 __all__ = (
     'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'STRINGENCY', 'DEFAULT_STRINGENCY',
@@ -67,6 +67,18 @@ FAMILY_TYPE = OverridableOption(
     default='pseudo.family',
     show_default=True,
     help='Choose the type of pseudo potential family to create.'
+)
+
+PSEUDO_TYPE = OverridableOption(
+    '-P',
+    '--pseudo-type',
+    type=PseudoPotentialTypeParam(),
+    default='pseudo',
+    show_default=True,
+    help=(
+        'Select the pseudopotential type to be used for the family. Should be the entry point name of a '
+        'subclass of `PseudoPotentialData`.'
+    )
 )
 
 ARCHIVE_FORMAT = OverridableOption(

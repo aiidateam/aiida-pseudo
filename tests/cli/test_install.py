@@ -10,6 +10,7 @@ from aiida.orm import QueryBuilder
 
 from aiida_pseudo.cli import install
 from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp, cmd_install_pseudo_dojo
+from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily
 from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoFamily, PseudoDojoConfiguration
 from aiida_pseudo.groups.family.sssp import SsspFamily, SsspConfiguration
@@ -130,6 +131,24 @@ def test_install_family(run_cli_command, get_pseudo_archive):
 
 
 @pytest.mark.usefixtures('clear_db')
+def test_install_family_folder(run_cli_command, filepath_pseudos):
+    """Test ``aiida-pseudo install family` from folder`."""
+    label = 'family_test'
+    description = 'description'
+    dirpath = filepath_pseudos()
+    options = ['-D', description, dirpath, label]
+
+    result = run_cli_command(cmd_install_family, options)
+    assert f'installed `{label}`' in result.output
+    assert PseudoPotentialFamily.objects.count() == 1
+
+    family = PseudoPotentialFamily.objects.get(label=label)
+    assert family.__class__ is PseudoPotentialFamily
+    assert family.description == description
+    assert len(family.pseudos) != 0
+
+
+@pytest.mark.usefixtures('clear_db')
 def test_install_family_url(run_cli_command):
     """Test ``aiida-pseudo install family`` when installing from a URL.
 
@@ -139,14 +158,15 @@ def test_install_family_url(run_cli_command):
     label = 'SSSP/1.0/PBE/efficiency'
     description = 'description'
     filepath_archive = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/SSSP_1.0_PBE_efficiency.tar.gz'
-    options = ['-D', description, filepath_archive, label, '-T', 'pseudo.family.sssp']
+    options = ['-D', description, filepath_archive, label, '-P', 'pseudo.upf']
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
-    assert SsspFamily.objects.count() == 1
+    assert PseudoPotentialFamily.objects.count() == 1
 
-    family = SsspFamily.objects.get(label=label)
-    assert family.__class__ is SsspFamily
+    family = PseudoPotentialFamily.objects.get(label=label)
+    assert isinstance(family.pseudos['Si'], UpfData)
+    assert family.__class__ is PseudoPotentialFamily
     assert family.description == description
     assert len(family.pseudos) != 0
 
@@ -252,8 +272,6 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
 
     The files should be downloadable even if the corresponding configuration is already installed.
     """
-    from aiida_pseudo.data.pseudo.upf import UpfData
-
     version = '1.1'
     functional = 'PBEsol'
     protocol = 'precision'
@@ -285,8 +303,6 @@ def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseu
 
     The files should be downloadable even if the corresponding configuration is already installed.
     """
-    from aiida_pseudo.data.pseudo.upf import UpfData
-
     version = '1.0'
     functional = 'LDA'
     relativistic = 'SR'

@@ -5,6 +5,7 @@ import os
 import pathlib
 import shutil
 import tempfile
+import urllib.request
 
 import click
 
@@ -23,43 +24,55 @@ def cmd_install():
 
 
 @cmd_install.command('family')
-@click.argument('archive', type=types.FileOrUrl(mode='rb'))
+@click.argument('archive', type=types.PathOrUrl(exists=True, file_okay=True))
 @click.argument('label', type=click.STRING)
 @options_core.DESCRIPTION(help='Description for the family.')
 @options.ARCHIVE_FORMAT()
 @options.FAMILY_TYPE()
+@options.PSEUDO_TYPE()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_family(archive, label, description, archive_format, family_type, traceback):  # pylint: disable=too-many-arguments
-    """Install a standard pseudo potential family from an ARCHIVE on the local file system or from a URL.
+def cmd_install_family(archive, label, description, archive_format, family_type, pseudo_type, traceback):  # pylint: disable=too-many-arguments
+    """Install a standard pseudo potential family from a FOLDER or an ARCHIVE (on the local file system or from a URL).
 
-    The command will attempt to infer the archive format from the filename extension of the ARCHIVE. If this fails, the
-    archive format can be specified explicitly with the archive format option, which will also display which formats
-    are supported.
+    The command will attempt first to recognize the passed ARCHIVE_FOLDER as a folder in the local system. If not,
+    `archive` is assumed to be an archive and the command will attempt to infer the archive format from the
+    filename extension of the ARCHIVE. If this fails, the archive format can be specified explicitly with the archive
+    format option, which will also display which formats are supported.
 
-    By default, the command will create a base `PseudoPotentialFamily`, but the type can be changed with the family
+    By default, the command will create a base `PseudoPotentialFamily`, but the type can be changed with the pseudos
     type option. If the base type is used, the pseudo potential files in the archive *have* to have filenames that
     strictly follow the format `ELEMENT.EXTENSION`, because otherwise the element cannot be determined automatically.
     """
     from .utils import attempt, create_family_from_archive
 
-    # The `archive` is now either a `http.client.HTTPResponse` or a normal filelike object, so we get the original file
-    # name in a different way.
-    try:
-        suffix = os.path.basename(archive.url)
-    except AttributeError:
-        suffix = os.path.basename(archive.name)
+    # `archive` is a simple string, containing the name of the folder / file / url location.
 
-    # Write the content of the archive to a temporary file, because `create_family_from_archive` does currently not
-    # accept filelike objects because the underlying `shutil.unpack_archive` does not. Likewise, `unpack_archive` will
-    # attempt to deduce the archive format from the filename extension, so it is important we maintain the original
-    # filename. Of course if this fails, users can specify the archive format explicitly wiht the corresponding option.
-    with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
-        shutil.copyfileobj(archive, handle)
-        handle.flush()
-
+    if pathlib.Path(archive).is_dir():
+        try:
+            family = family_type.create_from_folder(archive, label, pseudo_type=pseudo_type)
+        except ValueError as exception:
+            raise OSError(f'failed to parse pseudos from `{archive}`: {exception}') from exception
+    elif pathlib.Path(archive).is_file():
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
-            family = create_family_from_archive(family_type, label, pathlib.Path(handle.name), fmt=archive_format)
+            family = create_family_from_archive(
+                family_type, label, pathlib.Path(archive), fmt=archive_format, pseudo_type=pseudo_type
+            )
+    else:
+        # The file of the url must be copied to a local temporary file. Maybe better ways to do it?
+        # The `create_family_from_archive` does currently not accept filelike objects because the underlying
+        # `shutil.unpack_archive` does not. Likewise, `unpack_archive` will attempt to deduce the archive format
+        # from the filename extension, so it is important we maintain the original filename.
+        # Of course if this fails, users can specify the archive format explicitly wiht the corresponding option.
+        with urllib.request.urlopen(archive) as handle:
+            suffix = os.path.basename(handle.url)
+            with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
+                shutil.copyfileobj(handle, handle)
+                handle.flush()
+                with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
+                    family = create_family_from_archive(
+                        family_type, label, pathlib.Path(handle.name), fmt=archive_format, pseudo_type=pseudo_type
+                    )
 
     family.description = description
     echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')

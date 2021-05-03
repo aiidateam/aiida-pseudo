@@ -42,7 +42,7 @@ def test_list_project(clear_db, run_cli_command, get_pseudo_family):
 
 
 def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
-    """Test the filtering option `-T`."""
+    """Test the filtering option `-F`."""
     family_base = get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
     family_sssp = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=SsspFamily, pseudo_type=UpfData)
 
@@ -53,15 +53,15 @@ def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
     assert family_base.label in result.output
     assert family_sssp.label in result.output
 
-    result = run_cli_command(cmd_list, ['--raw', '-T', 'pseudo.family.sssp'])
+    result = run_cli_command(cmd_list, ['--raw', '-F', 'pseudo.family.sssp'])
     assert len(result.output_lines) == 1
     assert family_base.label not in result.output
     assert family_sssp.label in result.output
 
 
 def test_list_filter_no_result(clear_db, run_cli_command, get_pseudo_family):
-    """Test the filtering option `-T` for a type for which no families exist."""
+    """Test the filtering option `-F` for a type for which no families exist."""
     get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
 
-    result = run_cli_command(cmd_list, ['--raw', '-T', 'pseudo.family.sssp'])
+    result = run_cli_command(cmd_list, ['--raw', '-F', 'pseudo.family.sssp'])
     assert 'no pseudo potential families found that match the filtering criteria.' in result.output

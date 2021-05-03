@@ -3,10 +3,10 @@
 from ..mixins import RecommendedCutoffMixin
 from .pseudo import PseudoPotentialFamily
 
-__all__ = ('CutoffsFamily',)
+__all__ = ('CutoffsPseudoPotentialFamily',)
 
 
-class CutoffsFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
+class CutoffsPseudoPotentialFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
     """Subclass of ``PseudoPotentialFamily`` designed to represent a family with recommended cutoffs.
 
     This is mostly used for testing the functionality around the ``RecommendedCutoffMixin``.

@@ -12,7 +12,7 @@ import pytest
 from aiida.plugins import DataFactory
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
-from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsPseudoPotentialFamily
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
 
@@ -193,7 +193,7 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 
         family = cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
 
-        if cutoffs_dict is not None and isinstance(family, CutoffsFamily):
+        if cutoffs_dict is not None and isinstance(family, CutoffsPseudoPotentialFamily):
             default_stringency = default_stringency or list(cutoffs_dict.keys())[0]
             for stringency, cutoff_values in cutoffs_dict.items():
                 family.set_cutoffs(cutoff_values, stringency, unit)

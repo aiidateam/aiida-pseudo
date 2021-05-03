@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 """Command to install a pseudo potential family."""
 import json
-import os
 import pathlib
 import shutil
 import tempfile
-import urllib.request
 
 import click
+import requests
 
 from aiida.cmdline.utils import decorators, echo
 from aiida.cmdline.params import options as options_core
-from aiida.cmdline.params import types
 
 from aiida_pseudo.groups.family import PseudoDojoConfiguration, SsspConfiguration
-from .params import options
+from .params import options, types
 from .root import cmd_root
 
 
@@ -28,54 +26,70 @@ def cmd_install():
 @click.argument('label', type=click.STRING)
 @options_core.DESCRIPTION(help='Description for the family.')
 @options.ARCHIVE_FORMAT()
-@options.FAMILY_TYPE()
+@options.FAMILY_TYPE(
+    type=types.PseudoPotentialFamilyTypeParam(exclude=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
+)
 @options.PSEUDO_TYPE()
 @options.TRACEBACK()
 @decorators.with_dbenv()
 def cmd_install_family(archive, label, description, archive_format, family_type, pseudo_type, traceback):  # pylint: disable=too-many-arguments
-    """Install a standard pseudo potential family from a FOLDER or an ARCHIVE (on the local file system or from a URL).
+    """Install a standard pseudopotential family from an ARCHIVE.
 
-    The command will attempt first to recognize the passed ARCHIVE_FOLDER as a folder in the local system. If not,
-    `archive` is assumed to be an archive and the command will attempt to infer the archive format from the
+    The ARCHIVE can be a (compressed) archive of a directory containing the pseudopotentials on the local file system or
+    provided by an HTTP URL. Alternatively, it can be a normal directory on the local file system. The (unarchived)
+    directory should only contain the pseudopotential files and they cannot be in any subdirectory. In addition,
+    depending on the chosen pseudopotential type (see the option `-P/--pseudo-type`) there can be additional
+    requirements on the pseudopotential file and filename format.
+
+    If the ARCHIVE corresponds to a (compressed) archive, the command will attempt to infer the archive format from the
     filename extension of the ARCHIVE. If this fails, the archive format can be specified explicitly with the archive
-    format option, which will also display which formats are supported.
+    format option `-f/--archive-format`, which will also display which formats are supported. These format suffixes
+    follow the naming of the `shutil.unpack_archive` standard library method.
 
-    By default, the command will create a base `PseudoPotentialFamily`, but the type can be changed with the pseudos
-    type option. If the base type is used, the pseudo potential files in the archive *have* to have filenames that
-    strictly follow the format `ELEMENT.EXTENSION`, because otherwise the element cannot be determined automatically.
+    Once the ARCHIVE is downloaded, uncompressed and unarchived into a directory on the local file system, the command
+    will create a `PseudoPotentialFamily` instance where the type of the pseudopotential data nodes that are stored
+    within it is set through the `-P/--pseudo-type` option. If the default, `pseudo` (which corresponds to the data
+    plugin `PseudoPotentialData`), is used, the pseudopotential files in the archive *have* to have filenames that
+    strictly follow the format `ELEMENT.EXTENSION`, or the creation of the family will fail. This is because for the
+    default pseudopotential type, the format of the file is unknown and the family requires the element to be known,
+    which in this case can then only be parsed from the filename.
+
+    The pseudopotential family type that is created can also be changed with the `-F/--family-type` option. Note,
+    however, that not all values are accepted. For example, the `pseudo.family.sssp` and `pseudo.family.pseudo_dojo` are
+    blacklisted since they have their own dedicated commands in `install sssp` and `install pseudo-dojo`, respectively.
     """
     from .utils import attempt, create_family_from_archive
 
-    # `archive` is a simple string, containing the name of the folder / file / url location.
-
-    if pathlib.Path(archive).is_dir():
-        try:
+    if isinstance(archive, pathlib.Path) and archive.is_dir():
+        with attempt(f'creating a pseudopotential family from directory `{archive}`...', include_traceback=traceback):
             family = family_type.create_from_folder(archive, label, pseudo_type=pseudo_type)
-        except ValueError as exception:
-            raise OSError(f'failed to parse pseudos from `{archive}`: {exception}') from exception
-    elif pathlib.Path(archive).is_file():
+    elif isinstance(archive, pathlib.Path) and archive.is_file():
         with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
             family = create_family_from_archive(
-                family_type, label, pathlib.Path(archive), fmt=archive_format, pseudo_type=pseudo_type
+                family_type, label, archive, fmt=archive_format, pseudo_type=pseudo_type
             )
     else:
-        # The file of the url must be copied to a local temporary file. Maybe better ways to do it?
-        # The `create_family_from_archive` does currently not accept filelike objects because the underlying
-        # `shutil.unpack_archive` does not. Likewise, `unpack_archive` will attempt to deduce the archive format
-        # from the filename extension, so it is important we maintain the original filename.
-        # Of course if this fails, users can specify the archive format explicitly wiht the corresponding option.
-        with urllib.request.urlopen(archive) as handle:
-            suffix = os.path.basename(handle.url)
-            with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
-                shutil.copyfileobj(handle, handle)
-                handle.flush()
-                with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
-                    family = create_family_from_archive(
-                        family_type, label, pathlib.Path(handle.name), fmt=archive_format, pseudo_type=pseudo_type
-                    )
+        # At this point, we can assume that it is not a valid filepath on disk, but rather a URL and the ``archive``
+        # variable will contain the result objects from the ``requests`` library. The validation of the URL will already
+        # have been done by the ``PathOrUrl`` parameter type, so the URL is reachable. The content of the URL must be
+        # copied to a local temporary file because `create_family_from_archive` does currently not accept filelike
+        # objects, because in turn the underlying `shutil.unpack_archive` does not. In addition, `unpack_archive` will
+        # attempt to deduce the archive format from the filename extension, so it is important we maintain the original
+        # filename. Of course if this fails, users can specify the archive format explicitly with the corresponding
+        # option. We get the filename by converting the URL to a ``Path`` object and taking the filename, using that as
+        # a suffix for the temporary file that is generated on disk to copy the content to.
+        suffix = pathlib.Path(archive.url).name
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
+            handle.write(archive.content)
+            handle.flush()
+
+            with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
+                family = create_family_from_archive(
+                    family_type, label, pathlib.Path(handle.name), fmt=archive_format, pseudo_type=pseudo_type
+                )
 
     family.description = description
-    echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
+    echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')
 
 
 def download_sssp(
@@ -91,8 +105,6 @@ def download_sssp(
     :param filepath_metadata: absolute filepath to write the metadata file to.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
     """
-    import requests
-
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
 
@@ -100,14 +112,14 @@ def download_sssp(
     url_archive = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'tar.gz')}"
     url_metadata = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'json')}"
 
-    with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
+    with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
         response = requests.get(url_archive)
         response.raise_for_status()
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
-    with attempt('downloading selected pseudo potentials metadata... ', include_traceback=traceback):
+    with attempt('downloading selected pseudopotentials metadata... ', include_traceback=traceback):
         response = requests.get(url_metadata)
         response.raise_for_status()
         with open(filepath_metadata, 'wb') as handle:
@@ -128,8 +140,6 @@ def download_pseudo_dojo(
     :param filepath_metadata: absolute filepath to write the metadata archive to.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
     """
-    import requests
-
     from aiida_pseudo.groups.family import PseudoDojoFamily
     from .utils import attempt
 
@@ -137,14 +147,14 @@ def download_pseudo_dojo(
     url_archive = PseudoDojoFamily.get_url_archive(label)
     url_metadata = PseudoDojoFamily.get_url_metadata(label)
 
-    with attempt('downloading selected pseudo potentials archive... ', include_traceback=traceback):
+    with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
         response = requests.get(url_archive)
         response.raise_for_status()
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
-    with attempt('downloading selected pseudo potentials metadata archive... ', include_traceback=traceback):
+    with attempt('downloading selected pseudopotentials metadata archive... ', include_traceback=traceback):
         response = requests.get(url_metadata)
         response.raise_for_status()
         with open(filepath_metadata, 'wb') as handle:
@@ -225,7 +235,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
         family.description = description
         family.set_cutoffs(cutoffs, 'normal', unit='Ry')
 
-        echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')
 
 
 @cmd_install.command('pseudo-dojo')
@@ -348,4 +358,4 @@ def cmd_install_pseudo_dojo(
             family.set_cutoffs(cutoff_values, stringency, unit='Eh')
         family.set_default_stringency(default_stringency)
 
-        echo.echo_success(f'installed `{label}` containing {family.count()} pseudo potentials')
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')

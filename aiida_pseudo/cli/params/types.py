@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-self-use
 """Custom parameter types for command line interface commands."""
+import pathlib
+import typing
+
 import click
+import requests
 
 from aiida.cmdline.params.types import GroupParamType
+from ..utils import attempt
 
 __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'PseudoPotentialTypeParam')
 
@@ -57,6 +62,14 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
 
     name = 'pseudo_family_type'
 
+    def __init__(self, exclude: typing.Optional[typing.List[str]] = None, **kwargs):
+        """Construct the parameter.
+
+        :param exclude: an optional list of values that should be considered invalid and will raise ``BadParameter``.
+        """
+        super().__init__(**kwargs)
+        self.exclude = exclude
+
     def convert(self, value, _, __):
         """Convert the entry point name to the corresponding class.
 
@@ -73,6 +86,9 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         except exceptions.EntryPointError as exception:
             raise click.BadParameter(f'`{value}` is not an existing group plugin.') from exception
 
+        if self.exclude and value in self.exclude:
+            raise click.BadParameter(f'`{value}` is not an accepted value for this option.')
+
         if not issubclass(family_type, PseudoPotentialFamily):
             raise click.BadParameter(f'`{value}` entry point is not a subclass of `PseudoPotentialFamily`.')
 
@@ -88,3 +104,27 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         from aiida.plugins.entry_point import get_entry_point_names
         entry_points = get_entry_point_names('aiida.groups')
         return [(ep, '') for ep in entry_points if (ep.startswith('pseudo.family') and ep.startswith(incomplete))]
+
+
+class PathOrUrl(click.Path):
+    """Extension of ``click``'s ``Path``-type that also supports URLs."""
+
+    name = 'PathOrUrl'
+
+    def convert(self, value, param, ctx) -> typing.Union[pathlib.Path, bytes]:
+        """Convert the string value to the desired value.
+
+        If the ``value`` corresponds to a valid path on the local filesystem, return it as a ``pathlib.Path`` instance.
+        Otherwise, treat it as a URL and try to fetch the content. If successful, the raw retrieved bytes will be
+        returned.
+
+        :param value: the filepath on the local filesystem or a URL.
+        """
+        try:
+            # Call the method of the super class, which will raise if it ``value`` is not a valid path.
+            return pathlib.Path(super().convert(value, param, ctx))
+        except click.exceptions.BadParameter:
+            with attempt(f'attempting to download data from `{value}`...'):
+                response = requests.get(value)
+                response.raise_for_status()
+                return response

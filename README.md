@@ -154,18 +154,16 @@ aiida-pseudo install family <ARCHIVE> <LABEL>
 ```
 where `<ARCHIVE>` should be replaced with the pseudopotential archive and `<LABEL>` with the label to give to the family.
 The command will attempt to automatically detect the compression format of the archive.
-If this fails, you can specify the format manually with the `--archive-format/-F` option, for example, for a `.tar.gz` archive:
+If this fails, you can specify the format manually with the `--archive-format/-f` option, for example, for a `.tar.gz` archive:
 ```
-aiida-pseudo install family <ARCHIVE> <LABEL> -F gztar
+aiida-pseudo install family <ARCHIVE> <LABEL> -f gztar
 ```
 By default, the command will create a family of the base pseudopotential family type.
-If you want to create a more specific family, for example an `SsspFamily`, or a `PseudoDojoFamily`, you can provide the corresponding entry point to the `--family-type/-T` option:
+If you want to create a more specific family, for example an `CutoffsPseudoPotentialFamily`, you can provide the corresponding entry point to the `--family-type/-F` option:
 ```
-aiida-pseudo install family <ARCHIVE> <LABEL> -T pseudo.family.sssp
+aiida-pseudo install family <ARCHIVE> <LABEL> -F pseudo.family.cutoffs
 ```
-or
-```
-aiida-pseudo install family <ARCHIVE> <LABEL> -T pseudo.family.pseudo_dojo
+Note that the `pseudo.family.sssp` and `pseudo.family.pseudo_dojo` family types are blacklisted since they have their own dedicated install commands in `aiida-pseudo install sssp` and `aiida-pseudo install pseudo-dojo`, respectively.
 ```
 The available pseudopotential family classes can be listed with the command:
 ```

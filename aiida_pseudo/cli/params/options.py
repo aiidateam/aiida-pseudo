@@ -61,7 +61,7 @@ TRACEBACK = OverridableOption(
 )
 
 FAMILY_TYPE = OverridableOption(
-    '-T',
+    '-F',
     '--family-type',
     type=PseudoPotentialFamilyTypeParam(),
     default='pseudo.family',
@@ -82,7 +82,7 @@ PSEUDO_TYPE = OverridableOption(
 )
 
 ARCHIVE_FORMAT = OverridableOption(
-    '-F', '--archive-format', type=click.Choice([fmt[0] for fmt in shutil.get_archive_formats()])
+    '-f', '--archive-format', type=click.Choice([fmt[0] for fmt in shutil.get_archive_formats()])
 )
 
 UNIT = OverridableOption(

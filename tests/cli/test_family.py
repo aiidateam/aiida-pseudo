@@ -9,13 +9,13 @@ import pytest
 from aiida.orm import Group
 
 from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
-from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsFamily
+from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsPseudoPotentialFamily
 
 
 @pytest.mark.usefixtures('clear_db')
 def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs_dict, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command."""
-    family = get_pseudo_family(cls=CutoffsFamily)
+    family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
     stringencies = ('low', 'normal', 'high')
     cutoffs_dict = generate_cutoffs_dict(family, stringencies=stringencies)
 
@@ -51,7 +51,7 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
 @pytest.mark.usefixtures('clear_db')
 def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cutoffs, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command with the ``--unit`` flag."""
-    family = get_pseudo_family(cls=CutoffsFamily)
+    family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
     stringency = 'normal'
     cutoffs = generate_cutoffs(family)
 
@@ -86,7 +86,7 @@ def test_family_show(clear_db, run_cli_command, get_pseudo_family):
 
 def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_family, generate_cutoffs_dict):
     """Test the `aiida-pseudo show` command for a family with recommended cutoffs."""
-    family = get_pseudo_family(cls=CutoffsFamily)
+    family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
     stringencies = ('normal', 'high')
     cutoffs_dict = generate_cutoffs_dict(family, stringencies=stringencies)
 

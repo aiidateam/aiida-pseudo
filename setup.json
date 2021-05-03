@@ -29,7 +29,7 @@
         ],
         "aiida.groups": [
             "pseudo.family = aiida_pseudo.groups.family.pseudo:PseudoPotentialFamily",
-            "pseudo.family.cutoffs = aiida_pseudo.groups.family.cutoffs:CutoffsFamily",
+            "pseudo.family.cutoffs = aiida_pseudo.groups.family.cutoffs:CutoffsPseudoPotentialFamily",
             "pseudo.family.pseudo_dojo = aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoFamily",
             "pseudo.family.sssp = aiida_pseudo.groups.family.sssp:SsspFamily"
         ]

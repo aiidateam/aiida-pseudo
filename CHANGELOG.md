@@ -1,5 +1,18 @@
 # Change log
 
+## 0.6.1
+
+This release contains two changes that would be breaking, but the `CutoffsFamily` was only intended for testing purposes and the command line option flag changes are unlikely to break code.
+Therefore this is released as a patch version such that plugins do not have to update their version requirements which are often limited to a particular minor version.
+
+### Features
+- CLI: allow folder on disk for `aiida-pseudo install family` and add the `-P/--pseudo-type` option to define the pseudopotential data plugin to be used (#80)
+
+### Changes
+- Rename `CutoffsFamily` to `CutoffsPseudoPotentialFamily` (#82)
+- CLI: change the `-F/--archive-format` to `-f/--archive-format` and `-T/--family-type` to `-F/--family-type` (#80)
+
+
 ## 0.6.0
 
 The biggest change in this release is the addition of explicit units for the recommended cutoffs of pseudopotential families that support it.

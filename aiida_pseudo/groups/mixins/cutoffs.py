@@ -280,6 +280,7 @@ class RecommendedCutoffMixin:
         :return: tuple of recommended wavefunction and density cutoff.
         :raises ValueError: if the requested stringency is not defined for this family.
         :raises ValueError: if optional unit specified is invalid.
+        :raises ValueError: if the family does not have a pseudo for one of the elements (of the structure).
         """
         if (elements is None and structure is None) or (elements is not None and structure is not None):
             raise ValueError('at least one and only one of `elements` or `structure` should be defined')

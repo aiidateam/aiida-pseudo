@@ -220,7 +220,7 @@ class RecommendedCutoffMixin:
         try:
             if stringency == self.get_default_stringency():
                 self.delete_extra('_default_stringency')
-                warning += f'`{stringency}` was the default stringency of this family. '
+                warning += f'`{stringency}` was the default stringency of this family.'
                 assign_new_default = True
             else:
                 assign_new_default = False
@@ -228,13 +228,17 @@ class RecommendedCutoffMixin:
             assign_new_default = True
 
         if assign_new_default:
-            if len(cutoffs_dict) == 1:
+            if len(cutoffs_dict) == 0:
+                warning += (
+                    ' Since no other stringencies are defined for this family, no new default can be specified.'
+                )
+            elif len(cutoffs_dict) == 1:
                 final_stringency = list(cutoffs_dict.keys())[0]
                 self.set_default_stringency(final_stringency)
-                warning += f'Setting `{final_stringency}` as the default since it is now the only defined stringency.'
+                warning += f' Setting `{final_stringency}` as the default since it is now the only defined stringency.'
             else:
                 warning += (
-                    f'Please set one of {self.get_cutoff_stringencies()} as the new default stringency with the '
+                    f' Please set one of {self.get_cutoff_stringencies()} as the new default stringency with the '
                     '`set_default_stringency` method.'
                 )
 
@@ -298,6 +302,9 @@ class RecommendedCutoffMixin:
         cutoffs = self.get_cutoffs(stringency)
 
         for element in symbols:
+
+            if element not in cutoffs:
+                raise ValueError(f'family does not contain a pseudo for element `{element}`.')
 
             if unit is not None:
                 current_unit = self.get_cutoffs_unit(stringency)

@@ -24,7 +24,7 @@ The plugin comes with a variety of pseudopotential subtypes that represent vario
 The corresponding data plugins implement how the element and other data are parsed from a pseudopotential file with such a format.
 A new pseudopotential node can be created by instantiating the corresponding plugin class:
 
-.. code-block::
+.. code-block:: python
 
     from aiida import plugins
 

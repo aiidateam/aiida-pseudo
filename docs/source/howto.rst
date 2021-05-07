@@ -20,7 +20,7 @@ where ``<ARCHIVE_OR_FOLDER>`` should be replaced with the archive or folder that
 .. important::
 
     In order to properly parse the elements from the pseudopotential files, they must adhere ``ELEMENT.EXTENSION`` filename format.
-    There must also not be any extraneous files in the folder.
+    The unpacked archive should also contain nothing else besides the pseudopotential files (i.e. no other files or folders) and the pseudopotentials should be present at the top level (not nested in subfolders)..
 
 The command will attempt to automatically detect the compression format of the archive.
 If this fails, you can specify the format manually with the ``--archive-format/-f`` option, for example, for a ``.tar.gz`` archive:
@@ -28,6 +28,8 @@ If this fails, you can specify the format manually with the ``--archive-format/-
 .. code-block:: console
 
     $ aiida-pseudo install family <ARCHIVE> <LABEL> -f gztar
+
+The valid archive formats are those [defined by the ``shutil.unpack_archive`` function](https://docs.python.org/3/library/shutil.html#shutil.unpack_archive) of the standard Python library.
 
 Pseudopotential format
 ----------------------
@@ -85,11 +87,11 @@ where ``<STRINGENCY>`` is a string that defines the recommended cutoffs, ``<FAMI
 .. code-block::
 
     {
-    "Ag": {
-        "cutoff_wfc": 50.0,
-        "cutoff_rho": 200.0
-    },
-    ...
+        "Ag": {
+            "cutoff_wfc": 50.0,
+            "cutoff_rho": 200.0
+        },
+        ...
     }
 
 .. important::

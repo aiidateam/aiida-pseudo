@@ -35,6 +35,8 @@ class RecommendedCutoffMixin:
             specifies the ``cutoff_wfc`` and ``cutoff_rho`` keys, corresponding a float value with the recommended
             cutoff to be used for the wave functions and charge density, respectively. For example:
 
+            .. code-block::
+
                 {
                     "Ag": {
                         "cutoff_wfc": 50.0,
@@ -150,6 +152,8 @@ class RecommendedCutoffMixin:
             specifies the ``cutoff_wfc`` and ``cutoff_rho`` keys, corresponding a float value with the recommended
             cutoff to be used for the wave functions and charge density, respectively. For example:
 
+            .. code-block::
+
                 {
                     "Ag": {
                         "cutoff_wfc": 50.0,
@@ -157,7 +161,6 @@ class RecommendedCutoffMixin:
                     },
                     ...
                 }
-
         :param stringency: the stringency corresponding to the provided cutoffs.
         :param unit: string definition of a unit of energy as recognized by the ``UnitRegistry`` of the ``pint`` lib.
             Defaults to electronvolt.

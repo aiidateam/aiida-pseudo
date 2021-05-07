@@ -23,10 +23,10 @@ PseudoDojoConfiguration = collections.namedtuple(
 
 
 class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
-    """Subclass of `PseudoPotentialFfamily` designed to represent a PseudoDojo configuration.
+    """Subclass of ``PseudoPotentialFamily`` designed to represent a PseudoDojo configuration.
 
-    The `PseudoDojoFamily` is essentially a `PseudoPotentialFfamily` with some additional constraints. It can only be
-    used to contain the pseudo potentials and corresponding metadata of an official PseudoDojo configuration.
+    The ``PseudoDojoFamily`` is essentially a ``PseudoPotentialFamily`` with some additional constraints. It can only
+    be used to contain the pseudo potentials and corresponding metadata of an official PseudoDojo configuration.
     """
 
     _pseudo_types = (UpfData, PsmlData, Psp8Data, JthXmlData)

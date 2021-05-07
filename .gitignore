@@ -63,7 +63,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/build/
 
 # PyBuilder
 target/
@@ -100,3 +100,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# VSCode
+.vscode

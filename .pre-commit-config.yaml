@@ -24,15 +24,21 @@ repos:
         name: yapf
         types: [python]
         args: ['-i']
+        exclude: &exclude_files >
+            (?x)^(
+                docs/.*|
+            )$
 
 -   repo: https://github.com/PyCQA/pylint
     rev: pylint-2.6.0
     hooks:
     -   id: pylint
         language: system
+        exclude: *exclude_files
 
 -   repo: https://github.com/PyCQA/pydocstyle
     rev: 5.0.2
     hooks:
     -   id: pydocstyle
         args: ['--ignore=D104,D203,D213']
+        exclude: *exclude_files

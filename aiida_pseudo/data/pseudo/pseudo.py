@@ -26,7 +26,13 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         :return: instance of ``PseudoPotentialData``, stored if taken from database, unstored otherwise.
         """
         query = orm.QueryBuilder()
-        query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': md5_from_filelike(stream)})
+        try:
+            md5 = md5_from_filelike(stream)
+        except AttributeError as exception:
+            raise ValueError(
+                f'`{stream}`` doesn\'t seem to be a filelike object, file paths are not supported.'
+            ) from exception
+        query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': md5})
 
         existing = query.first()
 

@@ -4,6 +4,30 @@
 How-To Guides
 #############
 
+.. _how-to:install_automated:
+
+Automated install
+=================
+
+The easiest way to install a pseudopotential family with ``aiida-pseudo`` is by using the command line interface.
+For example, to install a configuration of the `Standard solid-state pseudopotentials (SSSP) <https://www.materialscloud.org/discover/sssp/table/efficiency>`_, just run:
+
+.. code-block:: console
+
+    $ aiida-pseudo install sssp
+
+The version, functional, and protocol can be controlled with various options; use ``aiida-pseudo install sssp --help`` to see their description.
+
+Besides the `SSSP`_, the pseudopotentials from the `Pseudo Dojo`_ library are also supported for automated installation:
+
+.. code-block:: console
+
+    $ aiida-pseudo install pseudo-dojo
+
+Similar to the `SSSP`_ pseudopotential family, the options can be used to set version, functional, and protocol.
+Moreover, the format of the pseudopotentials can be specified, as well as the default stringency.
+Use ``aiida-pseudo install pseudo-dojo --help`` for more information.
+
 .. _how-to:install_archive:
 
 Installing from archive or folder
@@ -68,7 +92,7 @@ The available pseudopotential family classes can be listed with the command:
 
 .. important::
 
-    The ``pseudo.family.sssp`` and ``pseudo.family.pseudo_dojo`` family types are blacklisted since they have their own dedicated install commands in ``aiida-pseudo install sssp`` and ``aiida-pseudo install pseudo-dojo``, respectively.
+    The ``pseudo.family.sssp`` and ``pseudo.family.pseudo_dojo`` family types are blacklisted since they have their own :ref:`dedicated install commands <how-to:install_automated>` in ``aiida-pseudo install sssp`` and ``aiida-pseudo install pseudo-dojo``, respectively.
 
 Adding recommended cutoffs
 --------------------------
@@ -98,3 +122,6 @@ where ``<STRINGENCY>`` is a string that defines the recommended cutoffs, ``<FAMI
 
     The ``PseudoPotentialFamily`` base family type does not support setting recommended cutoffs.
     To be able to use this feature for a manually installed family, install it as a ``CutoffsPseudoPotentialFamily`` as expained :ref:`here <how-to:install_archive:family_type>`.
+
+.. _SSSP: https://www.materialscloud.org/discover/sssp/table/efficiency
+.. _Pseudo Dojo: http://www.pseudo-dojo.org/

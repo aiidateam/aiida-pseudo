@@ -99,7 +99,7 @@ Recommended cutoffs
 ===================
 
 Certain pseudopotential family types, such as the ``SsspFamily``, provide recommended cutoff values for wave functions and charge density in plane-wave codes.
-These cutoffs are always in units of electronvolt.
+These cutoffs can be defined in any unit supported by the |pint|_ package.
 The recommended cutoffs for a set of elements or a ``StructureData`` can be retrieved from the family as follows:
 
 .. code-block:: python
@@ -107,3 +107,18 @@ The recommended cutoffs for a set of elements or a ``StructureData`` can be retr
     family = load_group('SSSP/1.1/PBE/efficiency')
     cutoffs = family.get_recommended_cutoffs(elements=('Ga', 'As'))  # From a tuple or list of element symbols
     cutoffs = family.get_recommended_cutoffs(structure=load_node(<IDENTIFIER>))  # From a `StructureData` node
+
+To obtain the recommended cutoffs in a specific unit, you can pass the string identifier of that unit:
+
+.. code-block:: ipython
+
+    In [1]: pseudo_family = load_group('SSSP/1.1/PBE/efficiency')
+
+    In [2]: family.get_recommended_cutoffs(elements=('Ga', 'As'), unit='Ry')
+    Out[2]: (70.0, 560.0)
+
+    In [3]: family.get_recommended_cutoffs(elements=('Ga', 'As'), unit='eV')
+    Out[3]: (952.3985186095965, 7619.188148876772)
+
+.. |pint| replace:: ``pint``
+.. _pint: https://pint.readthedocs.io/en/stable/index.html

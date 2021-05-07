@@ -66,3 +66,4 @@ html_theme_options = {
     'extra_navbar': ''
 }
 html_domain_indices = True
+html_logo = '_static/logo.png'

@@ -9,6 +9,7 @@ import requests
 
 from aiida.cmdline.params.types import GroupParamType
 from ..utils import attempt
+from ...common.units import U
 
 __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'PseudoPotentialTypeParam')
 
@@ -128,3 +129,33 @@ class PathOrUrl(click.Path):
                 response = requests.get(value)
                 response.raise_for_status()
                 return response
+
+
+class UnitParamType(click.ParamType):
+    """Parameter type ."""
+
+    name = 'unit'
+
+    def __init__(self, quantity: typing.Optional[typing.List[str]] = None, **kwargs):
+        """Construct the parameter.
+
+        :param quantity: The corresponding quantity of the unit.
+        """
+        super().__init__(**kwargs)
+        self.quantity = quantity
+
+    def convert(self, value, _, __):
+        """Check if the provided unit is a valid energy unit.
+
+        :raises: `click.BadParameter` if the provided unit is not a valid energy unit.
+        """
+        try:
+            if value not in U:
+                raise ValueError(f'`{value}` is not a valid unit.')
+
+            if not U.Quantity(1, value).check(f'[{self.quantity}]'):
+                raise ValueError(f'`{value}` is not a valid `{self.quantity}` unit.')
+        except ValueError as exception:
+            raise click.BadParameter(f'{exception}') from exception
+
+        return value

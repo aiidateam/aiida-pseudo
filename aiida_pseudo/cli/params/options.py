@@ -5,7 +5,7 @@ import shutil
 import click
 
 from aiida.cmdline.params.options import OverridableOption
-from .types import PseudoPotentialFamilyTypeParam, PseudoPotentialTypeParam
+from .types import PseudoPotentialFamilyTypeParam, PseudoPotentialTypeParam, UnitParamType
 
 __all__ = (
     'VERSION', 'FUNCTIONAL', 'RELATIVISTIC', 'PROTOCOL', 'PSEUDO_FORMAT', 'STRINGENCY', 'DEFAULT_STRINGENCY',
@@ -88,7 +88,7 @@ ARCHIVE_FORMAT = OverridableOption(
 UNIT = OverridableOption(
     '-u',
     '--unit',
-    type=click.STRING,
+    type=UnitParamType(quantity='energy'),
     required=False,
     default='eV',
     show_default=True,

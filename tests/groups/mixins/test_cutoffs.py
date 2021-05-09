@@ -51,14 +51,14 @@ def test_validate_stringency(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.validate_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
 
-    with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
+    with pytest.raises(ValueError, match=r'stringency `.*` is not one of the available cutoff stringencies for this'):
         family.validate_stringency('default')
 
     cutoffs = generate_cutoffs(family)
     stringency = 'default'
     family.set_cutoffs(cutoffs, stringency)
 
-    with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
+    with pytest.raises(ValueError, match=r'stringency `.*` is not one of the available cutoff stringencies for this'):
         family.validate_stringency(stringency + 'non-existing')
 
     family.validate_stringency(stringency)
@@ -91,7 +91,7 @@ def test_set_default_stringency(get_pseudo_family, generate_cutoffs_dict):
 
     assert family.get_default_stringency() == 'low'
 
-    with pytest.raises(ValueError, match='provided default stringency not in tuple of available cutoff stringencies:'):
+    with pytest.raises(ValueError, match=r'stringency `nonexistent` is not one of the available cutoff stringencies'):
         family.set_default_stringency('nonexistent')
 
     family.set_default_stringency('normal')
@@ -215,7 +215,7 @@ def test_get_cutoffs(get_pseudo_family, generate_cutoffs):
 
     family.set_cutoffs(cutoffs, stringency)
 
-    with pytest.raises(ValueError, match=r'stringency `.*` is not defined for this family.'):
+    with pytest.raises(ValueError, match=r'stringency `.*` is not one of the available cutoff stringencies for this'):
         family.get_cutoffs('non-existing')
 
     assert family.get_cutoffs() == cutoffs
@@ -314,7 +314,7 @@ def test_delete_cutoffs(get_pseudo_family, generate_cutoffs_dict):
     for stringency, cutoffs in generate_cutoffs_dict(family, stringencies).items():
         family.set_cutoffs(cutoffs, stringency)
 
-    with pytest.raises(ValueError, match='stringency `nonexistent` is not defined for this family.'):
+    with pytest.raises(ValueError, match=r'stringency `nonexistent` is not one of the available cutoff stringencies'):
         family.delete_cutoffs('nonexistent')
 
     with pytest.warns(UserWarning, match='`low` was the default stringency of this family. Please set'):

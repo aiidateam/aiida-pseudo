@@ -66,7 +66,7 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     result = run_cli_command(
         cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit], raises=True
     )
-    assert 'Error: Invalid value for UNIT:' in result.output
+    assert "Error: Invalid value for '-u' / '--unit': `GME stock` is not a valid unit." in result.output
 
     # Correct unit
     unit = 'hartree'
@@ -95,7 +95,7 @@ def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_f
 
     # Test the command prints an error for a non-existing stringency
     result = run_cli_command(cmd_family_show, [family.label, '--stringency', 'non-existing'], raises=True)
-    assert 'Invalid value for stringency: `non-existing` is not defined' in result.output
+    assert "Error: Invalid value for '-s' / '--stringency': stringency `non-existing` is not" in result.output
 
     # Test the command for default and explicit stringency
     for stringency in [None, 'high']:
@@ -131,3 +131,49 @@ def test_family_show_raw(clear_db, run_cli_command, get_pseudo_family):
     for option in ['-r', '--raw']:
         result = run_cli_command(cmd_family_show, [option, family.label])
         assert len(result.output_lines) == len(family.nodes)
+
+
+def test_family_show_unit_default(clear_db, run_cli_command, get_pseudo_family):
+    """Test the `family show` command with default unit."""
+    elements = ['Ar', 'Kr']
+    cutoff_dict = {'normal': {'Ar': {'cutoff_wfc': 50, 'cutoff_rho': 200}, 'Kr': {'cutoff_wfc': 25, 'cutoff_rho': 100}}}
+
+    family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily, elements=elements, cutoffs_dict=cutoff_dict, unit='Ry')
+
+    # Test the default unit (Ry)
+    result = run_cli_command(cmd_family_show, [family.label])
+
+    header_fields = result.output_lines[0].split()
+    unit = family.get_cutoffs_unit()
+
+    assert header_fields[4] == f'({unit})'
+    assert header_fields[7] == f'({unit})'
+
+    for index, element in enumerate(elements):
+        cutoffs = family.get_recommended_cutoffs(elements=element)
+        fields = result.output_lines[index + 2].split()
+        assert_almost_equal(cutoffs[0], float(fields[3]))
+        assert_almost_equal(cutoffs[1], float(fields[4]))
+
+
+@pytest.mark.parametrize('unit', ['Ry', 'eV', 'hartree', 'aJ'])
+def test_family_show_unit(clear_db, run_cli_command, get_pseudo_family, unit):
+    """Test the `-u/--unit` option."""
+    elements = [
+        'Ar',
+    ]
+    cutoff_dict = {'normal': {'Ar': {'cutoff_wfc': 50, 'cutoff_rho': 200}}}
+
+    family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily, elements=elements, cutoffs_dict=cutoff_dict, unit='Ry')
+
+    # Test both option strings and several units
+    for option in ['-u', '--unit']:
+        result = run_cli_command(cmd_family_show, [family.label, option, unit])
+        cutoffs = family.get_recommended_cutoffs(elements='Ar', unit=unit)
+        header_fields = result.output_lines[0].split()
+        assert header_fields[4] == f'({unit})'
+        assert header_fields[4] == f'({unit})'
+
+        values_fields = result.output_lines[2].split()
+        assert round(cutoffs[0], 1) == float(values_fields[3])
+        assert round(cutoffs[1], 1) == float(values_fields[4])

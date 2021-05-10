@@ -32,8 +32,14 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     assert "Error: Missing option '-s' / '--stringency'" in result.output
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
 
-    # Invalid cutoffs structure
+    # Missing cutoffs
     filepath.write_text(json.dumps({'Ar': {'cutoff_rho': 300}}))
+    result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', 'high'], raises=True)
+    assert 'is missing cutoffs for element:' in result.output
+    assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
+
+    # Invalid cutoffs structure
+    filepath.write_text(json.dumps({'Ar': {'cutoff_rho': 300, 'cutoff_wfc': 300, 'GME': 'moon'}}))
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', 'high'], raises=True)
     assert 'Error: Invalid value for CUTOFFS:' in result.output
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])

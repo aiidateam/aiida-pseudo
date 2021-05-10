@@ -57,6 +57,27 @@ class PseudoPotentialFamilyParam(GroupParamType):
 
     name = 'pseudo_family'
 
+    def __init__(self, exclude: typing.Optional[typing.List[str]] = None, **kwargs):
+        """Construct the parameter.
+
+        :param exclude: an optional list of values that should be considered invalid and will raise ``BadParameter``.
+        """
+        super().__init__(**kwargs)
+        self.exclude = exclude
+
+    def convert(self, value, param, ctx):
+        """Convert the entry point name to the corresponding class.
+
+        :param value: entry point name that should correspond to subclass of `PseudoPotentialFamily` group plugin
+        :return: the `PseudoPotentialFamily` subclass
+        :raises: `click.BadParameter` if the entry point cannot be loaded or is not subclass of `PseudoPotentialFamily`
+        """
+        family = super().convert(value, param, ctx)
+
+        if self.exclude and family.type_string in self.exclude:
+            raise click.BadParameter(f'Cannot modify cutoffs for established family `{family}`.')
+        return family
+
 
 class PseudoPotentialFamilyTypeParam(click.ParamType):
     """Parameter type for `click` commands to define a subclass of `PseudoPotentialFamily`."""

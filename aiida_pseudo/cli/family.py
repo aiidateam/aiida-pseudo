@@ -8,7 +8,7 @@ from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
 
 from ..groups.mixins import RecommendedCutoffMixin
-from .params import arguments, options
+from .params import arguments, options, types
 from .root import cmd_root
 
 
@@ -57,7 +57,9 @@ def cmd_family_cutoffs():
 
 
 @cmd_family_cutoffs.command('set')
-@arguments.PSEUDO_POTENTIAL_FAMILY()
+@arguments.PSEUDO_POTENTIAL_FAMILY(
+    type=types.PseudoPotentialFamilyParam(exclude=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
+)
 @click.argument('cutoffs', type=click.File(mode='rb'))
 @options.STRINGENCY(required=True)
 @options.UNIT()

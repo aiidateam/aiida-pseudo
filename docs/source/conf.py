@@ -31,7 +31,7 @@ release = aiida_pseudo.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_copybutton', 'autoapi.extension', 'sphinx_click']
+extensions = ['sphinx_copybutton', 'autoapi.extension', 'sphinx_click', 'sphinx.ext.intersphinx']
 
 # Settings for the `sphinx_copybutton` extension
 copybutton_selector = 'div:not(.no-copy)>div.highlight pre'
@@ -41,6 +41,11 @@ copybutton_prompt_is_regexp = True
 # Settings for the `autoapi` extension
 autoapi_dirs = ['../../aiida_pseudo']
 autoapi_ignore = ['*cli*']
+
+# Settings for the `sphinx.ext.intersphinx` extension
+intersphinx_mapping = {
+    'aiida': ('http://aiida_core.readthedocs.io/en/latest/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

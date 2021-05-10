@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests for the command `aiida-pseudo family`."""
+from copy import deepcopy
 import json
 
 from aiida.orm import Group
@@ -31,13 +32,15 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     assert "Error: Missing option '-s' / '--stringency'" in result.output
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
 
-    # Invalid cutoffs structure
-    filepath.write_text(json.dumps({'Ar': {'cutoff_rho': 300}}))
+    # Missing cutoffs
+    high_cutoffs = deepcopy(cutoffs_dict['high'])
+    high_cutoffs['Ar'].pop('cutoff_wfc')
+    filepath.write_text(json.dumps(high_cutoffs))
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', 'high'], raises=True)
-    assert 'Error: Invalid value for CUTOFFS:' in result.output
+    assert 'is missing cutoffs for element:' in result.output
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
 
-    # Set correct stringency
+    # Set the high stringency
     stringency = 'high'
     filepath.write_text(json.dumps(cutoffs_dict['high']))
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency])
@@ -45,6 +48,16 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     assert stringency in family.get_cutoff_stringencies()
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal', 'high'])
     assert family.get_cutoffs(stringency) == cutoffs_dict[stringency]
+
+    # Invalid cutoffs structure - Should pass fine
+    stringency = 'invalid'
+    high_cutoffs = deepcopy(cutoffs_dict['high'])
+    high_cutoffs['Ar']['GME'] = 'moon'
+    filepath.write_text(json.dumps(high_cutoffs))
+    result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency])
+    assert 'Success: set cutoffs for' in result.output
+    assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal', 'high', stringency])
+    assert family.get_cutoffs(stringency) == cutoffs_dict['high']
 
 
 @pytest.mark.usefixtures('clear_db')

@@ -167,9 +167,10 @@ def download_pseudo_dojo(
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
 @options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
 @options.DOWNLOAD_ONLY()
+@options.FROM_DIR()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_sssp(version, functional, protocol, download_only, traceback):
+def cmd_install_sssp(version, functional, protocol, download_only, from_dir, traceback):
     """Install an SSSP configuration.
 
     The SSSP configuration will be automatically downloaded from the Materials Cloud Archive entry to create a new
@@ -183,6 +184,11 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt, create_family_from_archive
 
+    if download_only and from_dir is not None:
+        raise click.BadParameter(
+            'cannot specify both `--download-only` and `--from-dir`.', param_hint="'--download-only' / '--from-dir'"
+        )
+
     configuration = SsspConfiguration(version, functional, protocol)
     label = SsspFamily.format_configuration_label(configuration)
     description = f'SSSP v{version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
@@ -195,11 +201,16 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        dirpath = pathlib.Path(dirpath)
+        if from_dir is not None:
+            dirpath = pathlib.Path(from_dir).absolute()
+        else:
+            dirpath = pathlib.Path(dirpath)
+
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
 
-        download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+        if from_dir is None:
+            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
@@ -246,10 +257,11 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml', 'jthxml']), default='psp8', show_default=True)
 @options.DEFAULT_STRINGENCY(type=click.Choice(['low', 'normal', 'high']), default='normal', show_default=True)
 @options.DOWNLOAD_ONLY()
+@options.FROM_DIR()
 @options.TRACEBACK()
 @decorators.with_dbenv()
 def cmd_install_pseudo_dojo(
-    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, traceback
+    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, from_dir, traceback
 ):
     """Install a PseudoDojo configuration.
 
@@ -281,6 +293,11 @@ def cmd_install_pseudo_dojo(
     )
     # yapf: enable
 
+    if download_only and from_dir is not None:
+        raise click.BadParameter(
+            'cannot specify both `--download-only` and `--from-dir`.', param_hint="'--download-only' / '--from-dir'"
+        )
+
     try:
         pseudo_type = pseudo_type_mapping[pseudo_format]
     except KeyError:
@@ -298,11 +315,16 @@ def cmd_install_pseudo_dojo(
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        dirpath = pathlib.Path(dirpath)
+        if from_dir is not None:
+            dirpath = pathlib.Path(from_dir).absolute()
+        else:
+            dirpath = pathlib.Path(dirpath)
+
         filepath_archive = dirpath / 'archive.tgz'
         filepath_metadata = dirpath / 'metadata.tgz'
 
-        download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
+        if from_dir is None:
+            download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'

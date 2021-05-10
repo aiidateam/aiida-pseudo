@@ -62,16 +62,21 @@ exclude_patterns = []
 #
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
-html_css_files = ['aiida-custom.css']
+html_css_files = [
+    'aiida-custom.css',
+    'aiida-pseudo-custom.css'
+]
 html_theme_options = {
     'home_page_in_toc': True,
     'repository_url': 'https://github.com/aiidateam/aiida-pseudo',
     'repository_branch': 'master',
     'use_repository_button': True,
     'use_issues_button': True,
+    'use_fullscreen_button': False,
     'path_to_docs': 'docs',
     'use_edit_page_button': True,
-    'extra_navbar': ''
+    'extra_navbar': '',
+    'extra_navbar': '<p>Made possible by the support of <a href="http://nccr-marvel.ch/" target="_blank"> NCCR MARVEL</a>, <a href="http://www.max-centre.eu/" target="_blank"> MaX CoE</a> and the <a href="https://www.materialscloud.org/swissuniversities" target="_blank"> swissuniversities P-5 project</a>.</p>'
 }
 html_domain_indices = True
 html_logo = '_static/logo.png'

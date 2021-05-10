@@ -103,3 +103,12 @@ DOWNLOAD_ONLY = OverridableOption(
         'pseudopotential family.'
     )
 )
+
+FROM_DIR = OverridableOption(
+    '--from-dir',
+    type=click.STRING,
+    required=False,
+    default=None,
+    show_default=False,
+    help='Install the pseudpotential family from the archive and metadata downloaded with the `--download-only` option.'
+)

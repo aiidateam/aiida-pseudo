@@ -68,6 +68,13 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     )
     assert "Error: Invalid value for '-u' / '--unit': `GME stock` is not a valid unit." in result.output
 
+    # Non-energy unit
+    unit = 'second'
+    result = run_cli_command(
+        cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit], raises=True
+    )
+    assert "Error: Invalid value for '-u' / '--unit': `second` is not a valid `energy` unit." in result.output
+
     # Correct unit
     unit = 'hartree'
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit])

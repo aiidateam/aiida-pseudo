@@ -145,7 +145,7 @@ class UnitParamType(click.ParamType):
         self.quantity = quantity
 
     def convert(self, value, _, __):
-        """Check if the provided unit is a valid energy unit.
+        """Check if the provided unit is a valid unit for the defined quantity.
 
         :raises: `click.BadParameter` if the provided unit is not valid for the quantity defined for this instance.
         """

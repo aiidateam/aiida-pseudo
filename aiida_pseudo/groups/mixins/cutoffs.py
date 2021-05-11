@@ -132,7 +132,11 @@ class RecommendedCutoffMixin:
         :param default_stringency: the default stringency to be used for the recommended cutoffs.
         :raises ValueError: if the provided default stringency is not in the tuple of available cutoff stringencies for
             the pseudo family.
+        :raises ValueError: if the user tries to unset the stringency by providing ``None`` as an input.
         """
+        if default_stringency is None:
+            raise ValueError('the default stringency cannot be unset.')
+
         self.validate_stringency(default_stringency)
         self.set_extra(self._key_default_stringency, default_stringency)
 

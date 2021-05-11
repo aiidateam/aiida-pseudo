@@ -91,6 +91,9 @@ def test_set_default_stringency(get_pseudo_family, generate_cutoffs_dict):
 
     assert family.get_default_stringency() == 'low'
 
+    with pytest.raises(ValueError, match=r'the default stringency cannot be unset'):
+        family.set_default_stringency(None)
+
     with pytest.raises(ValueError, match=r'stringency `nonexistent` is not one of the available cutoff stringencies'):
         family.set_default_stringency('nonexistent')
 

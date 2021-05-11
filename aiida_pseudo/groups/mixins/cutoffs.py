@@ -90,7 +90,7 @@ class RecommendedCutoffMixin:
         default stringency has been set.
 
         :param stringency: the cutoff stringency to validate.
-        :raises ValueError: if default stringency has not been defined.
+        :raises ValueError: if `stringency` is equal to `None` and the family defines no default stringency.
         :raises ValueError: if the family does not define cutoffs for the specified stringency.
         """
         if stringency is None:

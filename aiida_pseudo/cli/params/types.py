@@ -132,7 +132,7 @@ class PathOrUrl(click.Path):
 
 
 class UnitParamType(click.ParamType):
-    """Parameter type ."""
+    """Parameter type to specify units from the `pint` library."""
 
     name = 'unit'
 
@@ -147,15 +147,12 @@ class UnitParamType(click.ParamType):
     def convert(self, value, _, __):
         """Check if the provided unit is a valid energy unit.
 
-        :raises: `click.BadParameter` if the provided unit is not a valid energy unit.
+        :raises: `click.BadParameter` if the provided unit is not valid for the quantity defined for this instance.
         """
-        try:
-            if value not in U:
-                raise ValueError(f'`{value}` is not a valid unit.')
+        if value not in U:
+            raise click.BadParameter(f'`{value}` is not a valid unit.')
 
-            if not U.Quantity(1, value).check(f'[{self.quantity}]'):
-                raise ValueError(f'`{value}` is not a valid `{self.quantity}` unit.')
-        except ValueError as exception:
-            raise click.BadParameter(f'{exception}') from exception
+        if not U.Quantity(1, value).check(f'[{self.quantity}]'):
+            raise click.BadParameter(f'`{value}` is not a valid `{self.quantity}` unit.')
 
         return value

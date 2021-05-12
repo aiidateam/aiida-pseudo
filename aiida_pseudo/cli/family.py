@@ -20,21 +20,26 @@ def cmd_family():
 @cmd_family.command('show')
 @arguments.PSEUDO_POTENTIAL_FAMILY()
 @options.STRINGENCY()
+@options.UNIT(default=None)
 @options_core.RAW()
 @decorators.with_dbenv()
-def cmd_family_show(family, stringency, raw):
+def cmd_family_show(family, stringency, unit, raw):
     """Show details of pseudo potential family."""
     from tabulate import tabulate
 
     if isinstance(family, RecommendedCutoffMixin):
 
-        if stringency is not None and stringency not in family.get_cutoff_stringencies():
-            raise click.BadParameter(f'`{stringency}` is not defined for family `{family}`.', param_hint='stringency')
+        try:
+            family.validate_stringency(stringency)
+        except ValueError as exception:
+            raise click.BadParameter(f'{exception}', param_hint="'-s' / '--stringency'")
 
-        headers = ['Element', 'Pseudo', 'MD5', 'Wavefunction (eV)', 'Charge density (eV)']
+        unit = unit or family.get_cutoffs_unit(stringency)
+
+        headers = ['Element', 'Pseudo', 'MD5', f'Wavefunction ({unit})', f'Charge density ({unit})']
         rows = [[
             pseudo.element, pseudo.filename, pseudo.md5,
-            *family.get_recommended_cutoffs(elements=pseudo.element, stringency=stringency)
+            *family.get_recommended_cutoffs(elements=pseudo.element, stringency=stringency, unit=unit)
         ] for pseudo in family.nodes]
     else:
         headers = ['Element', 'Pseudo', 'MD5']
@@ -75,11 +80,6 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
     """
     if not isinstance(family, RecommendedCutoffMixin):
         raise click.BadParameter(f'family `{family}` does not support recommended cutoffs to be set.')
-
-    try:
-        family.validate_cutoffs_unit(unit)
-    except ValueError as exception:
-        raise click.BadParameter(f'{exception}', param_hint='UNIT')
 
     try:
         data = json.load(cutoffs)

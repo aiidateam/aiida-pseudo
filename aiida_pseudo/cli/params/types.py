@@ -9,6 +9,7 @@ import requests
 
 from aiida.cmdline.params.types import GroupParamType
 from ..utils import attempt
+from ...common.units import U
 
 __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'PseudoPotentialTypeParam')
 
@@ -128,3 +129,30 @@ class PathOrUrl(click.Path):
                 response = requests.get(value)
                 response.raise_for_status()
                 return response
+
+
+class UnitParamType(click.ParamType):
+    """Parameter type to specify units from the `pint` library."""
+
+    name = 'unit'
+
+    def __init__(self, quantity: typing.Optional[typing.List[str]] = None, **kwargs):
+        """Construct the parameter.
+
+        :param quantity: The corresponding quantity of the unit.
+        """
+        super().__init__(**kwargs)
+        self.quantity = quantity
+
+    def convert(self, value, _, __):
+        """Check if the provided unit is a valid unit for the defined quantity.
+
+        :raises: `click.BadParameter` if the provided unit is not valid for the quantity defined for this instance.
+        """
+        if value not in U:
+            raise click.BadParameter(f'`{value}` is not a valid unit.')
+
+        if not U.Quantity(1, value).check(f'[{self.quantity}]'):
+            raise click.BadParameter(f'`{value}` is not a valid `{self.quantity}` unit.')
+
+        return value

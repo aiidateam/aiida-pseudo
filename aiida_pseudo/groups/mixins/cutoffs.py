@@ -2,6 +2,8 @@
 """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras."""
 import warnings
 
+from typing import Optional
+
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory
 
@@ -81,17 +83,23 @@ class RecommendedCutoffMixin:
         if not U.Quantity(1, unit).check('[energy]'):
             raise ValueError(f'`{unit}` is not a valid energy unit.')
 
-    def validate_stringency(self, stringency: str) -> None:
+    def validate_stringency(self, stringency: Optional[str]) -> None:
         """Validate a cutoff stringency.
 
+        Check if the stringency is defined for the family. If no stringency input is passed, the method checks if a
+        default stringency has been set.
+
         :param stringency: the cutoff stringency to validate.
-        :raises ValueError: if stringency is None or the family does not define cutoffs for the specified stringency.
+        :raises ValueError: if `stringency` is equal to `None` and the family defines no default stringency.
+        :raises ValueError: if the family does not define cutoffs for the specified stringency.
         """
         if stringency is None:
-            raise ValueError('defining a stringency is required.')
-
-        if stringency not in self.get_cutoff_stringencies():
-            raise ValueError(f'stringency `{stringency}` is not defined for this family.')
+            self.get_default_stringency()
+        elif stringency not in self.get_cutoff_stringencies():
+            raise ValueError(
+                f'stringency `{stringency}` is not one of the available cutoff stringencies for this family: '
+                f'{self.get_cutoff_stringencies()}.'
+            )
 
     def _get_cutoffs_dict(self) -> dict:
         """Return the cutoffs dictionary that maps the stringencies to the recommended cutoffs.
@@ -124,13 +132,12 @@ class RecommendedCutoffMixin:
         :param default_stringency: the default stringency to be used for the recommended cutoffs.
         :raises ValueError: if the provided default stringency is not in the tuple of available cutoff stringencies for
             the pseudo family.
+        :raises ValueError: if the user tries to unset the stringency by providing ``None`` as an input.
         """
-        if default_stringency not in self.get_cutoff_stringencies():
-            raise ValueError(
-                'provided default stringency not in tuple of available cutoff stringencies: '
-                f'{self.get_cutoff_stringencies()}.'
-            )
+        if default_stringency is None:
+            raise ValueError('the default stringency cannot be unset.')
 
+        self.validate_stringency(default_stringency)
         self.set_extra(self._key_default_stringency, default_stringency)
 
     def get_cutoff_stringencies(self) -> tuple:
@@ -182,7 +189,7 @@ class RecommendedCutoffMixin:
         if len(cutoffs_dict) == 1:
             self.set_default_stringency(stringency)
 
-    def get_cutoffs(self, stringency=None) -> dict:
+    def get_cutoffs(self, stringency: str = None) -> dict:
         """Return a set of cutoffs for the given stringency.
 
         :param stringency: optional stringency for which to retrieve the cutoffs. If not specified, the default
@@ -190,14 +197,11 @@ class RecommendedCutoffMixin:
         :raises ValueError: if no stringency is specified and no default stringency is defined for the family.
         :raises ValueError: if the requested stringency is not defined for this family.
         """
+        self.validate_stringency(stringency)
         stringency = stringency or self.get_default_stringency()
+        return self._get_cutoffs_dict()[stringency]
 
-        try:
-            return self._get_cutoffs_dict()[stringency]
-        except KeyError as exception:
-            raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
-
-    def delete_cutoffs(self, stringency) -> None:
+    def delete_cutoffs(self, stringency: str) -> None:
         """Delete the recommended cutoffs for a specified stringency.
 
         .. note: If, after the cutoffs have been deleted, there is only one stringency defined for the pseudo family,
@@ -207,8 +211,7 @@ class RecommendedCutoffMixin:
         :param stringency: stringency for which to delete the cutoffs.
         :raises ValueError: if the requested stringency is not defined for this family.
         """
-        if stringency not in self.get_cutoff_stringencies():
-            raise ValueError(f'stringency `{stringency}` is not defined for this family.')
+        self.validate_stringency(stringency)
 
         cutoffs_dict = self._get_cutoffs_dict()
         cutoffs_dict.pop(stringency)
@@ -257,19 +260,18 @@ class RecommendedCutoffMixin:
         :raises ValueError: if no stringency is specified and no default stringency is defined for the family.
         :raises ValueError: if the requested stringency is not defined for this family.
         """
+        self.validate_stringency(stringency)
         stringency = stringency or self.get_default_stringency()
 
         try:
             return self._get_cutoffs_unit_dict()[stringency]
-        except KeyError as exception:
+        except KeyError:
             # Workaround to deal with pseudo families installed in v0.5.0 - Set default unit in case it is not in extras
-            if stringency in self.get_cutoff_stringencies():
-                cutoffs_unit_dict = self._get_cutoffs_unit_dict()
-                cutoffs_unit_dict[stringency] = 'eV'
-                self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
-                return 'eV'
+            cutoffs_unit_dict = self._get_cutoffs_unit_dict()
+            cutoffs_unit_dict[stringency] = 'eV'
+            self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+            return 'eV'
             # End of workaround
-            raise ValueError(f'stringency `{stringency}` is not defined for this family.') from exception
 
     def get_recommended_cutoffs(self, *, elements=None, structure=None, stringency=None, unit=None):
         """Return tuple of recommended wavefunction and density cutoffs for the given elements or ``StructureData``.

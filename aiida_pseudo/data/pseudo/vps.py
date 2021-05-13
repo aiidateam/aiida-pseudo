@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Module for data plugin to represent a pseudo potential in VPS format."""
+import pathlib
 import re
-from typing import BinaryIO, Union
+import typing
 
 from aiida.common.constants import elements
 
@@ -101,25 +102,35 @@ class VpsData(PseudoPotentialData):
     _key_z_valence = 'z_valence'
     _key_xc_type = 'xc_type'
 
-    def set_file(self, stream: BinaryIO, filename: str = None, **kwargs):  # pylint: disable=arguments-differ
-        """Set the file content.
+    def set_file(self, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: str = None, **kwargs):  # pylint: disable=arguments-differ
+        """Set the file content and parse other optional attributes from the content.
 
-        :param stream: a filelike object with the binary content of the file.
+        .. note:: this method will first analyse the type of the ``source`` and if it is a filepath will convert it
+            to a binary stream of the content located at that filepath, which is then passed on to the superclass. This
+            needs to be done first, because it will properly set the file and filename attributes that are expected by
+            other methods. Straight after the superclass call, the source seeker needs to be reset to zero if it needs
+            to be read again, because the superclass most likely will have read the stream to the end. Finally it is
+            important that the ``prepare_source`` is called here before the superclass invocation, because this way the
+            conversion from filepath to byte stream will be performed only once. Otherwise, each subclass would perform
+            the conversion over and over again.
+
+        :param source: the source pseudopotential content, either a binary stream, or a ``str`` or ``Path`` to the path
+            of the file on disk, which can be relative or absolute.
         :param filename: optional explicit filename to give to the file stored in the repository.
+        :raises TypeError: if the source is not a ``str``, ``pathlib.Path`` instance or binary stream.
+        :raises FileNotFoundError: if the source is a filepath but does not exist.
         :raises ValueError: if the element symbol is invalid.
         """
-        stream.seek(0)
-
-        content = stream.read().decode('utf-8')
+        source = self.prepare_source(source)
+        super().set_file(source, filename, **kwargs)
+        source.seek(0)
+        content = source.read().decode('utf-8')
         self.element = parse_element(content)
         self.z_valence = parse_z_valence(content)
         self.xc_type = parse_xc_type(content)
 
-        stream.seek(0)
-        super().set_file(stream, filename, **kwargs)
-
     @property
-    def z_valence(self) -> Union[int, None]:
+    def z_valence(self) -> typing.Optional[int]:
         """Return the Z valence.
 
         :return: the Z valence.
@@ -139,7 +150,7 @@ class VpsData(PseudoPotentialData):
         self.set_attribute(self._key_z_valence, value)
 
     @property
-    def xc_type(self) -> Union[str, None]:
+    def xc_type(self) -> typing.Optional[int]:
         """Return the exchange-correlation type.
 
         :return: the exchange-correlation type.

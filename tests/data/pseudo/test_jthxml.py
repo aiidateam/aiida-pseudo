@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.jthxml` module."""
+import io
 import os
+import pathlib
 
 import pytest
 
@@ -8,7 +11,28 @@ from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import JthXmlData
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.fixture
+def source(request, filepath_pseudos):
+    """Return a pseudopotential, eiter as ``str``, ``Path`` or ``io.BytesIO``."""
+    filepath_pseudo = pathlib.Path(filepath_pseudos(entry_point='jthxml')) / 'Ar.jthxml'
+
+    if request.param is str:
+        return str(filepath_pseudo)
+
+    if request.param is pathlib.Path:
+        return filepath_pseudo
+
+    return io.BytesIO(filepath_pseudo.read_bytes())
+
+
+@pytest.mark.parametrize('source', (io.BytesIO, str, pathlib.Path), indirect=True)
+def test_constructor_source_types(source):
+    """Test the constructor accept the various types."""
+    pseudo = JthXmlData(source)
+    assert isinstance(pseudo, JthXmlData)
+    assert not pseudo.is_stored
+
+
 def test_constructor(filepath_pseudos):
     """Test the constructor."""
     for filename in os.listdir(filepath_pseudos('jthxml')):

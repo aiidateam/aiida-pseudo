@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=redefined-outer-name
 """Tests for the :py:mod:`~aiida_pseudo.data.pseudo.pseudo` module."""
 import io
+import pathlib
 
 import pytest
 
@@ -12,21 +14,89 @@ from aiida.orm import CalcJobNode
 from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
 
 
-@pytest.mark.usefixtures('clear_db')
-def test_constructor():
-    """Test the constructor."""
-    stream = io.BytesIO(b'pseudo')
+@pytest.fixture
+def source(request, filepath_pseudos):
+    """Return a pseudopotential, eiter as ``str``, ``Path`` or ``io.BytesIO``."""
+    filepath_pseudo = pathlib.Path(filepath_pseudos()) / 'Ar.upf'
 
-    pseudo = PseudoPotentialData(stream)
+    if request.param is str:
+        return str(filepath_pseudo)
+
+    if request.param is pathlib.Path:
+        return filepath_pseudo
+
+    return io.BytesIO(filepath_pseudo.read_bytes())
+
+
+@pytest.mark.parametrize('source', (io.BytesIO, str, pathlib.Path), indirect=True)
+def test_constructor_source_types(source):
+    """Test the constructor."""
+    pseudo = PseudoPotentialData(source)
     assert isinstance(pseudo, PseudoPotentialData)
     assert not pseudo.is_stored
 
 
-@pytest.mark.usefixtures('clear_db')
 def test_constructor_invalid():
     """Test the constructor for invalid arguments."""
     with pytest.raises(TypeError, match='missing 1 required positional argument'):
         PseudoPotentialData()  # pylint: disable=no-value-for-parameter
+
+
+@pytest.mark.usefixtures('chtmpdir')
+@pytest.mark.parametrize('source_type', ('stream', 'str_absolute', 'str_relative', 'pathlib.Path'))
+@pytest.mark.parametrize('implicit', (True, False))
+def test_constructor_filename(get_pseudo_potential_data, implicit, source_type):
+    """Test the ``filename`` argument of the constructor."""
+    pseudo = get_pseudo_potential_data()
+    explicit_filename = 'custom.dat'
+
+    # Copy the content of the test pseudo to file in the current working directory
+    filepath = pathlib.Path('tempfile.pseudo')
+
+    with open(filepath, mode='wb') as handle:
+        handle.write(pseudo.get_object_content(pseudo.filename, mode='rb'))
+        handle.flush()
+
+    if source_type == 'stream':
+        with open(filepath, 'rb') as handle:
+            source = io.BytesIO(handle.read())
+    elif source_type == 'str_absolute':
+        source = str(filepath.absolute())
+    elif source_type == 'str_relative':
+        source = str(filepath.name)
+    elif source_type == 'pathlib.Path':
+        source = filepath
+
+    if implicit:
+        node = PseudoPotentialData(source, filename=None)
+        # If the source type was a stream, we pass a bytestream which doesn't have a name and so the name will be
+        # determined by the baseclass which has some default, but in this case we don't have to check anything.
+        if source_type != 'stream':
+            assert node.filename == filepath.name
+    else:
+        node = PseudoPotentialData(source, filename=explicit_filename)
+        assert node.filename == explicit_filename
+
+
+@pytest.mark.parametrize(('value, exception, pattern'), (
+    (io.StringIO('content'), TypeError, r'`source` should be a `str` or `pathlib.Path` filepath .*'),
+    ('non-existing/path', FileNotFoundError, r'No such file or directory: .*'),
+    (pathlib.Path('non-existing/path'), FileNotFoundError, r'No such file or directory: .*'),
+))
+def test_prepare_source_excepts(value, exception, pattern):
+    """Test the ``PseudoPotentialData.prepare_source`` method when it is supposed to except."""
+    with pytest.raises(exception, match=pattern):
+        PseudoPotentialData.prepare_source(value)
+
+
+@pytest.mark.parametrize('source', (io.BytesIO, str, pathlib.Path), indirect=True)
+def test_prepare_source(source):
+    """Test the ``PseudoPotentialData.prepare_source`` method for valid input."""
+    assert isinstance(PseudoPotentialData.prepare_source(source), io.BytesIO)
+
+    if isinstance(source, io.BytesIO):
+        # If we pass a bytestream, we should get the exact same back
+        assert PseudoPotentialData.prepare_source(source) is source
 
 
 @pytest.mark.usefixtures('clear_db')

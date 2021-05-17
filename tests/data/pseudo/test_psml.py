@@ -51,13 +51,16 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
     """
     pseudo = get_pseudo_potential_data(element='Ar', entry_point='psml')
     assert pseudo.element == 'Ar'
+    assert pseudo.z_valence == 8
 
     with (filepath_pseudos('psml') / 'He.psml').open('rb') as handle:
         pseudo.set_file(handle)
         assert pseudo.element == 'He'
+        assert pseudo.z_valence == 2
 
         pseudo.store()
         assert pseudo.element == 'He'
+        assert pseudo.z_valence == 2
 
         with pytest.raises(ModificationNotAllowed):
             pseudo.set_file(handle)

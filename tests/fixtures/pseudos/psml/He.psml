@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <psml version="1.1" energy_unit="hartree" length_unit="bohr">
-<pseudo-atom-spec atomic-label="He" atomic-number="2"></pseudo-atom-spec>
+<pseudo-atom-spec atomic-label="He" atomic-number="2"  z-pseudo="2"></pseudo-atom-spec>
 </psml>

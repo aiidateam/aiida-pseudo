@@ -1,16 +1,30 @@
 # Change log
 
+## 0.6.2
+
+This release comes with the addition of the first version of the [online documentation](https://aiida-pseudo.readthedocs.io/en/latest/).
+It is now also possible to construct a new pseudopotential data node from a filepath on disk instead of a bytestream.
+
+### Features
+- CLI: add support for units to `family show` [[#97]](https://github.com/aiidateam/aiida-pseudo/pull/97)
+- `PseudoPotentialData`: allow `str` or `Path` for `source` argument [[#98]](https://github.com/aiidateam/aiida-pseudo/pull/98)
+
+### Improvements
+- `RecommendedCutoffMixin`: improve error messages [[#86]](https://github.com/aiidateam/aiida-pseudo/pull/86)
+- Docs: add first version of documentation [[#88]](https://github.com/aiidateam/aiida-pseudo/pull/88)
+
+
 ## 0.6.1
 
 This release contains two changes that would be breaking, but the `CutoffsFamily` was only intended for testing purposes and the command line option flag changes are unlikely to break code.
 Therefore this is released as a patch version such that plugins do not have to update their version requirements which are often limited to a particular minor version.
 
 ### Features
-- CLI: allow folder on disk for `aiida-pseudo install family` and add the `-P/--pseudo-type` option to define the pseudopotential data plugin to be used (#80)
+- CLI: allow folder on disk for `aiida-pseudo install family` and add the `-P/--pseudo-type` option to define the pseudopotential data plugin to be used [[#80]](https://github.com/aiidateam/aiida-pseudo/pull/80)
 
 ### Changes
-- Rename `CutoffsFamily` to `CutoffsPseudoPotentialFamily` (#82)
-- CLI: change the `-F/--archive-format` to `-f/--archive-format` and `-T/--family-type` to `-F/--family-type` (#80)
+- Rename `CutoffsFamily` to `CutoffsPseudoPotentialFamily` [[#82]](https://github.com/aiidateam/aiida-pseudo/pull/82)
+- CLI: change the `-F/--archive-format` to `-f/--archive-format` and `-T/--family-type` to `-F/--family-type` [[#80]](https://github.com/aiidateam/aiida-pseudo/pull/80)
 
 
 ## 0.6.0

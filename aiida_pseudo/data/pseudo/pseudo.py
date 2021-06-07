@@ -33,7 +33,7 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         source = cls.prepare_source(source)
 
         query = orm.QueryBuilder()
-        query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': md5_from_filelike(source)})
+        query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': {"==": md5_from_filelike(source)}})
 
         existing = query.first()
 

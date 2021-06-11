@@ -104,8 +104,8 @@ DOWNLOAD_ONLY = OverridableOption(
     )
 )
 
-FROM_DIR = OverridableOption(
-    '--from-dir',
+FROM_DOWNLOAD = OverridableOption(
+    '--from-download',
     type=click.STRING,
     required=False,
     default=None,

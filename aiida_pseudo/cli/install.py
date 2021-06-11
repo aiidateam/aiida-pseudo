@@ -4,6 +4,7 @@ import json
 import pathlib
 import shutil
 import tempfile
+import tarfile
 
 import click
 import requests
@@ -167,16 +168,16 @@ def download_pseudo_dojo(
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
 @options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
 @options.DOWNLOAD_ONLY()
-@options.FROM_DIR()
+@options.FROM_DOWNLOAD()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_sssp(version, functional, protocol, download_only, from_dir, traceback):
+def cmd_install_sssp(version, functional, protocol, download_only, from_download, traceback):
     """Install an SSSP configuration.
 
     The SSSP configuration will be automatically downloaded from the Materials Cloud Archive entry to create a new
     `SsspFamily`.
     """
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals, too-many-statements
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
 
@@ -184,47 +185,10 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_dir, tra
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt, create_family_from_archive
 
-    if download_only and from_dir is not None:
-        raise click.BadParameter(
-            'cannot specify both `--download-only` and `--from-dir`.', param_hint="'--download-only' / '--from-dir'"
-        )
-
-    configuration = SsspConfiguration(version, functional, protocol)
-    label = SsspFamily.format_configuration_label(configuration)
-    description = f'SSSP v{version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
-
-    if configuration not in SsspFamily.valid_configurations:
-        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
-
-    if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
-        echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
-
-    with tempfile.TemporaryDirectory() as dirpath:
-
-        if from_dir is not None:
-            dirpath = pathlib.Path(from_dir).absolute()
-        else:
-            dirpath = pathlib.Path(dirpath)
-
-        filepath_archive = dirpath / 'archive.tar.gz'
-        filepath_metadata = dirpath / 'metadata.json'
-
-        if from_dir is None:
-            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+    def install_sssp(filepath_archive, filepath_metadata, label, description):
 
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
-
-        if download_only:
-            for filepath in [filepath_archive, filepath_metadata]:
-                filepath_target = pathlib.Path.cwd() / filepath.name
-                if filepath_target.exists():
-                    echo.echo_warning(f'the file `{filepath_target}` already exists, skipping.')
-                else:
-                    # Cannot use ``pathlib.Path.rename`` because this will fail if it moves across file systems.
-                    shutil.move(filepath, filepath_target)
-                    echo.echo_success(f'`{filepath_target.name}` written to the current directory.')
-            return
 
         with open(filepath_metadata, 'rb') as handle:
             handle.seek(0)
@@ -248,6 +212,63 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_dir, tra
 
         echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')
 
+    if download_only and from_download is not None:
+        raise click.BadParameter(
+            'cannot specify both `--download-only` and `--from-download`.',
+            param_hint="'--download-only' / '--from-download'"
+        )
+
+    configuration = SsspConfiguration(version, functional, protocol)
+
+    if configuration not in SsspFamily.valid_configurations:
+        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+
+    with tempfile.TemporaryDirectory() as dirpath:
+
+        dirpath = pathlib.Path(dirpath)
+
+        filepath_archive = dirpath / 'archive.tar.gz'
+        filepath_metadata = dirpath / 'metadata.json'
+
+        if from_download is not None:
+
+            tarball_path = pathlib.Path(from_download).absolute()
+            with tarfile.open(tarball_path, 'r') as handle:
+                handle.extractall(dirpath)
+
+            filepath_configuration = dirpath / 'configuration.json'
+
+            with filepath_configuration.open('r') as handle:
+                configuration = SsspConfiguration(**json.load(handle))
+        else:
+            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+
+        label = SsspFamily.format_configuration_label(configuration)
+        description = (
+            f'SSSP v{configuration.version} {configuration.functional} {configuration.protocol} '
+            f'installed with aiida-pseudo v{__version__}'
+        )
+        if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
+            echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
+
+        if download_only:
+            filepath_configuration = dirpath / 'configuration.json'
+
+            with filepath_configuration.open('w') as handle:
+                handle.write(json.dumps(configuration._asdict()))
+
+            tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
+
+            if tarball_path.exists():
+                echo.echo_critical(f'the file `{tarball_path}` already exists.')
+
+            with tarfile.open(tarball_path, 'w') as tarball_file:
+                for filepath in [filepath_configuration, filepath_metadata, filepath_archive]:
+                    tarball_file.add(filepath, filepath.name)
+            return
+
+        install_sssp(filepath_archive, filepath_metadata, label, description)
+
 
 @cmd_install.command('pseudo-dojo')
 @options.VERSION(type=click.Choice(['0.4', '1.0']), default='0.4', show_default=True)
@@ -257,11 +278,12 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_dir, tra
 @options.PSEUDO_FORMAT(type=click.Choice(['psp8', 'upf', 'psml', 'jthxml']), default='psp8', show_default=True)
 @options.DEFAULT_STRINGENCY(type=click.Choice(['low', 'normal', 'high']), default='normal', show_default=True)
 @options.DOWNLOAD_ONLY()
-@options.FROM_DIR()
+@options.FROM_DOWNLOAD()
 @options.TRACEBACK()
 @decorators.with_dbenv()
 def cmd_install_pseudo_dojo(
-    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, from_dir, traceback
+    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, from_download,
+    traceback
 ):
     """Install a PseudoDojo configuration.
 
@@ -293,9 +315,10 @@ def cmd_install_pseudo_dojo(
     )
     # yapf: enable
 
-    if download_only and from_dir is not None:
+    if download_only and from_download is not None:
         raise click.BadParameter(
-            'cannot specify both `--download-only` and `--from-dir`.', param_hint="'--download-only' / '--from-dir'"
+            'cannot specify both `--download-only` and `--from-download`.',
+            param_hint="'--download-only' / '--from-download'"
         )
 
     try:
@@ -315,15 +338,15 @@ def cmd_install_pseudo_dojo(
 
     with tempfile.TemporaryDirectory() as dirpath:
 
-        if from_dir is not None:
-            dirpath = pathlib.Path(from_dir).absolute()
+        if from_download is not None:
+            dirpath = pathlib.Path(from_download).absolute()
         else:
             dirpath = pathlib.Path(dirpath)
 
         filepath_archive = dirpath / 'archive.tgz'
         filepath_metadata = dirpath / 'metadata.tgz'
 
-        if from_dir is None:
+        if from_download is None:
             download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'

@@ -110,15 +110,12 @@ def download_sssp(
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
 
-    url_prefix = 'https://staging-invenio.materialscloud.org/record/file?filename='
-    url_suffix = '&parent_id=19'
-
-    url_version_yaml = f"{url_prefix}versions.yaml{url_suffix}"
+    url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
 
     with attempt('downloading patch versions information... ', include_traceback=traceback):
-        response = requests.get(url_version_yaml)
+        response = requests.get(url_template.format(filename='versions.yaml'))
         response.raise_for_status()
-        version_mapping = yaml.load(response.content, Loader=yaml.FullLoader)
+        version_mapping = yaml.load(response.content, Loader=yaml.SafeLoader)
 
     echo.echo_info(f'Latest patch version found: {version_mapping[configuration.version]}')
 
@@ -129,8 +126,8 @@ def download_sssp(
         configuration, 'json', version_mapping[configuration.version]
     )
 
-    url_archive = f"{url_prefix}{archive_filename}{url_suffix}"
-    url_metadata = f"{url_prefix}{metadata_filename}{url_suffix}"
+    url_archive = url_template.format(filename=archive_filename)
+    url_metadata = url_template.format(filename=metadata_filename)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
         response = requests.get(url_archive)

@@ -3,9 +3,6 @@
 from collections import namedtuple
 from typing import Sequence, Optional
 
-from aiida.cmdline import params
-from wrapt.wrappers import PartialCallableObjectProxy
-
 from aiida_pseudo.data.pseudo import UpfData
 from ..mixins import RecommendedCutoffMixin
 from .pseudo import PseudoPotentialFamily
@@ -53,7 +50,9 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         )
 
     @classmethod
-    def format_configuration_filename(cls, configuration: SsspConfiguration, extension: str, patch_version: Optional[str] = None) -> str:
+    def format_configuration_filename(
+        cls, configuration: SsspConfiguration, extension: str, patch_version: Optional[str] = None
+    ) -> str:
         """Format the filename for a file of a particular SSSP configuration as it is available from MC Archive.
 
         :param configuration: the SSSP configuration.

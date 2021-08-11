@@ -3,7 +3,9 @@
 import json
 import pathlib
 import shutil
+from sys import version
 import tempfile
+import yaml
 
 import click
 import requests
@@ -108,9 +110,27 @@ def download_sssp(
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
 
-    url_sssp_base = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/'
-    url_archive = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'tar.gz')}"
-    url_metadata = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'json')}"
+    url_prefix = 'https://staging-invenio.materialscloud.org/record/file?filename='
+    url_suffix = '&parent_id=19'
+
+    url_version_yaml = f"{url_prefix}versions.yaml{url_suffix}"
+
+    with attempt('downloading patch versions information... ', include_traceback=traceback):
+        response = requests.get(url_version_yaml)
+        response.raise_for_status()
+        version_mapping = yaml.load(response.content, Loader=yaml.FullLoader)
+
+    echo.echo_info(f'Latest patch version found: {version_mapping[configuration.version]}')
+
+    archive_filename = SsspFamily.format_configuration_filename(
+        configuration, 'tar.gz', version_mapping[configuration.version]
+    )
+    metadata_filename = SsspFamily.format_configuration_filename(
+        configuration, 'json', version_mapping[configuration.version]
+    )
+
+    url_archive = f"{url_prefix}{archive_filename}{url_suffix}"
+    url_metadata = f"{url_prefix}{metadata_filename}{url_suffix}"
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
         response = requests.get(url_archive)

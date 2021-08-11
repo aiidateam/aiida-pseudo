@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Subclass of ``PseudoPotentialFamily`` designed to represent an SSSP configuration."""
 from collections import namedtuple
-from typing import Sequence
+from typing import Sequence, Optional
+
+from aiida.cmdline import params
+from wrapt.wrappers import PartialCallableObjectProxy
 
 from aiida_pseudo.data.pseudo import UpfData
 from ..mixins import RecommendedCutoffMixin
@@ -50,15 +53,17 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         )
 
     @classmethod
-    def format_configuration_filename(cls, configuration: SsspConfiguration, extension: str) -> str:
+    def format_configuration_filename(cls, configuration: SsspConfiguration, extension: str, patch_version: Optional[str] = None) -> str:
         """Format the filename for a file of a particular SSSP configuration as it is available from MC Archive.
 
         :param configuration: the SSSP configuration.
         :param extension: the filename extension without the leading dot.
         :return: filename
         """
+        version = configuration.version if patch_version is None else patch_version
+
         return cls.filename_template.format(
-            version=configuration.version, functional=configuration.functional, protocol=configuration.protocol
+            version=version, functional=configuration.functional, protocol=configuration.protocol
         ) + f'.{extension}'
 
     def __init__(self, label=None, **kwargs):

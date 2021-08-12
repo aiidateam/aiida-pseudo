@@ -356,7 +356,7 @@ def cmd_install_pseudo_dojo(
             adjusted_cutoffs = {}
             for stringency, str_cutoffs in cutoffs.items():
                 adjusted_cutoffs[stringency] = []
-                max_cutoff_wfc = max([element_cutoffs['cutoff_wfc'] for element_cutoffs in str_cutoffs.values()])
+                max_cutoff_wfc = max([cutoffs['cutoff_wfc'] for cutoffs in str_cutoffs.values()])
                 filler_cutoff_wfc = max_cutoff_wfc * 1.5
                 for element, cutoff in str_cutoffs.items():
                     if cutoff['cutoff_wfc'] <= 0:

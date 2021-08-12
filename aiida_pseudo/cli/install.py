@@ -111,19 +111,20 @@ def download_sssp(
 
     url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
 
+    # Download the dictionary mapping of the minor versions to the latest corresponding patch versions. Since patch
+    # releases of the SSSP only contain bug fixes, there is no reason to have the user install an outdated patch
+    # version. So, the latest patch version of the minor version that is specified by the user is always installed.
     with attempt('downloading patch versions information... ', include_traceback=traceback):
         response = requests.get(url_template.format(filename='versions.yaml'))
         response.raise_for_status()
+        # The `version_mapping` is a dictionary that maps each minor version (key) to the latest patch version (value)
         version_mapping = yaml.load(response.content, Loader=yaml.SafeLoader)
+        patch_version = version_mapping[configuration.version]
 
-    echo.echo_info(f'Latest patch version found: {version_mapping[configuration.version]}')
+    echo.echo_info(f'Latest patch version found: {patch_version}')
 
-    archive_filename = SsspFamily.format_configuration_filename(
-        configuration, 'tar.gz', version_mapping[configuration.version]
-    )
-    metadata_filename = SsspFamily.format_configuration_filename(
-        configuration, 'json', version_mapping[configuration.version]
-    )
+    archive_filename = SsspFamily.format_configuration_filename(configuration, 'tar.gz', patch_version)
+    metadata_filename = SsspFamily.format_configuration_filename(configuration, 'json', patch_version)
 
     url_archive = url_template.format(filename=archive_filename)
     url_metadata = url_template.format(filename=metadata_filename)

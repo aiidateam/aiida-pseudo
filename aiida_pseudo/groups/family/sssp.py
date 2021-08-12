@@ -57,6 +57,10 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
         :param configuration: the SSSP configuration.
         :param extension: the filename extension without the leading dot.
+        :param patch_version: patch version of the files which overrides the ``version`` specified in the
+            ``configuration``. This is necessary because we only let users specify the minor version, not install
+            configurations with a specific patch version. The filename on the archive however will contain the patch
+            version, so this needs to be substituted.
         :return: filename
         """
         version = configuration.version if patch_version is None else patch_version

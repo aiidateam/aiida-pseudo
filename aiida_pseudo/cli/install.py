@@ -4,6 +4,7 @@ import json
 import pathlib
 import shutil
 import tempfile
+import yaml
 
 import click
 import requests
@@ -97,20 +98,37 @@ def download_sssp(
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
     traceback: bool = False
-) -> None:
+) -> str:
     """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
 
     :param configuration: the SSSP configuration to download.
     :param filepath_archive: absolute filepath to write the pseudopotential archive to.
     :param filepath_metadata: absolute filepath to write the metadata file to.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
+    :return: Latest patch version of the requested minor version
     """
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
 
-    url_sssp_base = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/'
-    url_archive = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'tar.gz')}"
-    url_metadata = f"{url_sssp_base}/{SsspFamily.format_configuration_filename(configuration, 'json')}"
+    url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
+
+    # Download the dictionary mapping of the minor versions to the latest corresponding patch versions. Since patch
+    # releases of the SSSP only contain bug fixes, there is no reason to have the user install an outdated patch
+    # version. So, the latest patch version of the minor version that is specified by the user is always installed.
+    with attempt('downloading patch versions information... ', include_traceback=traceback):
+        response = requests.get(url_template.format(filename='versions.yaml'))
+        response.raise_for_status()
+        # The `version_mapping` is a dictionary that maps each minor version (key) to the latest patch version (value)
+        version_mapping = yaml.load(response.content, Loader=yaml.SafeLoader)
+        patch_version = version_mapping[configuration.version]
+
+    echo.echo_info(f'Latest patch version found: {patch_version}')
+
+    archive_filename = SsspFamily.format_configuration_filename(configuration, 'tar.gz', patch_version)
+    metadata_filename = SsspFamily.format_configuration_filename(configuration, 'json', patch_version)
+
+    url_archive = url_template.format(filename=archive_filename)
+    url_metadata = url_template.format(filename=metadata_filename)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
         response = requests.get(url_archive)
@@ -125,6 +143,8 @@ def download_sssp(
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
+
+    return patch_version
 
 
 def download_pseudo_dojo(
@@ -185,7 +205,6 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 
     configuration = SsspConfiguration(version, functional, protocol)
     label = SsspFamily.format_configuration_label(configuration)
-    description = f'SSSP v{version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
 
     if configuration not in SsspFamily.valid_configurations:
         echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
@@ -199,8 +218,9 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
 
-        download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+        patch_version = download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
+        description = f'SSSP v{patch_version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 

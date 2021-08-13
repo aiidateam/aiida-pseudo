@@ -182,9 +182,9 @@ def test_install_sssp(run_cli_command):
 
     family = QueryBuilder().append(SsspFamily).one()[0]
     assert family.get_cutoffs is not None
-    assert f'SSSP v1.1 PBE efficiency installed with aiida-pseudo v{__version__}' in family.description
-    assert 'Archive pseudos md5: 4803ce9fd1d84c777f87173cd4a2de33' in family.description
-    assert 'Pseudo metadata md5: 0d5d6c2c840383c7c4fc3a99b5dc3001' in family.description
+    assert f'PBE efficiency installed with aiida-pseudo v{__version__}' in family.description
+    assert 'Archive pseudos md5: ' in family.description
+    assert 'Pseudo metadata md5: ' in family.description
 
     result = run_cli_command(cmd_install_sssp, raises=SystemExit)
     assert 'is already installed' in result.output

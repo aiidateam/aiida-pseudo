@@ -98,7 +98,7 @@ def download_sssp(
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
     traceback: bool = False
-) -> None:
+) -> str:
     """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
 
     :param configuration: the SSSP configuration to download.

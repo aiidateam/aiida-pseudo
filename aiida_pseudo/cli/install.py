@@ -105,6 +105,7 @@ def download_sssp(
     :param filepath_archive: absolute filepath to write the pseudopotential archive to.
     :param filepath_metadata: absolute filepath to write the metadata file to.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
+    :return: Latest patch version of the requested minor version
     """
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
@@ -142,6 +143,8 @@ def download_sssp(
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
+
+    return patch_version
 
 
 def download_pseudo_dojo(
@@ -202,7 +205,6 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 
     configuration = SsspConfiguration(version, functional, protocol)
     label = SsspFamily.format_configuration_label(configuration)
-    description = f'SSSP v{version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
 
     if configuration not in SsspFamily.valid_configurations:
         echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
@@ -216,8 +218,9 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
 
-        download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+        patch_version = download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
+        description = f'SSSP v{patch_version} {functional} {protocol} installed with aiida-pseudo v{__version__}'
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 

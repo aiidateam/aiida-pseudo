@@ -1,5 +1,15 @@
 # Change log
 
+## 0.6.3
+
+### Fixes
+- CLI: update base URL to SSSP files on Materials Cloud [[#104]]](https://github.com/aiidateam/aiida-pseudo/pull/104)
+
+### Devops
+- Dependencies: remove temporary upper limit for sqlalchemy [[#73]]](https://github.com/aiidateam/aiida-pseudo/pull/73)
+- Dependencies: put upper limit on psycopg2-binary [[#106]]](https://github.com/aiidateam/aiida-pseudo/pull/106)
+
+
 ## 0.6.2
 
 This release comes with the addition of the first version of the [online documentation](https://aiida-pseudo.readthedocs.io/en/latest/).

@@ -120,9 +120,9 @@ def test_install_family(run_cli_command, get_pseudo_archive):
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
-    assert PseudoPotentialFamily.objects.count() == 1
+    assert PseudoPotentialFamily.collection.count() == 1
 
-    family = PseudoPotentialFamily.objects.get(label=label)
+    family = PseudoPotentialFamily.collection.get(label=label)
     assert family.__class__ is PseudoPotentialFamily
     assert family.description == description
     assert len(family.pseudos) != 0
@@ -138,9 +138,9 @@ def test_install_family_folder(run_cli_command, filepath_pseudos):
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
-    assert PseudoPotentialFamily.objects.count() == 1
+    assert PseudoPotentialFamily.collection.count() == 1
 
-    family = PseudoPotentialFamily.objects.get(label=label)
+    family = PseudoPotentialFamily.collection.get(label=label)
     assert family.__class__ is PseudoPotentialFamily
     assert family.description == description
     assert len(family.pseudos) != 0
@@ -175,9 +175,9 @@ def test_install_family_url(run_cli_command, get_pseudo_archive, monkeypatch):
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
-    assert PseudoPotentialFamily.objects.count() == 1
+    assert PseudoPotentialFamily.collection.count() == 1
 
-    family = PseudoPotentialFamily.objects.get(label=label)
+    family = PseudoPotentialFamily.collection.get(label=label)
     assert isinstance(family.pseudos['Ar'], UpfData)
     assert family.__class__ is PseudoPotentialFamily
     assert family.description == description
@@ -239,9 +239,9 @@ def test_install_sssp_monkeypatched(run_monkeypatched_install_sssp):
     options = ['-v', version, '-x', functional, '-p', protocol]
     result = run_monkeypatched_install_sssp(options=options)
     assert f'installed `{label}`' in result.output
-    assert SsspFamily.objects.count() == 1
+    assert SsspFamily.collection.count() == 1
 
-    family = SsspFamily.objects.get(label=label)
+    family = SsspFamily.collection.get(label=label)
     assert family.label == label
 
 
@@ -263,9 +263,9 @@ def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo
     options = ['-v', version, '-x', functional, '-p', protocol, '-f', pseudo_format]
     result = run_monkeypatched_install_pseudo_dojo(options=options)
     assert f'installed `{label}`' in result.output
-    assert PseudoDojoFamily.objects.count() == 1
+    assert PseudoDojoFamily.collection.count() == 1
 
-    family = PseudoDojoFamily.objects.get(label=label)
+    family = PseudoDojoFamily.collection.get(label=label)
     assert family.label == label
 
 
@@ -275,7 +275,7 @@ def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     options = ['--download-only']
     result = run_monkeypatched_install_sssp(options=options)
 
-    assert SsspFamily.objects.count() == 0
+    assert SsspFamily.collection.count() == 0
     assert 'written to the current directory.' in result.output
 
 
@@ -296,7 +296,7 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
     options = ['--download-only', '-v', version, '-x', functional, '-p', protocol]
     result = run_monkeypatched_install_sssp(options=options)
 
-    assert SsspFamily.objects.count() == 1
+    assert SsspFamily.collection.count() == 1
     assert 'written to the current directory.' in result.output
 
 
@@ -306,7 +306,7 @@ def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo
     options = ['--download-only']
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 
-    assert PseudoDojoFamily.objects.count() == 0
+    assert PseudoDojoFamily.collection.count() == 0
     assert 'written to the current directory.' in result.output
 
 
@@ -332,5 +332,5 @@ def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseu
     ]
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 
-    assert PseudoDojoFamily.objects.count() == 1
+    assert PseudoDojoFamily.collection.count() == 1
     assert 'written to the current directory.' in result.output

@@ -13,7 +13,7 @@ from aiida_pseudo.data.pseudo import PseudoPotentialData
 
 __all__ = ('PseudoPotentialFamily',)
 
-StructureData = DataFactory('structure')
+StructureData = DataFactory('core.structure')
 
 
 class PseudoPotentialFamily(Group):
@@ -172,7 +172,7 @@ class PseudoPotentialFamily(Group):
         """
         type_check(description, str, allow_none=True)
 
-        if cls.objects.count(filters={'label': label}):
+        if cls.collection.count(filters={'label': label}):
             raise ValueError(f'the {cls.__name__} `{label}` already exists')
 
         family = cls(label=label, description=description)
@@ -191,7 +191,7 @@ class PseudoPotentialFamily(Group):
 
         :return: the pseudopotential type or ``None`` if none has been set yet.
         """
-        return self.get_extra(self._key_pseudo_type, None)
+        return self.base.extras.get(self._key_pseudo_type, None)
 
     def update_pseudo_type(self):
         """Update the pseudo type, stored as an extra, based on the current nodes in the family."""
@@ -203,7 +203,7 @@ class PseudoPotentialFamily(Group):
         else:
             entry_point_name = None
 
-        self.set_extra(self._key_pseudo_type, entry_point_name)
+        self.base.extras.set(self._key_pseudo_type, entry_point_name)
 
     def add_nodes(self, nodes):
         """Add a node or a set of nodes to the family.

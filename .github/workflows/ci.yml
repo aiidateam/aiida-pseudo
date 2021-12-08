@@ -1,4 +1,4 @@
-name: continuous-integration
+name: ci
 
 on: [push, pull_request]
 
@@ -11,8 +11,7 @@ jobs:
         steps:
         -   uses: actions/checkout@v2
 
-        -   name: Cache python dependencies
-            id: cache-pip
+        -   name: Cache Python dependencies
             uses: actions/cache@v1
             with:
                 path: ~/.cache/pip
@@ -25,13 +24,11 @@ jobs:
             with:
                 python-version: '3.9'
 
-        -   name: Install python dependencies
-            run:
-                pip install -e .[pre-commit,tests]
+        -   name: Install Python dependencies
+            run: pip install -e .[pre-commit,tests]
 
         -   name: Run pre-commit
-            run:
-                pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
+            run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
 
     tests:
 
@@ -43,6 +40,8 @@ jobs:
                 python-version: ['3.8', '3.9', '3.10']
 
         services:
+            postgres:
+                image: postgres:12
             rabbitmq:
                 image: rabbitmq:latest
                 ports:
@@ -51,8 +50,7 @@ jobs:
         steps:
         -   uses: actions/checkout@v2
 
-        -   name: Cache python dependencies
-            id: cache-pip
+        -   name: Cache Python dependencies
             uses: actions/cache@v1
             with:
                 path: ~/.cache/pip
@@ -65,17 +63,10 @@ jobs:
             with:
                 python-version: ${{ matrix.python-version }}
 
-        -   name: Install system dependencies
-            run: |
-                sudo apt update
-                sudo apt install postgresql
-
-        -   name: Install python dependencies
-            run: |
-                pip install --upgrade setuptools
-                pip install -e .[tests]
-                reentry scan
+        -   name: Install Python dependencies
+            run: pip install -e .[tests]
 
         -   name: Run pytest
-            run:
-                pytest -sv tests
+            env:
+                AIIDA_WARN_v3: True
+            run: pytest -sv tests

@@ -17,8 +17,8 @@ pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=inval
 
 
 @pytest.fixture
-def clear_db(clear_database_before_test):
-    """Alias for the `clear_database_before_test` fixture from `aiida-core`."""
+def clear_db(aiida_profile_clean):
+    """Alias for the `aiida_profile_clean` fixture from `aiida-core`."""
     yield
 
 

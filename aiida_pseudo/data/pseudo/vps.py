@@ -135,7 +135,7 @@ class VpsData(PseudoPotentialData):
 
         :return: the Z valence.
         """
-        return self.get_attribute(self._key_z_valence, None)
+        return self.base.attributes.get(self._key_z_valence, None)
 
     @z_valence.setter
     def z_valence(self, value: int):
@@ -147,7 +147,7 @@ class VpsData(PseudoPotentialData):
         if not isinstance(value, int) or value < 0:
             raise ValueError(f'`{value}` is not a positive integer.')
 
-        self.set_attribute(self._key_z_valence, value)
+        self.base.attributes.set(self._key_z_valence, value)
 
     @property
     def xc_type(self) -> typing.Optional[int]:
@@ -155,7 +155,7 @@ class VpsData(PseudoPotentialData):
 
         :return: the exchange-correlation type.
         """
-        return self.get_attribute(self._key_xc_type, None)
+        return self.base.attributes.get(self._key_xc_type, None)
 
     @xc_type.setter
     def xc_type(self, value: str):
@@ -167,4 +167,4 @@ class VpsData(PseudoPotentialData):
         if not isinstance(value, str) or value not in VALID_XC_TYPES:
             raise ValueError(f'`{value}` is not a valid OpenMX XcType string.')
 
-        self.set_attribute(self._key_xc_type, value)
+        self.base.attributes.set(self._key_xc_type, value)

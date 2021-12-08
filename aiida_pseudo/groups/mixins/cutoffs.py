@@ -8,7 +8,7 @@ from aiida.plugins import DataFactory
 
 from aiida_pseudo.common.units import U
 
-StructureData = DataFactory('structure')  # pylint: disable=invalid-name
+StructureData = DataFactory('core.structure')  # pylint: disable=invalid-name
 
 __all__ = ('RecommendedCutoffMixin',)
 
@@ -105,14 +105,14 @@ class RecommendedCutoffMixin:
 
         :return: the cutoffs extra or an empty dictionary if it has not yet been set.
         """
-        return self.get_extra(self._key_cutoffs, {})
+        return self.base.extras.get(self._key_cutoffs, {})
 
     def _get_cutoffs_unit_dict(self) -> dict:
         """Return the cutoffs units for each of the stringencies.
 
         :return: the cutoffs units extra or an empty dictionary if it has not yet been set.
         """
-        return self.get_extra(self._key_cutoffs_unit, {})
+        return self.base.extras.get(self._key_cutoffs_unit, {})
 
     def get_default_stringency(self) -> str:
         """Return the default stringency if defined.
@@ -121,7 +121,7 @@ class RecommendedCutoffMixin:
         :raises ValueError: if default stringency has not been defined.
         """
         try:
-            return self.get_extra(self._key_default_stringency)
+            return self.base.extras.get(self._key_default_stringency)
         except AttributeError as exception:
             raise ValueError('no default stringency has been defined.') from exception
 
@@ -137,7 +137,7 @@ class RecommendedCutoffMixin:
             raise ValueError('the default stringency cannot be unset.')
 
         self.validate_stringency(default_stringency)
-        self.set_extra(self._key_default_stringency, default_stringency)
+        self.base.extras.set(self._key_default_stringency, default_stringency)
 
     def get_cutoff_stringencies(self) -> tuple:
         """Return a tuple of the available cutoff stringencies.
@@ -183,8 +183,8 @@ class RecommendedCutoffMixin:
         cutoffs_unit_dict = self._get_cutoffs_unit_dict()
         cutoffs_unit_dict[stringency] = unit
 
-        self.set_extra(self._key_cutoffs, cutoffs_dict)
-        self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+        self.base.extras.set(self._key_cutoffs, cutoffs_dict)
+        self.base.extras.set(self._key_cutoffs_unit, cutoffs_unit_dict)
         if len(cutoffs_dict) == 1:
             self.set_default_stringency(stringency)
 
@@ -218,8 +218,8 @@ class RecommendedCutoffMixin:
         cutoffs_unit_dict = self._get_cutoffs_unit_dict()
         cutoffs_unit_dict.pop(stringency, None)  # `None` is added to support pseudo families installed with v0.5.0
 
-        self.set_extra(self._key_cutoffs, cutoffs_dict)
-        self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+        self.base.extras.set(self._key_cutoffs, cutoffs_dict)
+        self.base.extras.set(self._key_cutoffs_unit, cutoffs_unit_dict)
 
         warning = ''
         try:
@@ -268,7 +268,7 @@ class RecommendedCutoffMixin:
             # Workaround to deal with pseudo families installed in v0.5.0 - Set default unit in case it is not in extras
             cutoffs_unit_dict = self._get_cutoffs_unit_dict()
             cutoffs_unit_dict[stringency] = 'eV'
-            self.set_extra(self._key_cutoffs_unit, cutoffs_unit_dict)
+            self.base.extras.set(self._key_cutoffs_unit, cutoffs_unit_dict)
             return 'eV'
             # End of workaround
 

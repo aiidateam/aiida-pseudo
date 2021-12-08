@@ -5,9 +5,9 @@ import io
 import os
 import pathlib
 
+from aiida.common.exceptions import ModificationNotAllowed
 import pytest
 
-from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import PsfData
 from aiida_pseudo.data.pseudo.psf import parse_element
 

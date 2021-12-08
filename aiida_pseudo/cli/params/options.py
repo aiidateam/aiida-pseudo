@@ -2,9 +2,9 @@
 """Reusable options for CLI commands."""
 import shutil
 
+from aiida.cmdline.params.options import OverridableOption
 import click
 
-from aiida.cmdline.params.options import OverridableOption
 from .types import PseudoPotentialFamilyTypeParam, PseudoPotentialTypeParam, UnitParamType
 
 __all__ = (

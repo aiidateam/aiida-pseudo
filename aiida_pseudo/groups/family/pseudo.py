@@ -2,7 +2,7 @@
 """Subclass of ``Group`` that serves as a base class for representing pseudo potential families."""
 import os
 import re
-from typing import Union, List, Tuple, Mapping
+from typing import List, Mapping, Tuple, Union
 
 from aiida.common import exceptions
 from aiida.common.lang import classproperty, type_check

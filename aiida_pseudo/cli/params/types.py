@@ -4,12 +4,12 @@
 import pathlib
 import typing
 
+from aiida.cmdline.params.types import GroupParamType
 import click
 import requests
 
-from aiida.cmdline.params.types import GroupParamType
-from ..utils import attempt
 from ...common.units import U
+from ..utils import attempt
 
 __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'PseudoPotentialTypeParam')
 
@@ -28,6 +28,7 @@ class PseudoPotentialTypeParam(click.ParamType):
         """
         from aiida.common import exceptions
         from aiida.plugins import DataFactory
+
         from aiida_pseudo.data.pseudo import PseudoPotentialData
 
         try:
@@ -80,6 +81,7 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         """
         from aiida.common import exceptions
         from aiida.plugins import GroupFactory
+
         from aiida_pseudo.groups.family import PseudoPotentialFamily
 
         try:

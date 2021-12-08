@@ -3,7 +3,7 @@
 """Tests for the `PseudoDojoFamily` class."""
 import pytest
 
-from aiida_pseudo.data.pseudo import UpfData, Psp8Data, PsmlData, JthXmlData
+from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
 from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
 
 

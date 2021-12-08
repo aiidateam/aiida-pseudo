@@ -10,15 +10,16 @@ except ImportError:
 def setup_package():
     """Install the `aiida-pseudo` package."""
     import json
-    from setuptools import setup, find_packages
+
+    from setuptools import find_packages, setup
 
     filename_setup_json = 'setup.json'
     filename_description = 'README.md'
 
-    with open(filename_setup_json, 'r') as handle:
+    with open(filename_setup_json, 'r', encoding='utf-8') as handle:
         setup_json = json.load(handle)
 
-    with open(filename_description, 'r') as handle:
+    with open(filename_description, 'r', encoding='utf-8') as handle:
         description = handle.read()
 
     setup(

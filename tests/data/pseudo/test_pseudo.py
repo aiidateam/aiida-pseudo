@@ -4,12 +4,11 @@
 import io
 import pathlib
 
-import pytest
-
-from aiida.common.files import md5_from_filelike
 from aiida.common.exceptions import ModificationNotAllowed, StoringNotAllowed
+from aiida.common.files import md5_from_filelike
 from aiida.common.links import LinkType
 from aiida.orm import CalcJobNode
+import pytest
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
 

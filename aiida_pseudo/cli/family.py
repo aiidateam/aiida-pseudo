@@ -2,10 +2,9 @@
 """Commands to inspect or modify the contents of pseudo potential families."""
 import json
 
-import click
-
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
+import click
 
 from ..groups.mixins import RecommendedCutoffMixin
 from .params import arguments, options

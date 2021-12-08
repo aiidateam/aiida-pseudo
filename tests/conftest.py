@@ -6,13 +6,12 @@ import os
 import re
 import shutil
 
+from aiida.plugins import DataFactory
 import click
 import pytest
 
-from aiida.plugins import DataFactory
-
 from aiida_pseudo.data.pseudo import PseudoPotentialData
-from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsPseudoPotentialFamily
+from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
 
@@ -51,6 +50,7 @@ def run_cli_command():
         :param raises: optionally an exception class that is expected to be raised
         """
         import traceback
+
         from click.testing import CliRunner
 
         runner = CliRunner()

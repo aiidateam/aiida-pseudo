@@ -3,13 +3,12 @@
 """Tests for the command `aiida-pseudo family`."""
 import json
 
+from aiida.orm import Group
 from numpy.testing import assert_almost_equal
 import pytest
 
-from aiida.orm import Group
-
 from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
-from aiida_pseudo.groups.family import PseudoPotentialFamily, CutoffsPseudoPotentialFamily
+from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
 
 
 @pytest.mark.usefixtures('clear_db')

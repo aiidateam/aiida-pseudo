@@ -9,7 +9,7 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/ikamensh/flynt/
-    rev: '0.55'
+    rev: '0.66'
     hooks:
     -   id: flynt
         args: [
@@ -17,28 +17,36 @@ repos:
             '--fail-on-change',
         ]
 
+-   repo: https://github.com/pycqa/isort
+    rev: 5.9.3
+    hooks:
+    -   id: isort
+
 -   repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.30.0
+    rev: v0.31.0
     hooks:
     -   id: yapf
         name: yapf
         types: [python]
         args: ['-i']
+        additional_dependencies: ['toml']
         exclude: &exclude_files >
             (?x)^(
                 docs/.*|
             )$
 
--   repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
-    hooks:
-    -   id: pylint
-        language: system
-        exclude: *exclude_files
-
 -   repo: https://github.com/PyCQA/pydocstyle
     rev: 5.0.2
     hooks:
     -   id: pydocstyle
-        args: ['--ignore=D104,D203,D213']
+        additional_dependencies: ['toml']
+        exclude: *exclude_files
+
+-   repo: local
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: pylint
+        types: [python]
+        language: system
         exclude: *exclude_files

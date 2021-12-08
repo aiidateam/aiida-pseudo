@@ -4,15 +4,15 @@ import json
 import pathlib
 import shutil
 import tempfile
-import yaml
 
+from aiida.cmdline.params import options as options_core
+from aiida.cmdline.utils import decorators, echo
 import click
 import requests
-
-from aiida.cmdline.utils import decorators, echo
-from aiida.cmdline.params import options as options_core
+import yaml
 
 from aiida_pseudo.groups.family import PseudoDojoConfiguration, SsspConfiguration
+
 from .params import options, types
 from .root import cmd_root
 
@@ -103,6 +103,7 @@ def download_sssp(
     :return: Latest patch version of the requested minor version
     """
     from aiida_pseudo.groups.family import SsspFamily
+
     from .utils import attempt
 
     url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
@@ -156,6 +157,7 @@ def download_pseudo_dojo(
     :param traceback: boolean, if true, print the traceback when an exception occurs.
     """
     from aiida_pseudo.groups.family import PseudoDojoFamily
+
     from .utils import attempt
 
     label = PseudoDojoFamily.format_configuration_label(configuration)
@@ -196,6 +198,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 
     from aiida_pseudo import __version__
     from aiida_pseudo.groups.family import SsspFamily
+
     from .utils import attempt, create_family_from_archive
 
     configuration = SsspConfiguration(version, functional, protocol)
@@ -274,8 +277,9 @@ def cmd_install_pseudo_dojo(
     # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements
     from aiida.common.files import md5_file
     from aiida.orm import Group, QueryBuilder
+
     from aiida_pseudo import __version__
-    from aiida_pseudo.data.pseudo import JthXmlData, Psp8Data, PsmlData, UpfData
+    from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
     from aiida_pseudo.groups.family import PseudoDojoFamily
 
     from .utils import attempt, create_family_from_archive

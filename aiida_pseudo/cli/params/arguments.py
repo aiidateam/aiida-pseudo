@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reusable arguments for CLI commands."""
 from aiida.cmdline.params.arguments import OverridableArgument
+
 from .types import PseudoPotentialFamilyParam
 
 __all__ = ('PSEUDO_POTENTIAL_FAMILY',)

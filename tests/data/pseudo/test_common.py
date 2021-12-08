@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=redefined-outer-name
 """Tests that are common to all data plugins in the :py:mod:`~aiida_pseudo.data.pseudo` module."""
-import pytest
-
 from aiida import plugins
+import pytest
 
 
 def get_entry_point_names():

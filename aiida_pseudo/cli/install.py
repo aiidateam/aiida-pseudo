@@ -72,15 +72,10 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
     else:
         # At this point, we can assume that it is not a valid filepath on disk, but rather a URL and the ``archive``
         # variable will contain the result objects from the ``requests`` library. The validation of the URL will already
-        # have been done by the ``PathOrUrl`` parameter type, so the URL is reachable. The content of the URL must be
-        # copied to a local temporary file because `create_family_from_archive` does currently not accept filelike
-        # objects, because in turn the underlying `shutil.unpack_archive` does not. In addition, `unpack_archive` will
-        # attempt to deduce the archive format from the filename extension, so it is important we maintain the original
-        # filename. Of course if this fails, users can specify the archive format explicitly with the corresponding
-        # option. We get the filename by converting the URL to a ``Path`` object and taking the filename, using that as
-        # a suffix for the temporary file that is generated on disk to copy the content to.
-        suffix = pathlib.Path(archive.url).name
-        with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as handle:
+        # have been done by the ``PathOrUrl`` parameter type and will already have retrieved the content. The content of
+        # the URL must be copied to a local temporary file because `create_family_from_archive` does currently not
+        # accept filelike objects, because in turn the underlying `shutil.unpack_archive` does not.
+        with tempfile.NamedTemporaryFile(mode='w+b') as handle:
             handle.write(archive.content)
             handle.flush()
 

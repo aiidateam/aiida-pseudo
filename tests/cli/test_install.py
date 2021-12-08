@@ -157,8 +157,10 @@ def test_install_family_url(run_cli_command):
     """
     label = 'SSSP/1.0/PBE/efficiency'
     description = 'description'
-    filepath_archive = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/SSSP_1.0_PBE_efficiency.tar.gz'
-    options = ['-D', description, filepath_archive, label, '-P', 'pseudo.upf']
+    configuration = SsspConfiguration('1.0', 'PBE', 'efficiency')
+    filename = SsspFamily.format_configuration_filename(configuration, 'tar.gz', '1.0')
+    filepath_archive = f'https://archive.materialscloud.org/record/file?filename={filename}&record_id=23'
+    options = ['-D', description, '-P', 'pseudo.upf', '-f', 'gztar', filepath_archive, label]
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output

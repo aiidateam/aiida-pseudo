@@ -16,7 +16,7 @@ from aiida_pseudo.groups.family import PseudoPotentialFamily
 def test_create_family_from_archive(get_pseudo_archive, fmt):
     """Test the `create_family_from_archive` utility function."""
     label = 'PSEUDO/0.0/LDA/extreme'
-    filepath_archive = next(get_pseudo_archive(fmt))
+    filepath_archive = get_pseudo_archive(fmt)
     family = create_family_from_archive(PseudoPotentialFamily, label, filepath_archive, fmt=fmt)
 
     assert isinstance(family, PseudoPotentialFamily)

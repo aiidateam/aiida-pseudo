@@ -117,8 +117,8 @@ def test_install_family(run_cli_command, get_pseudo_archive):
     """Test ``aiida-pseudo install family``."""
     label = 'family'
     description = 'description'
-    filepath_archive = next(get_pseudo_archive())
-    options = ['-D', description, filepath_archive, label]
+    filepath = get_pseudo_archive()
+    options = ['-D', description, str(filepath), label]
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
@@ -149,23 +149,40 @@ def test_install_family_folder(run_cli_command, filepath_pseudos):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_install_family_url(run_cli_command):
+def test_install_family_url(run_cli_command, get_pseudo_archive, monkeypatch):
     """Test ``aiida-pseudo install family`` when installing from a URL.
 
-    When a URL is passed, the parameter converts it into a ``http.client.HTTPResponse``, which is not trivial to mock so
-    instead we use an actual URL, which is slow, but is anyway already tested indirectly in ``test_install_sssp``.
+    Testing this functionality by actually retrieving from a URL has two main downsides: it will be potentially slow
+    by having to download data from the web, but most importantly it is susceptible to random failures if the remote
+    URL is (temporarily) not availabe, or even permanently goes offline, or even the content changes. That is why we
+    monkeypatch the ``PathOrUrl`` instead to simply return the content of an archive that is created on the fly on the
+    local disk. The command expects that the parameter type returns an object that contains the content of the archive
+    under the ``content`` attribute. To mimick this, we construct a namedtuple with a ``content`` attribute on the fly.
     """
+    from aiida_pseudo.cli.params.types import PathOrUrl
+
+    fmt = 'gztar'
     label = 'SSSP/1.0/PBE/efficiency'
     description = 'description'
-    filepath_archive = 'https://legacy-archive.materialscloud.org/file/2018.0001/v4/SSSP_1.0_PBE_efficiency.tar.gz'
-    options = ['-D', description, filepath_archive, label, '-P', 'pseudo.upf']
+    filepath_archive = 'https://archive.materialscloud.org/record/file?filename=fake-url'
+    options = ['-D', description, '-P', 'pseudo.upf', '-f', fmt, filepath_archive, label]
+
+    def convert(*_, **__):
+        from collections import namedtuple
+        Archive = namedtuple('Archive', ['content', 'url'])
+        archive = Archive(
+            get_pseudo_archive(fmt=fmt).read_bytes(), 'https://archive.materialscloud.org/record/file?filename=fake-url'
+        )
+        return archive
+
+    monkeypatch.setattr(PathOrUrl, 'convert', convert)
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output
     assert PseudoPotentialFamily.objects.count() == 1
 
     family = PseudoPotentialFamily.objects.get(label=label)
-    assert isinstance(family.pseudos['Si'], UpfData)
+    assert isinstance(family.pseudos['Ar'], UpfData)
     assert family.__class__ is PseudoPotentialFamily
     assert family.description == description
     assert len(family.pseudos) != 0

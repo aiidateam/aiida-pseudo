@@ -5,11 +5,11 @@ import io
 import os
 import pathlib
 
+from aiida.common.exceptions import ModificationNotAllowed
 import pytest
 
-from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import VpsData
-from aiida_pseudo.data.pseudo.vps import parse_z_valence, parse_xc_type
+from aiida_pseudo.data.pseudo.vps import parse_xc_type, parse_z_valence
 
 
 @pytest.fixture

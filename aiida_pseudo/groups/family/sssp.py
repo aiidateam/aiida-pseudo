@@ -3,6 +3,7 @@
 from typing import NamedTuple, Optional, Sequence
 
 from aiida_pseudo.data.pseudo import UpfData
+
 from ..mixins import RecommendedCutoffMixin
 from .pseudo import PseudoPotentialFamily
 

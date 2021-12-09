@@ -46,7 +46,8 @@
     "extras_require": {
         "pre-commit": [
             "pre-commit~=2.2",
-            "pylint~=2.6.0"
+            "pylint~=2.6",
+            "pylint-aiida~=0.1"
         ],
         "tests": [
             "pgtest~=1.3",

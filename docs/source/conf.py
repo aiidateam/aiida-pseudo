@@ -6,6 +6,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 from reentry import manager
+
 manager.scan()
 
 # -- Path setup --------------------------------------------------------------
@@ -16,6 +17,7 @@ manager.scan()
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../../'))
 
 import aiida_pseudo

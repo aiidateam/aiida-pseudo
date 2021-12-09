@@ -4,16 +4,14 @@
 import json
 import pathlib
 
+from aiida.orm import QueryBuilder
 import pytest
 
-from aiida.orm import QueryBuilder
-
-from aiida_pseudo.cli import install
-from aiida_pseudo.cli import cmd_install_family, cmd_install_sssp, cmd_install_pseudo_dojo
+from aiida_pseudo.cli import cmd_install_family, cmd_install_pseudo_dojo, cmd_install_sssp, install
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily
-from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoFamily, PseudoDojoConfiguration
-from aiida_pseudo.groups.family.sssp import SsspFamily, SsspConfiguration
+from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoConfiguration, PseudoDojoFamily
+from aiida_pseudo.groups.family.sssp import SsspConfiguration, SsspFamily
 
 
 @pytest.fixture
@@ -49,7 +47,7 @@ def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, m
         filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmpdir, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
 
-        with open(filepath_metadata, 'w') as handle:
+        with open(filepath_metadata, 'w', encoding='utf-8') as handle:
             data = {element: {'md5': md5, 'cutoff_wfc': 60.0, 'cutoff_rho': 240.0}}
             json.dump(data, handle)
             handle.flush()
@@ -98,7 +96,7 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_
 
         filepath_djrepo = tmpdir / f'{element}.djrepo'
 
-        with open(filepath_djrepo, 'w') as handle:
+        with open(filepath_djrepo, 'w', encoding='utf-8') as handle:
             json.dump(data, handle)
             handle.flush()
 

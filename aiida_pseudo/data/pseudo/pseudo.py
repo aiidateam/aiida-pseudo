@@ -4,8 +4,7 @@ import io
 import pathlib
 import typing
 
-from aiida import orm
-from aiida import plugins
+from aiida import orm, plugins
 from aiida.common.constants import elements
 from aiida.common.exceptions import StoringNotAllowed
 from aiida.common.files import md5_from_filelike

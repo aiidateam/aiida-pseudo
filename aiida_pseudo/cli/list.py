@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Commands to list instances of `PseudoPotentialFamily`."""
-import click
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
+import click
 
 from .params import options
 from .root import cmd_root
@@ -17,6 +17,7 @@ def get_families_builder():
     :return: `QueryBuilder` instance
     """
     from aiida.orm import QueryBuilder
+
     from aiida_pseudo.groups.family import PseudoPotentialFamily
 
     builder = QueryBuilder().append(PseudoPotentialFamily)

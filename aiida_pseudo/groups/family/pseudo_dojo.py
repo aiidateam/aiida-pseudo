@@ -2,15 +2,15 @@
 """Subclass of `PseudoPotentialFamily` designed to represent a PseudoDojo configuration."""
 import json
 import os
+from pathlib import Path
 import re
 from typing import NamedTuple, Sequence
 import warnings
 
-from pathlib import Path
-
 from aiida.common.exceptions import ParsingError
 
-from aiida_pseudo.data.pseudo import UpfData, PsmlData, Psp8Data, JthXmlData
+from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
+
 from ..mixins import RecommendedCutoffMixin
 from .pseudo import PseudoPotentialFamily
 
@@ -285,7 +285,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
                 continue
 
             try:
-                with open(filepath, 'r') as handle:
+                with open(filepath, 'r', encoding='utf-8') as handle:
                     djrepo = json.load(handle)
             except ParsingError as exception:
                 raise ParsingError(f'failed to parse `{filepath}`: {exception}') from exception

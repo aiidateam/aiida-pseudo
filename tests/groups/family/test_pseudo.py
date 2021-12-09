@@ -4,10 +4,9 @@
 import distutils.dir_util
 import os
 
-import pytest
-
 from aiida.common import exceptions
 from aiida.orm import QueryBuilder
+import pytest
 
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily

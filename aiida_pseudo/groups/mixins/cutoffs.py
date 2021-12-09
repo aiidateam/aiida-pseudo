@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras."""
-import warnings
-
 from typing import Optional
+import warnings
 
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory

@@ -205,13 +205,13 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 
 
 @pytest.fixture
-def get_pseudo_archive(tmpdir, filepath_pseudos):
+def get_pseudo_archive(tmp_path, filepath_pseudos):
     """Create an archive with pseudos."""
 
     def _get_pseudo_archive(fmt='gztar'):
-        shutil.make_archive(str(tmpdir / 'archive'), fmt, filepath_pseudos('upf'))
-        filepath = os.path.join(str(tmpdir), os.listdir(str(tmpdir))[0])
-        yield filepath
+        shutil.make_archive(str(tmp_path / 'archive'), fmt, filepath_pseudos('upf'))
+        # The created archive should be the only file in ``tmp_path`` so just get first entry from the iterator.
+        return list(tmp_path.iterdir())[0]
 
     return _get_pseudo_archive
 

@@ -1,4 +1,4 @@
-include setup.json
+include setup.cfg
 include LICENSE
 include CHANGELOG.md
 include README.md

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """Subclass of `PseudoPotentialFamily` designed to represent a PseudoDojo configuration."""
-import collections
 import json
 import os
 import re
+from typing import NamedTuple, Sequence
 import warnings
 
 from pathlib import Path
-from typing import Sequence
 
 from aiida.common.exceptions import ParsingError
 
@@ -17,9 +16,19 @@ from .pseudo import PseudoPotentialFamily
 
 __all__ = ('PseudoDojoConfiguration', 'PseudoDojoFamily')
 
-PseudoDojoConfiguration = collections.namedtuple(
-    'PseudoDojoConfiguration', ['version', 'functional', 'relativistic', 'protocol', 'pseudo_format']
-)
+
+class PseudoDojoConfiguration(NamedTuple):
+    """Named tuple that represents a PseudoDojo configuration."""
+
+    version: str
+    functional: str
+    relativistic: str
+    protocol: str
+    pseudo_format: str
+
+    def __str__(self):
+        """Represent the configuration as a string."""
+        return f'PseudoDojo v{self.version} {self.functional} {self.relativistic} {self.protocol} {self.pseudo_format}'
 
 
 class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Subclass of ``PseudoPotentialFamily`` designed to represent an SSSP configuration."""
-from collections import namedtuple
-from typing import Sequence, Optional
+from typing import NamedTuple, Optional, Sequence
 
 from aiida_pseudo.data.pseudo import UpfData
 from ..mixins import RecommendedCutoffMixin
@@ -9,7 +8,17 @@ from .pseudo import PseudoPotentialFamily
 
 __all__ = ('SsspConfiguration', 'SsspFamily')
 
-SsspConfiguration = namedtuple('SsspConfiguration', ['version', 'functional', 'protocol'])
+
+class SsspConfiguration(NamedTuple):
+    """Named tuple that represents an SSSP configuration."""
+
+    version: str
+    functional: str
+    protocol: str
+
+    def __str__(self):
+        """Represent the configuration as a string."""
+        return f'SSSP v{self.version} {self.functional} {self.protocol}'
 
 
 class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):

@@ -202,7 +202,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
     label = SsspFamily.format_configuration_label(configuration)
 
     if configuration not in SsspFamily.valid_configurations:
-        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+        echo.echo_critical(f'{configuration} is not a valid configuration.')
 
     if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
         echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
@@ -250,7 +250,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
         family.description = description
         family.set_cutoffs(cutoffs, 'normal', unit='Ry')
 
-        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials.')
 
 
 @cmd_install.command('pseudo-dojo')
@@ -299,17 +299,17 @@ def cmd_install_pseudo_dojo(
     try:
         pseudo_type = pseudo_type_mapping[pseudo_format]
     except KeyError:
-        echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format')
+        echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format.')
 
     configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
     label = PseudoDojoFamily.format_configuration_label(configuration)
-    description = 'PseudoDojo v{} {} {} {} {} installed with aiida-pseudo v{}'.format(*configuration, __version__)
+    description = f'{configuration} installed with aiida-pseudo v{__version__}'
 
     if configuration not in PseudoDojoFamily.valid_configurations:
-        echo.echo_critical('{} {} {} {} {} is not a valid PseudoDojo configuration'.format(*configuration))
+        echo.echo_critical(f'{configuration} is not a valid configuration')
 
     if not download_only and QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
-        echo.echo_critical(f'{PseudoDojoFamily.__name__}<{label}> is already installed')
+        echo.echo_critical(f'{PseudoDojoFamily.__name__}<{label}> is already installed.')
 
     with tempfile.TemporaryDirectory() as dirpath:
 
@@ -373,4 +373,4 @@ def cmd_install_pseudo_dojo(
             family.set_cutoffs(cutoff_values, stringency, unit='Eh')
         family.set_default_stringency(default_stringency)
 
-        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials')
+        echo.echo_success(f'installed `{label}` containing {family.count()} pseudopotentials.')

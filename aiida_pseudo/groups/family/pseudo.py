@@ -172,13 +172,10 @@ class PseudoPotentialFamily(Group):
         """
         type_check(description, str, allow_none=True)
 
-        try:
-            cls.objects.get(label=label)
-        except exceptions.NotExistent:
-            family = cls(label=label, description=description)
-        else:
+        if cls.objects.count(filters={'label': label}):
             raise ValueError(f'the {cls.__name__} `{label}` already exists')
 
+        family = cls(label=label, description=description)
         pseudos = cls.parse_pseudos_from_directory(dirpath, pseudo_type, deduplicate=deduplicate)
 
         # Only store the ``Group`` and the pseudo nodes now, such that we don't have to worry about the clean up in the

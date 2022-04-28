@@ -37,7 +37,7 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         existing = query.first()
 
         if existing:
-            pseudo = existing[0]
+            pseudo = existing[0]  # pylint: disable=unsubscriptable-object
         else:
             source.seek(0)
             pseudo = cls(source, filename)

@@ -18,18 +18,18 @@ def attempt(message, exception_types=Exception, include_traceback=False):
     import sys
     import traceback
 
-    echo.echo_info(message, nl=False)
+    echo.echo_report(message, nl=False)
 
     try:
         yield
     except exception_types as exception:  # pylint: disable=broad-except
-        echo.echo_highlight(' [FAILED]', color='error', bold=True)
+        echo.echo(' [FAILED]', fg='red', bold=True)
         message = str(exception)
         if include_traceback:
             message += f"\n{''.join(traceback.format_exception(*sys.exc_info()))}"
         echo.echo_critical(message)
     else:
-        echo.echo_highlight(' [OK]', color='success', bold=True)
+        echo.echo(' [OK]', fg='green', bold=True)
 
 
 def create_family_from_archive(cls, label, filepath_archive: Path, fmt=None, pseudo_type=None):

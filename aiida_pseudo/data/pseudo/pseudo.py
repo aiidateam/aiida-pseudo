@@ -12,7 +12,7 @@ from aiida.common.files import md5_from_filelike
 __all__ = ('PseudoPotentialData',)
 
 
-class PseudoPotentialData(plugins.DataFactory('singlefile')):
+class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
     """Base class for data types representing pseudo potentials."""
 
     _key_element = 'element'
@@ -34,11 +34,9 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         query = orm.QueryBuilder()
         query.append(cls, subclassing=False, filters={f'attributes.{cls._key_md5}': md5_from_filelike(source)})
 
-        existing = query.first()
+        pseudo = query.first(flat=True)
 
-        if existing:
-            pseudo = existing[0]  # pylint: disable=unsubscriptable-object
-        else:
+        if not pseudo:
             source.seek(0)
             pseudo = cls(source, filename)
 
@@ -155,7 +153,7 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
 
         :return: the symbol of the element following the IUPAC naming standard or None if not defined.
         """
-        return self.get_attribute(self._key_element, None)
+        return self.base.attributes.get(self._key_element, None)
 
     @element.setter
     def element(self, value: str):
@@ -165,7 +163,7 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         :raises ValueError: if the element symbol is invalid.
         """
         self.validate_element(value)
-        self.set_attribute(self._key_element, value)
+        self.base.attributes.set(self._key_element, value)
 
     @property
     def md5(self) -> typing.Optional[int]:
@@ -173,7 +171,7 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
 
         :return: the md5 of the stored file.
         """
-        return self.get_attribute(self._key_md5, None)
+        return self.base.attributes.get(self._key_md5, None)
 
     @md5.setter
     def md5(self, value: str):
@@ -183,4 +181,4 @@ class PseudoPotentialData(plugins.DataFactory('singlefile')):
         :raises ValueError: if the md5 does not match that of the currently stored file.
         """
         self.validate_md5(value)
-        self.set_attribute(self._key_md5, value)
+        self.base.attributes.set(self._key_md5, value)

@@ -53,7 +53,7 @@ def test_constructor_filename(get_pseudo_potential_data, implicit, source_type):
     filepath = pathlib.Path('tempfile.pseudo')
 
     with open(filepath, mode='wb') as handle:
-        handle.write(pseudo.get_object_content(pseudo.filename, mode='rb'))
+        handle.write(pseudo.base.repository.get_object_content(pseudo.filename, mode='rb'))
         handle.flush()
 
     if source_type == 'stream':
@@ -112,7 +112,7 @@ def test_store():
         pseudo.store()
 
     pseudo.element = 'Ar'
-    pseudo.set_attribute(PseudoPotentialData._key_md5, md5_incorrect)  # pylint: disable=protected-access
+    pseudo.base.attributes.set(PseudoPotentialData._key_md5, md5_incorrect)  # pylint: disable=protected-access
 
     with pytest.raises(StoringNotAllowed, match=r'md5 does not match that of stored file:'):
         pseudo.store()
@@ -170,7 +170,7 @@ def test_store_indirect():
     pseudo.element = 'Ar'
 
     node = CalcJobNode()
-    node.add_incoming(pseudo, link_type=LinkType.INPUT_CALC, link_label='pseudo')
+    node.base.links.add_incoming(pseudo, link_type=LinkType.INPUT_CALC, link_label='pseudo')
     node.store_all()
 
 

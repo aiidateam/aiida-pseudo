@@ -244,7 +244,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
 
         for element, values in metadata.items():
             if family.get_pseudo(element).md5 != values['md5']:
-                Group.objects.delete(family.pk)
+                Group.collection.delete(family.pk)
                 msg = f"md5 of pseudo for element {element} does not match that of the metadata {values['md5']}"
                 echo.echo_critical(msg)
 
@@ -345,7 +345,7 @@ def cmd_install_pseudo_dojo(
 
         for element, md5 in md5s.items():
             if family.get_pseudo(element).md5 != md5:
-                Group.objects.delete(family.pk)
+                Group.collection.delete(family.pk)
                 msg = f'md5 of pseudo for element {element} does not match that of the metadata {md5}'
                 echo.echo_critical(msg)
 

@@ -46,7 +46,7 @@ def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
     family_base = get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
     family_sssp = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=SsspFamily, pseudo_type=UpfData)
 
-    assert PseudoPotentialFamily.objects.count() == 2
+    assert PseudoPotentialFamily.collection.count() == 2
 
     result = run_cli_command(cmd_list, ['--raw'])
     assert len(result.output_lines) == 2

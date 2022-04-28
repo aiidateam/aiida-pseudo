@@ -95,7 +95,7 @@ class UpfData(PseudoPotentialData):
 
         :return: the Z valence.
         """
-        return self.get_attribute(self._key_z_valence, None)
+        return self.base.attributes.get(self._key_z_valence, None)
 
     @z_valence.setter
     def z_valence(self, value: int):
@@ -107,4 +107,4 @@ class UpfData(PseudoPotentialData):
         if not isinstance(value, int) or value < 0:
             raise ValueError(f'`{value}` is not a positive integer')
 
-        self.set_attribute(self._key_z_valence, value)
+        self.base.attributes.set(self._key_z_valence, value)

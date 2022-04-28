@@ -39,7 +39,7 @@ def cmd_list(project, raw, family_type):
     }
 
     if get_families_builder().count() == 0:
-        echo.echo_info('no pseudo potential families have been installed yet: use `aiida-pseudo install`.')
+        echo.echo_report('no pseudo potential families have been installed yet: use `aiida-pseudo install`.')
         return
 
     rows = []
@@ -61,7 +61,7 @@ def cmd_list(project, raw, family_type):
         rows.append(row)
 
     if not rows:
-        echo.echo_info('no pseudo potential families found that match the filtering criteria.')
+        echo.echo_report('no pseudo potential families found that match the filtering criteria.')
         return
 
     if raw:

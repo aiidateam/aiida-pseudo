@@ -37,7 +37,7 @@ copybutton_prompt_text = r'>>> |\.\.\. |(?:\(.*\) )?\$ |In \[\d*\]: | {2,5}\.\.\
 copybutton_prompt_is_regexp = True
 
 # Settings for the `autoapi` extension
-autoapi_dirs = ['../../aiida_pseudo']
+autoapi_dirs = ['../../src/aiida_pseudo']
 autoapi_ignore = ['*cli*']
 
 # Add any paths that contain templates here, relative to this directory.

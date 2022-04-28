@@ -1,13 +1,39 @@
 # Change log
 
+## 0.7.0
+
+### Fixes
+- CLI: Fix bug in `install family` when downloading from URL [[#110]](https://github.com/aiidateam/aiida-pseudo/pull/110)
+- CLI: Replace SSSP link to legacy MC Archive [[#110]](https://github.com/aiidateam/aiida-pseudo/pull/110)
+
+## Changes
+- Use `typing.NamedTuple` for pseudo family configurations [[#111]](https://github.com/aiidateam/aiida-pseudo/pull/111)
+
+### Dependencies
+- Add compatibility with `aiida-core==2.0` [[#120]](https://github.com/aiidateam/aiida-pseudo/pull/120)
+- Update Python compatibility: drop Python 3.6 and 3.7, add support for Python 3.10 [[#117]](https://github.com/aiidateam/aiida-pseudo/pull/117)
+- Update and pin `pylint==2.13.7` [[#116]](https://github.com/aiidateam/aiida-pseudo/pull/116)
+
+### Tests
+- Do not rely on actual URL to test install family [[#112]](https://github.com/aiidateam/aiida-pseudo/pull/112)
+
+### Devops
+- Adopt PEP 621 and move build spec to `pyproject.toml` [[#118]](https://github.com/aiidateam/aiida-pseudo/pull/118)
+- Move the source directory into `src/` [[#121]](https://github.com/aiidateam/aiida-pseudo/pull/121)
+- Add GitHub Actions workflow for continuous deployment [[#123]](https://github.com/aiidateam/aiida-pseudo/pull/123)
+- Add compatibility matrix `README.md` [[#122]](https://github.com/aiidateam/aiida-pseudo/pull/122)
+- Add proper file extension to license file [[#119]](https://github.com/aiidateam/aiida-pseudo/pull/119)
+- Update the `pre-commit` configuration [[#113]](https://github.com/aiidateam/aiida-pseudo/pull/113)
+
+
 ## 0.6.3
 
 ### Fixes
-- CLI: update base URL to SSSP files on Materials Cloud [[#104]]](https://github.com/aiidateam/aiida-pseudo/pull/104)
+- CLI: update base URL to SSSP files on Materials Cloud [[#104]](https://github.com/aiidateam/aiida-pseudo/pull/104)
 
 ### Devops
-- Dependencies: remove temporary upper limit for sqlalchemy [[#73]]](https://github.com/aiidateam/aiida-pseudo/pull/73)
-- Dependencies: put upper limit on psycopg2-binary [[#106]]](https://github.com/aiidateam/aiida-pseudo/pull/106)
+- Dependencies: remove temporary upper limit for sqlalchemy [[#73]](https://github.com/aiidateam/aiida-pseudo/pull/73)
+- Dependencies: put upper limit on psycopg2-binary [[#106]](https://github.com/aiidateam/aiida-pseudo/pull/106)
 
 
 ## 0.6.2

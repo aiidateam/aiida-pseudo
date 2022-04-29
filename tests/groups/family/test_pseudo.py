@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=redefined-outer-name
 """Tests for the `PseudoPotentialFamily` class."""
-import distutils.dir_util
 import os
+import shutil
 
 from aiida.common import exceptions
 from aiida.orm import QueryBuilder
@@ -88,8 +88,7 @@ def test_create_from_folder(filepath_pseudos):
 @pytest.mark.usefixtures('clear_db')
 def test_create_from_folder_nested(filepath_pseudos, tmpdir):
     """Test the `PseudoPotentialFamily.create_from_folder` class method when the pseudos are in a subfolder."""
-    filepath = str(tmpdir / 'subdirectory')
-    distutils.dir_util.copy_tree(filepath_pseudos(), filepath)
+    shutil.copytree(filepath_pseudos(), tmpdir / 'subdirectory')
 
     label = 'label'
     family = PseudoPotentialFamily.create_from_folder(str(tmpdir), label)
@@ -153,13 +152,14 @@ def test_create_from_folder_empty(tmpdir):
 @pytest.mark.usefixtures('clear_db')
 def test_create_from_folder_duplicate_element(tmpdir, filepath_pseudos):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for folder containing duplicate element."""
-    distutils.dir_util.copy_tree(filepath_pseudos(), str(tmpdir))
+    dirpath = tmpdir / 'pseudos'
+    shutil.copytree(filepath_pseudos(), dirpath)
 
-    with open(os.path.join(str(tmpdir), 'Ar.UPF'), 'wb'):
+    with open(os.path.join(str(dirpath), 'Ar.UPF'), 'wb'):
         pass
 
     with pytest.raises(ValueError, match=r'directory `.*` contains pseudo potentials with duplicate elements'):
-        PseudoPotentialFamily.create_from_folder(str(tmpdir), 'label')
+        PseudoPotentialFamily.create_from_folder(str(dirpath), 'label')
 
 
 @pytest.mark.usefixtures('clear_db')

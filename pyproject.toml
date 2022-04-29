@@ -116,12 +116,6 @@ minversion = '6.0'
 testpaths = [
     'tests',
 ]
-filterwarnings = [
-    'ignore::DeprecationWarning:distutils:',
-    'ignore::DeprecationWarning:frozendict:',
-    'ignore::DeprecationWarning:sqlalchemy_utils:',
-    'ignore::DeprecationWarning:pkg_resources:',
-]
 
 [tool.yapf]
 align_closing_bracket_with_visual_indent = true

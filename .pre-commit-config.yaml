@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
+    rev: 'v4.2.0'
     hooks:
     -   id: double-quote-string-fixer
     -   id: end-of-file-fixer
@@ -9,17 +9,17 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/ikamensh/flynt/
-    rev: '0.66'
+    rev: '0.76'
     hooks:
     -   id: flynt
 
 -   repo: https://github.com/pycqa/isort
-    rev: 5.9.3
+    rev: '5.10.1'
     hooks:
     -   id: isort
 
 -   repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.31.0
+    rev: 'v0.32.0'
     hooks:
     -   id: yapf
         name: yapf
@@ -32,7 +32,7 @@ repos:
             )$
 
 -   repo: https://github.com/PyCQA/pydocstyle
-    rev: 5.0.2
+    rev: '6.1.1'
     hooks:
     -   id: pydocstyle
         additional_dependencies: ['toml']

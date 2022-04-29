@@ -25,19 +25,19 @@ def test_create_family_from_archive(get_pseudo_archive, fmt):
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_create_family_from_archive_incorrect_filetype(tmpdir):
+def test_create_family_from_archive_incorrect_filetype(tmp_path):
     """Test the `create_family_from_archive` utility function for incorrect archive filetype."""
     with pytest.raises(OSError, match=r'failed to unpack the archive.*'):
-        create_family_from_archive(PseudoPotentialFamily, 'label', str(tmpdir))
+        create_family_from_archive(PseudoPotentialFamily, 'label', str(tmp_path))
 
 
 @pytest.mark.usefixtures('clear_db')
-def test_create_family_from_archive_incorrect_format(tmpdir):
+def test_create_family_from_archive_incorrect_format(tmp_path):
     """Test the `create_family_from_archive` utility function for invalid archive content."""
     with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:
 
         with tarfile.open(filepath_archive.name, 'w:gz') as tar:
-            tar.add(str(tmpdir), arcname='.')
+            tar.add(str(tmp_path), arcname='.')
 
         with pytest.raises(OSError, match=r'failed to parse pseudos from.*'):
             create_family_from_archive(PseudoPotentialFamily, 'label', filepath_archive.name)

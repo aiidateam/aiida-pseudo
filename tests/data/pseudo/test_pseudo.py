@@ -41,7 +41,7 @@ def test_constructor_invalid():
         PseudoPotentialData()  # pylint: disable=no-value-for-parameter
 
 
-@pytest.mark.usefixtures('chtmpdir')
+@pytest.mark.usefixtures('chdir_tmp_path')
 @pytest.mark.parametrize('source_type', ('stream', 'str_absolute', 'str_relative', 'pathlib.Path'))
 @pytest.mark.parametrize('implicit', (True, False))
 def test_constructor_filename(get_pseudo_potential_data, implicit, source_type):

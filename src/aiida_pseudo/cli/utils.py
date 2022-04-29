@@ -53,13 +53,12 @@ def create_family_from_archive(cls, label, filepath_archive: Path, fmt=None, pse
     with tempfile.TemporaryDirectory() as dirpath:
 
         try:
-            # In Python 3.6 the ``unpack_archive`` method does not yet support ``pathlib.Path`` objects.
-            shutil.unpack_archive(str(filepath_archive), dirpath, format=fmt)
+            shutil.unpack_archive(filepath_archive, dirpath, format=fmt)
         except shutil.ReadError as exception:
             raise OSError(f'failed to unpack the archive `{filepath_archive}`: {exception}') from exception
 
         try:
-            family = cls.create_from_folder(dirpath, label, pseudo_type=pseudo_type)
+            family = cls.create_from_folder(Path(dirpath), label, pseudo_type=pseudo_type)
         except ValueError as exception:
             raise OSError(f'failed to parse pseudos from `{dirpath}`: {exception}') from exception
 

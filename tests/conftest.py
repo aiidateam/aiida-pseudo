@@ -76,12 +76,12 @@ def run_cli_command():
 
 
 @pytest.fixture
-def filepath_fixtures() -> str:
+def filepath_fixtures() -> pathlib.Path:
     """Return the absolute filepath to the directory containing the file `fixtures`.
 
     :return: absolute filepath to directory containing test fixture data.
     """
-    return os.path.join(os.path.dirname(__file__), 'fixtures')
+    return pathlib.Path(__file__).parent.resolve() / 'fixtures'
 
 
 @pytest.fixture
@@ -91,13 +91,13 @@ def filepath_pseudos(filepath_fixtures):
     :return: absolute filepath to directory containing test pseudo potentials.
     """
 
-    def _filepath_pseudos(entry_point='upf') -> str:
+    def _filepath_pseudos(entry_point='upf') -> pathlib.Path:
         """Return the absolute filepath containing the pseudo potential files for a given entry point.
 
         :param entry_point: pseudo potential data entry point
         :return: filepath to folder containing pseudo files.
         """
-        return os.path.join(filepath_fixtures, 'pseudos', entry_point)
+        return filepath_fixtures / 'pseudos' / entry_point
 
     return _filepath_pseudos
 
@@ -120,7 +120,7 @@ def get_pseudo_potential_data(filepath_pseudos):
         else:
             cls = DataFactory(f'pseudo.{entry_point}')
             filename = f'{element}.{entry_point}'
-            with open(os.path.join(filepath_pseudos(entry_point), filename), 'rb') as handle:
+            with (filepath_pseudos(entry_point) / filename).open('rb') as handle:
                 pseudo = cls(handle, filename)
 
         return pseudo
@@ -192,11 +192,11 @@ def get_pseudo_family(tmp_path, filepath_pseudos):
 
         dirpath = filepath_pseudos(extension)
 
-        for pseudo in os.listdir(dirpath):
-            if elements is None or any(pseudo.startswith(element) for element in elements):
-                shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmp_path), pseudo))
+        for pseudo in dirpath.iterdir():
+            if elements is None or any(pseudo.name.startswith(element) for element in elements):
+                shutil.copyfile(pseudo, tmp_path / pseudo.name)
 
-        family = cls.create_from_folder(str(tmp_path), label, pseudo_type=pseudo_type)
+        family = cls.create_from_folder(tmp_path, label, pseudo_type=pseudo_type)
 
         if cutoffs_dict is not None and isinstance(family, CutoffsPseudoPotentialFamily):
             default_stringency = default_stringency or list(cutoffs_dict.keys())[0]
@@ -214,7 +214,7 @@ def get_pseudo_archive(tmp_path, filepath_pseudos):
     """Create an archive with pseudos."""
 
     def _get_pseudo_archive(fmt='gztar'):
-        shutil.make_archive(str(tmp_path / 'archive'), fmt, filepath_pseudos('upf'))
+        shutil.make_archive(tmp_path / 'archive', fmt, filepath_pseudos('upf'))
         # The created archive should be the only file in ``tmp_path`` so just get first entry from the iterator.
         return list(tmp_path.iterdir())[0]
 

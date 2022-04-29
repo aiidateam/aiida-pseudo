@@ -16,7 +16,7 @@ from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
 @pytest.fixture
 def source(request, filepath_pseudos):
     """Return a pseudopotential, eiter as ``str``, ``Path`` or ``io.BytesIO``."""
-    filepath_pseudo = pathlib.Path(filepath_pseudos()) / 'Ar.upf'
+    filepath_pseudo = filepath_pseudos() / 'Ar.upf'
 
     if request.param is str:
         return str(filepath_pseudo)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=redefined-outer-name
 """Tests for the `PseudoPotentialFamily` class."""
-import os
 import shutil
 
 from aiida.common import exceptions
@@ -82,7 +81,7 @@ def test_create_from_folder(filepath_pseudos):
     assert isinstance(family, PseudoPotentialFamily)
     assert family.is_stored
     assert family.label == label
-    assert len(family.nodes) == len(os.listdir(filepath_pseudos()))
+    assert len(family.nodes) == len(list(filepath_pseudos().iterdir()))
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -91,11 +90,11 @@ def test_create_from_folder_nested(filepath_pseudos, tmp_path):
     shutil.copytree(filepath_pseudos(), tmp_path / 'subdirectory')
 
     label = 'label'
-    family = PseudoPotentialFamily.create_from_folder(str(tmp_path), label)
+    family = PseudoPotentialFamily.create_from_folder(tmp_path, label)
     assert isinstance(family, PseudoPotentialFamily)
     assert family.is_stored
     assert family.label == label
-    assert len(family.nodes) == len(os.listdir(filepath_pseudos()))
+    assert len(family.nodes) == len(list(filepath_pseudos().iterdir()))
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -115,7 +114,7 @@ def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
     assert isinstance(family, PseudoPotentialFamily)
     assert family.is_stored
 
-    pseudo_count = len(os.listdir(filepath_pseudos()))
+    pseudo_count = len(list(filepath_pseudos().iterdir()))
     original_pseudos = {pseudo.pk for pseudo in original.pseudos.values()}
     family_pseudos = {pseudo.pk for pseudo in family.pseudos.values()}
 
@@ -135,18 +134,17 @@ def test_create_from_folder_parse_fail(tmp_path):
     difficult to test, however, the constructor parses the filename for the element, and that can fail if the filename
     has the incorrect format.
     """
-    with open(os.path.join(str(tmp_path), 'Arr.upf'), 'wb'):
-        pass
+    (tmp_path / 'Arr.upf').touch()
 
     with pytest.raises(exceptions.ParsingError, match=r'`.*` constructor did not define the element .*'):
-        PseudoPotentialFamily.create_from_folder(str(tmp_path), 'label')
+        PseudoPotentialFamily.create_from_folder(tmp_path, 'label')
 
 
 @pytest.mark.usefixtures('clear_db')
 def test_create_from_folder_empty(tmp_path):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for empty folder."""
     with pytest.raises(ValueError, match=r'no pseudo potentials were parsed from.*'):
-        PseudoPotentialFamily.create_from_folder(str(tmp_path), 'label')
+        PseudoPotentialFamily.create_from_folder(tmp_path, 'label')
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -155,11 +153,10 @@ def test_create_from_folder_duplicate_element(tmp_path, filepath_pseudos):
     dirpath = tmp_path / 'pseudos'
     shutil.copytree(filepath_pseudos(), dirpath)
 
-    with open(os.path.join(str(dirpath), 'Ar.UPF'), 'wb'):
-        pass
+    (dirpath / 'Ar.UPF').touch()
 
     with pytest.raises(ValueError, match=r'directory `.*` contains pseudo potentials with duplicate elements'):
-        PseudoPotentialFamily.create_from_folder(str(dirpath), 'label')
+        PseudoPotentialFamily.create_from_folder(dirpath, 'label')
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -178,12 +175,11 @@ def test_parse_pseudos_from_directory_non_file(tmp_path):
     Note that a subdirectory containing the pseudos is fine, but if we find a directory and any other object at the
     base path, it should raise.
     """
-    os.makedirs(os.path.join(str(tmp_path), 'directory'))
-    with open(os.path.join(str(tmp_path), 'Ar.upf'), 'wb'):
-        pass
+    (tmp_path / 'directory').mkdir(parents=True)
+    (tmp_path / 'Ar.upf').touch()
 
     with pytest.raises(ValueError, match=r'dirpath `.*` contains at least one entry that is not a file'):
-        PseudoPotentialFamily.parse_pseudos_from_directory(str(tmp_path))
+        PseudoPotentialFamily.parse_pseudos_from_directory(tmp_path)
 
 
 def test_parse_pseudos_from_directory_non_file_nested(tmp_path):
@@ -192,12 +188,11 @@ def test_parse_pseudos_from_directory_non_file_nested(tmp_path):
     Note that a subdirectory containing the pseudos is fine, but if we find a directory and any other object at the
     base path, it should raise.
     """
-    os.makedirs(os.path.join(str(tmp_path), 'pseudos', 'directory'))
-    with open(os.path.join(str(tmp_path), 'pseudos', 'Ar.upf'), 'wb'):
-        pass
+    (tmp_path / 'pseudos' / 'directory').mkdir(parents=True)
+    (tmp_path / 'pseudos' / 'Ar.upf').touch()
 
     with pytest.raises(ValueError, match=r'dirpath `.*` contains at least one entry that is not a file'):
-        PseudoPotentialFamily.parse_pseudos_from_directory(str(tmp_path))
+        PseudoPotentialFamily.parse_pseudos_from_directory(tmp_path)
 
 
 @pytest.mark.filterwarnings('ignore:no registered entry point for `SomeFamily` so its instances will not be storable.')
@@ -215,10 +210,10 @@ def test_parse_pseudos_from_directory_incorrect_pseudo_type(tmp_path):
         _pseudo_types = (PsfData, UpfData)
 
     with pytest.raises(ValueError, match=r'.* supports more than one type, so `pseudo_type` needs to be explicitly .*'):
-        SomeFamily.parse_pseudos_from_directory(str(tmp_path))
+        SomeFamily.parse_pseudos_from_directory(tmp_path)
 
     with pytest.raises(ValueError, match=r'`.*` is not supported by `.*`'):
-        SomeFamily.parse_pseudos_from_directory(str(tmp_path), pseudo_type=PsmlData)
+        SomeFamily.parse_pseudos_from_directory(tmp_path, pseudo_type=PsmlData)
 
 
 @pytest.mark.usefixtures('clear_db')

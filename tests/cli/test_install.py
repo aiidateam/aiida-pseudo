@@ -134,7 +134,7 @@ def test_install_family_folder(run_cli_command, filepath_pseudos):
     label = 'family_test'
     description = 'description'
     dirpath = filepath_pseudos()
-    options = ['-D', description, dirpath, label]
+    options = ['-D', description, str(dirpath), label]
 
     result = run_cli_command(cmd_install_family, options)
     assert f'installed `{label}`' in result.output

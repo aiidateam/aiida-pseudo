@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Subclass of `PseudoPotentialFamily` designed to represent a PseudoDojo configuration."""
 import json
-import os
-from pathlib import Path
+import pathlib
 import re
 from typing import NamedTuple, Sequence
 import warnings
@@ -247,7 +246,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         return cutoffs
 
     @classmethod
-    def parse_djrepos_from_folder(cls, dirpath, pseudo_type):
+    def parse_djrepos_from_folder(cls, dirpath: pathlib.Path, pseudo_type):
         # pylint: disable=too-many-locals,too-many-branches
         """Parse the djrepo files in the given directory into a list of data nodes.
 
@@ -265,19 +264,14 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         cutoffs = {'low': {}, 'normal': {}, 'high': {}}
         elements = []
 
-        if not os.path.isdir(dirpath):
-            raise ValueError(f'`{dirpath}` is not a directory')
+        dirpath = cls._validate_dirpath(dirpath)
 
-        dirpath_contents = os.listdir(dirpath)
+        for filepath in dirpath.iterdir():
 
-        if len(dirpath_contents) == 1 and os.path.isdir(os.path.join(dirpath, dirpath_contents[0])):
-            dirpath = os.path.join(dirpath, dirpath_contents[0])
+            filename = filepath.name
 
-        for filename in os.listdir(dirpath):
-            filepath = os.path.join(dirpath, filename)
-
-            if not os.path.isfile(filepath):
-                raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file')
+            if not filepath.is_file():
+                raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file: {filepath}')
 
             # Some of the djrepo archives contain extraneous files. Here we skip files with unsupported extensions.
             if filename.split('.')[-1] not in cls._pseudo_repo_file_extensions:
@@ -325,7 +319,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         return md5s, cutoffs
 
     @classmethod
-    def parse_djrepos_from_archive(cls, filepath_metadata: Path, fmt=None, pseudo_type=None):
+    def parse_djrepos_from_archive(cls, filepath_metadata: pathlib.Path, fmt=None, pseudo_type=None):
         """Parse metadata from a djrepo .tgz archive.
 
         .. warning:: the archive should not contain any subdirectories, but just the djrepo files.
@@ -344,15 +338,14 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
         with tempfile.TemporaryDirectory() as dirpath:
             try:
-                # In Python 3.6 the ``unpack_archive`` method does not yet support ``pathlib.Path`` objects.
-                shutil.unpack_archive(str(filepath_metadata), dirpath, format=fmt)
+                shutil.unpack_archive(filepath_metadata, dirpath, format=fmt)
             except shutil.ReadError as exception:
                 raise OSError(
                     f'failed to unpack the metadata archive `{filepath_metadata}`: {exception}'
                 ) from exception
 
             try:
-                md5s, cutoffs = cls.parse_djrepos_from_folder(dirpath, pseudo_type=pseudo_type)
+                md5s, cutoffs = cls.parse_djrepos_from_folder(pathlib.Path(dirpath), pseudo_type=pseudo_type)
             except ValueError as exception:
                 raise OSError(f'failed to parse djrepos from `{dirpath}`: {exception}') from exception
 

@@ -2,7 +2,6 @@
 # pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.psml` module."""
 import io
-import os
 import pathlib
 
 from aiida.common.exceptions import ModificationNotAllowed
@@ -14,7 +13,7 @@ from aiida_pseudo.data.pseudo import PsmlData
 @pytest.fixture
 def source(request, filepath_pseudos):
     """Return a pseudopotential, eiter as ``str``, ``Path`` or ``io.BytesIO``."""
-    filepath_pseudo = pathlib.Path(filepath_pseudos(entry_point='psml')) / 'Ar.psml'
+    filepath_pseudo = filepath_pseudos(entry_point='psml') / 'Ar.psml'
 
     if request.param is str:
         return str(filepath_pseudo)
@@ -35,12 +34,12 @@ def test_constructor_source_types(source):
 
 def test_constructor(filepath_pseudos):
     """Test the constructor."""
-    for filename in os.listdir(filepath_pseudos('psml')):
-        with open(os.path.join(filepath_pseudos('psml'), filename), 'rb') as handle:
-            pseudo = PsmlData(handle, filename=filename)
+    for filepath in filepath_pseudos('psml').iterdir():
+        with filepath.open('rb') as handle:
+            pseudo = PsmlData(handle, filename=filepath.name)
             assert isinstance(pseudo, PsmlData)
             assert not pseudo.is_stored
-            assert pseudo.element == filename.split('.')[0]
+            assert pseudo.element == filepath.name.split('.')[0]
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -53,7 +52,7 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
     pseudo = get_pseudo_potential_data(element='Ar', entry_point='psml')
     assert pseudo.element == 'Ar'
 
-    with open(os.path.join(filepath_pseudos('psml'), 'He.psml'), 'rb') as handle:
+    with (filepath_pseudos('psml') / 'He.psml').open('rb') as handle:
         pseudo.set_file(handle)
         assert pseudo.element == 'He'
 

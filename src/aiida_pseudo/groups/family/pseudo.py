@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Subclass of ``Group`` that serves as a base class for representing pseudo potential families."""
-import os
 import re
 from typing import List, Mapping, Tuple, Union
 
@@ -77,13 +76,13 @@ class PseudoPotentialFamily(Group):
 
         :return: the directory path to be used.
         """
-        if not os.path.isdir(dirpath):
+        if not dirpath.is_dir():
             raise ValueError(f'`{dirpath}` is not a directory')
 
-        dirpath_contents = os.listdir(dirpath)
+        dirpath_contents = list(dirpath.iterdir())
 
-        if len(dirpath_contents) == 1 and os.path.isdir(os.path.join(dirpath, dirpath_contents[0])):
-            dirpath = os.path.join(dirpath, dirpath_contents[0])
+        if len(dirpath_contents) == 1 and (dirpath / dirpath_contents[0]).is_dir():
+            dirpath = dirpath_contents[0]
 
         return dirpath
 
@@ -115,11 +114,12 @@ class PseudoPotentialFamily(Group):
         dirpath = cls._validate_dirpath(dirpath)
         pseudo_type = cls._validate_pseudo_type(pseudo_type)
 
-        for filename in os.listdir(dirpath):
-            filepath = os.path.join(dirpath, filename)
+        for filepath in dirpath.iterdir():
 
-            if not os.path.isfile(filepath):
-                raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file')
+            filename = filepath.name
+
+            if not filepath.is_file():
+                raise ValueError(f'dirpath `{dirpath}` contains at least one entry that is not a file: {filepath}')
 
             with open(filepath, 'rb') as handle:
                 try:

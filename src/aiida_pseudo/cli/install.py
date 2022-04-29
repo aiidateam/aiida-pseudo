@@ -23,7 +23,7 @@ def cmd_install():
 
 
 @cmd_install.command('family')
-@click.argument('archive', type=types.PathOrUrl(exists=True, file_okay=True))
+@click.argument('archive', type=types.PathOrUrl(exists=True, file_okay=True, path_type=pathlib.Path))
 @click.argument('label', type=click.STRING)
 @options_core.DESCRIPTION(help='Description for the family.')
 @options.ARCHIVE_FORMAT()

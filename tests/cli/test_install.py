@@ -15,7 +15,7 @@ from aiida_pseudo.groups.family.sssp import SsspConfiguration, SsspFamily
 
 
 @pytest.fixture
-def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, monkeypatch, tmpdir):
+def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, monkeypatch, tmp_path):
     """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_sssp`` method and call the install cmd."""
 
     def download_sssp(
@@ -37,14 +37,14 @@ def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, m
 
         element = 'Ar'
         pseudo = get_pseudo_potential_data(element)
-        filepath = tmpdir / pseudo.filename
+        filepath = tmp_path / pseudo.filename
 
         with pseudo.open(mode='rb') as handle:
             md5 = hashlib.md5(handle.read()).hexdigest()
             handle.seek(0)
-            filepath.write_binary(handle.read())
+            filepath.write_bytes(handle.read())
 
-        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmpdir, base_dir='.')
+        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmp_path, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
 
         with open(filepath_metadata, 'w', encoding='utf-8') as handle:
@@ -60,7 +60,7 @@ def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, m
 
 
 @pytest.fixture
-def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_data, monkeypatch, tmpdir):
+def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_data, monkeypatch, tmp_path):
     """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_pseudo_dojo`` method and call the install cmd."""
 
     def download_pseudo_dojo(
@@ -82,25 +82,25 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_
 
         element = 'Ar'
         pseudo = get_pseudo_potential_data(element, entry_point='jthxml')
-        filepath = tmpdir / pseudo.filename
+        filepath = tmp_path / pseudo.filename
 
         with pseudo.open(mode='rb') as handle:
             md5 = hashlib.md5(handle.read()).hexdigest()
             handle.seek(0)
-            filepath.write_binary(handle.read())
+            filepath.write_bytes(handle.read())
 
-        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmpdir, base_dir='.')
+        filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmp_path, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
 
         data = {'hints': {'high': {'ecut': 20.00}, 'low': {'ecut': 20.00}, 'normal': {'ecut': 20.00}}, 'md5': md5}
 
-        filepath_djrepo = tmpdir / f'{element}.djrepo'
+        filepath_djrepo = tmp_path / f'{element}.djrepo'
 
         with open(filepath_djrepo, 'w', encoding='utf-8') as handle:
             json.dump(data, handle)
             handle.flush()
 
-        filename_metadata = shutil.make_archive('tempmetadata', 'gztar', root_dir=tmpdir, base_dir='.')
+        filename_metadata = shutil.make_archive('tempmetadata', 'gztar', root_dir=tmp_path, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_metadata, filepath_metadata)
 
     def _run_monkeypatched_install_pseudo_dojo(options=None, raises=None):
@@ -269,7 +269,7 @@ def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo
     assert family.label == label
 
 
-@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option."""
     options = ['--download-only']
@@ -279,7 +279,7 @@ def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     assert 'written to the current directory.' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_pseudo_family):
     """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option.
 
@@ -300,7 +300,7 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
     assert 'written to the current directory.' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--download-only`` option."""
     options = ['--download-only']
@@ -310,7 +310,7 @@ def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo
     assert 'written to the current directory.' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chtmpdir')
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseudo_dojo, get_pseudo_family):
     """Test the ``aiida-pseudo install pseudo_dojo`` command with the ``--download-only`` option.
 

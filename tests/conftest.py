@@ -3,6 +3,7 @@
 """Configuration and fixtures for unit test suite."""
 import io
 import os
+import pathlib
 import re
 import shutil
 
@@ -29,10 +30,14 @@ def ctx():
 
 
 @pytest.fixture
-def chtmpdir(tmpdir):
+def chdir_tmp_path(tmp_path):
     """Change the current working directory to a temporary directory."""
-    with tmpdir.as_cwd():
+    cwd = pathlib.Path.cwd()
+    os.chdir(tmp_path)
+    try:
         yield
+    finally:
+        os.chdir(cwd)
 
 
 @pytest.fixture
@@ -151,7 +156,7 @@ def generate_cutoffs_dict(generate_cutoffs):
 
 
 @pytest.fixture
-def get_pseudo_family(tmpdir, filepath_pseudos):
+def get_pseudo_family(tmp_path, filepath_pseudos):
     """Return a factory for a ``PseudoPotentialFamily`` instance."""
 
     def _get_pseudo_family(
@@ -189,9 +194,9 @@ def get_pseudo_family(tmpdir, filepath_pseudos):
 
         for pseudo in os.listdir(dirpath):
             if elements is None or any(pseudo.startswith(element) for element in elements):
-                shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmpdir), pseudo))
+                shutil.copyfile(os.path.join(dirpath, pseudo), os.path.join(str(tmp_path), pseudo))
 
-        family = cls.create_from_folder(str(tmpdir), label, pseudo_type=pseudo_type)
+        family = cls.create_from_folder(str(tmp_path), label, pseudo_type=pseudo_type)
 
         if cutoffs_dict is not None and isinstance(family, CutoffsPseudoPotentialFamily):
             default_stringency = default_stringency or list(cutoffs_dict.keys())[0]

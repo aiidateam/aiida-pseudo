@@ -22,7 +22,7 @@ classifiers = [
 keywords = ['aiida', 'pseudopotentials']
 requires-python = '>=3.8'
 dependencies = [
-    'aiida-core~=2.0',
+    'aiida-core~=2.1',
     'click~=8.0',
     'pint~=0.16.1',
     'requests~=2.20',

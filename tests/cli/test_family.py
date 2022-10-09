@@ -8,7 +8,10 @@ from numpy.testing import assert_almost_equal
 import pytest
 
 from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
+from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
+from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoFamily
+from aiida_pseudo.groups.family.sssp import SsspFamily
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -78,6 +81,30 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     unit = 'hartree'
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency, '-u', unit])
     assert family.get_cutoffs_unit() == unit
+
+
+@pytest.mark.parametrize(
+    'family_cls,label', [(SsspFamily, 'SSSP/1.1/PBE/efficiency'),
+                         (PseudoDojoFamily, 'PseudoDojo/0.4/PBE/SR/standard/psp8')]
+)
+@pytest.mark.usefixtures('clear_db')
+def test_family_cutoffs_set_established(
+    run_cli_command, get_pseudo_family, generate_cutoffs, tmp_path, family_cls, label
+):
+    """Test that `aiida-pseudo family cutoffs set` is blocked for established families."""
+    family = get_pseudo_family(
+        label=label,
+        cls=family_cls,
+        pseudo_type=UpfData,
+    )
+    stringency = 'normal'
+    cutoffs = generate_cutoffs(family)
+
+    filepath = tmp_path / 'cutoffs.json'
+    filepath.write_text(json.dumps(cutoffs))
+
+    result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', stringency], raises=True)
+    assert f"Invalid value for 'FAMILY': The value `{family}` is not allowed for this parameter." in result.output
 
 
 def test_family_show(clear_db, run_cli_command, get_pseudo_family):

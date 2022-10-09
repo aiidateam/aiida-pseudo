@@ -15,16 +15,17 @@ __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'Pseu
 
 
 class PseudoPotentialTypeParam(click.ParamType):
-    """Parameter type for `click` commands to define a subclass of `PseudoPotentialData`."""
+    """Parameter type for ``click`` commands to define a subclass of ``PseudoPotentialData``."""
 
     name = 'pseudo_type'
 
     def convert(self, value, _, __):
         """Convert the entry point name to the corresponding class.
 
-        :param value: entry point name that should correspond to subclass of `PseudoPotentialData` data plugin
-        :return: the `PseudoPotentialData` subclass
-        :raises: `click.BadParameter` if the entry point cannot be loaded or is not subclass of `PseudoPotentialData`
+        :param value: entry point name that should correspond to subclass of ``PseudoPotentialData`` data plugin
+        :return: the ``PseudoPotentialData`` subclass
+        :raises: ``click.BadParameter`` if the entry point cannot be loaded or is not subclass of
+            ``PseudoPotentialData``
         """
         from aiida.common import exceptions
         from aiida.plugins import DataFactory
@@ -54,13 +55,34 @@ class PseudoPotentialTypeParam(click.ParamType):
 
 
 class PseudoPotentialFamilyParam(GroupParamType):
-    """Parameter type for `click` commands to define an instance of a `PseudoPotentialFamily`."""
+    """Parameter type for ``click`` commands to define an instance of a ``PseudoPotentialFamily``."""
 
     name = 'pseudo_family'
 
+    def __init__(self, exclude: typing.Optional[typing.List[str]] = None, **kwargs):
+        """Construct the parameter.
+
+        :param exclude: an optional list of values that should be considered invalid and will raise ``BadParameter``.
+        """
+        super().__init__(**kwargs)
+        self.exclude = exclude
+
+    def convert(self, value, param, ctx):
+        """Convert the entry point name to the corresponding class.
+
+        :param value: entry point name that should correspond to subclass of ``PseudoPotentialFamily`` group plugin
+        :return: the ``PseudoPotentialFamily`` subclass
+        :raises: `click.BadParameter` if the entry point cannot be loaded or is not subclass of `PseudoPotentialFamily`
+        """
+        family = super().convert(value, param, ctx)
+
+        if self.exclude and family.type_string in self.exclude:
+            self.fail(f'The value `{family}` is not allowed for this parameter.', param, ctx)
+        return family
+
 
 class PseudoPotentialFamilyTypeParam(click.ParamType):
-    """Parameter type for `click` commands to define a subclass of `PseudoPotentialFamily`."""
+    """Parameter type for ``click`` commands to define a subclass of ``PseudoPotentialFamily``."""
 
     name = 'pseudo_family_type'
 
@@ -75,9 +97,10 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
     def convert(self, value, _, __):
         """Convert the entry point name to the corresponding class.
 
-        :param value: entry point name that should correspond to subclass of `PseudoPotentialFamily` group plugin
-        :return: the `PseudoPotentialFamily` subclass
-        :raises: `click.BadParameter` if the entry point cannot be loaded or is not subclass of `PseudoPotentialFamily`
+        :param value: entry point name that should correspond to subclass of ``PseudoPotentialFamily`` group plugin
+        :return: the ``PseudoPotentialFamily`` subclass
+        :raises: `click.BadParameter` if the entry point cannot be loaded or is not subclass of `
+            `PseudoPotentialFamily``
         """
         from aiida.common import exceptions
         from aiida.plugins import GroupFactory
@@ -134,7 +157,7 @@ class PathOrUrl(click.Path):
 
 
 class UnitParamType(click.ParamType):
-    """Parameter type to specify units from the `pint` library."""
+    """Parameter type to specify units from the ``pint`` library."""
 
     name = 'unit'
 
@@ -149,7 +172,7 @@ class UnitParamType(click.ParamType):
     def convert(self, value, _, __):
         """Check if the provided unit is a valid unit for the defined quantity.
 
-        :raises: `click.BadParameter` if the provided unit is not valid for the quantity defined for this instance.
+        :raises: ``click.BadParameter`` if the provided unit is not valid for the quantity defined for this instance.
         """
         if value not in U:
             raise click.BadParameter(f'`{value}` is not a valid unit.')

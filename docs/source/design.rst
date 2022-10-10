@@ -103,9 +103,9 @@ A pseudopotential family is only considered to be *established* when it has a co
 
 Only a pseudopotential family that is *established* will receive support for automated installs with its own class (e.g. :py:class:`~aiida_pseudo.groups.family.SsspFamily`/:py:class:`~aiida_pseudo.groups.family.PseudoDojoFamily`) and command line interface (CLI) commands (e.g. ``install sssp``/``install pseudo-dojo``).
 To make sure these families represent the official ones, they can only be installed with their supported CLI commands, and there are strict checks on the format of these files to make sure they correspond to the official ones.
-Based on the same principle of preserving the integrity of these established pseudopotentials, the ``family cutoffs set`` command can not be used to set the recommended cutoffs of an established family.
+Based on the same principle of preserving the integrity of these established pseudopotentials, the ``family cutoffs set`` command cannot be used to set the recommended cutoffs of an established family.
 
-If users want to install the a set of *non-established* pseudopotentials and configure their recommended cutoffs, they have to install them from the archive using ``install family`` as a :py:class:`~aiida_pseudo.groups.family.CutoffsPseudoPotentialFamily` as described in the :ref:`corresponding how-to section <how-to:install_archive>`.
+To install a set of *non-established* pseudopotentials and configure their recommended cutoffs, install them from the archive using ``install family`` as a :py:class:`~aiida_pseudo.groups.family.CutoffsPseudoPotentialFamily` as described in the :ref:`corresponding how-to section <how-to:install_archive>`.
 
 Recommended cutoffs
 ===================

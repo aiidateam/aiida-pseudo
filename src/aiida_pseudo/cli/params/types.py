@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-self-use
 """Custom parameter types for command line interface commands."""
+from __future__ import annotations
+
 import pathlib
-import typing
 
 from aiida.cmdline.params.types import GroupParamType
 import click
@@ -59,13 +60,13 @@ class PseudoPotentialFamilyParam(GroupParamType):
 
     name = 'pseudo_family'
 
-    def __init__(self, exclude: typing.Optional[typing.List[str]] = None, **kwargs):
+    def __init__(self, blacklist: list[str] | None = None, **kwargs):
         """Construct the parameter.
 
-        :param exclude: an optional list of values that should be considered invalid and will raise ``BadParameter``.
+        :param blacklist: an optional list of values that should be considered invalid and will raise ``BadParameter``.
         """
         super().__init__(**kwargs)
-        self.exclude = exclude
+        self.blacklist = blacklist
 
     def convert(self, value, param, ctx):
         """Convert the entry point name to the corresponding class.
@@ -76,7 +77,7 @@ class PseudoPotentialFamilyParam(GroupParamType):
         """
         family = super().convert(value, param, ctx)
 
-        if self.exclude and family.type_string in self.exclude:
+        if self.blacklist and family.type_string in self.blacklist:
             self.fail(f'The value `{family}` is not allowed for this parameter.', param, ctx)
         return family
 
@@ -86,13 +87,13 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
 
     name = 'pseudo_family_type'
 
-    def __init__(self, exclude: typing.Optional[typing.List[str]] = None, **kwargs):
+    def __init__(self, blacklist: list[str] | None = None, **kwargs):
         """Construct the parameter.
 
-        :param exclude: an optional list of values that should be considered invalid and will raise ``BadParameter``.
+        :param blacklist: an optional list of values that should be considered invalid and will raise ``BadParameter``.
         """
         super().__init__(**kwargs)
-        self.exclude = exclude
+        self.blacklist = blacklist
 
     def convert(self, value, _, __):
         """Convert the entry point name to the corresponding class.
@@ -112,7 +113,7 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         except exceptions.EntryPointError as exception:
             raise click.BadParameter(f'`{value}` is not an existing group plugin.') from exception
 
-        if self.exclude and value in self.exclude:
+        if self.blacklist and value in self.blacklist:
             raise click.BadParameter(f'`{value}` is not an accepted value for this option.')
 
         if not issubclass(family_type, PseudoPotentialFamily):
@@ -137,7 +138,7 @@ class PathOrUrl(click.Path):
 
     name = 'PathOrUrl'
 
-    def convert(self, value, param, ctx) -> typing.Union[pathlib.Path, bytes]:
+    def convert(self, value, param, ctx) -> pathlib.Path | bytes:
         """Convert the string value to the desired value.
 
         If the ``value`` corresponds to a valid path on the local filesystem, return it as a ``pathlib.Path`` instance.
@@ -161,7 +162,7 @@ class UnitParamType(click.ParamType):
 
     name = 'unit'
 
-    def __init__(self, quantity: typing.Optional[typing.List[str]] = None, **kwargs):
+    def __init__(self, quantity: list[str] | None = None, **kwargs):
         """Construct the parameter.
 
         :param quantity: The corresponding quantity of the unit.

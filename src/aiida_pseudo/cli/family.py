@@ -57,7 +57,7 @@ def cmd_family_cutoffs():
 
 @cmd_family_cutoffs.command('set')
 @arguments.PSEUDO_POTENTIAL_FAMILY(
-    type=types.PseudoPotentialFamilyParam(exclude=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
+    type=types.PseudoPotentialFamilyParam(blacklist=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
 )
 @click.argument('cutoffs', type=click.File(mode='rb'))
 @options.STRINGENCY(required=True)

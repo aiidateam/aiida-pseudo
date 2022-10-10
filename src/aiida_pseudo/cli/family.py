@@ -90,7 +90,9 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
         try:
             cutoffs_dict[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
         except KeyError as exception:
-            raise click.BadParameter(f'`{cutoffs.name}` is missing cutoffs for element: {element}') from exception
+            raise click.BadParameter(
+                f'`{cutoffs.name}` is missing cutoffs for element `{element}`: {exception}', param_hint='CUTOFFS'
+            ) from exception
 
     try:
         family.set_cutoffs(cutoffs_dict, stringency, unit=unit)

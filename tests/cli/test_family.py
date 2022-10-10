@@ -37,7 +37,7 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     high_cutoffs['Ar'].pop('cutoff_wfc')
     filepath.write_text(json.dumps(high_cutoffs))
     result = run_cli_command(cmd_family_cutoffs_set, [family.label, str(filepath), '-s', 'high'], raises=True)
-    assert 'is missing cutoffs for element:' in result.output
+    assert 'Error: Invalid value for CUTOFFS: ' in result.output
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal'])
 
     # Set the high stringency
@@ -49,7 +49,7 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     assert sorted(family.get_cutoff_stringencies()) == sorted(['low', 'normal', 'high'])
     assert family.get_cutoffs(stringency) == cutoffs_dict[stringency]
 
-    # Invalid cutoffs structure - Should pass fine
+    # Additional keys in the cutoffs should be accepted and simply ignored
     stringency = 'invalid'
     high_cutoffs = deepcopy(cutoffs_dict['high'])
     high_cutoffs['Ar']['GME'] = 'moon'

@@ -63,3 +63,47 @@ Contents
    cli
 
 .. _SSSP: https://www.materialscloud.org/discover/sssp/table/efficiency
+
+Acknowledgements
+================
+
+If you use this plugin and/or AiiDA for your research, please cite the following work:
+
+* Sebastiaan. P. Huber, Spyros Zoupanos, Martin Uhrin, Leopold Talirz, Leonid Kahle, Rico Häuselmann, Dominik Gresch, Tiziano Müller, Aliaksandr V. Yakutovich, Casper W. Andersen, Francisco F. Ramirez, Carl S. Adorf, Fernando Gargiulo, Snehal Kumbhar, Elsa Passaro, Conrad Johnston, Andrius Merkys, Andrea Cepellotti, Nicolas Mounet, Nicola Marzari, Boris Kozinsky, and Giovanni Pizzi, |AiiDA main paper|_, Scientific Data **7**, 300 (2020)
+
+* Martin Uhrin, Sebastiaan. P. Huber, Jusong Yu, Nicola Marzari, and Giovanni Pizzi, |AiiDA engine paper|_, Computational Materials Science **187**, 110086 (2021)
+
+.. rst-class:: bigfont
+
+    We acknowledge support from:
+
+.. list-table::
+    :widths: 60 40
+    :class: logo-table
+    :header-rows: 0
+
+    * - The `NCCR MARVEL`_ funded by the Swiss National Science Foundation.
+      - |marvel|
+    * - The EU Centre of Excellence "`MaX – Materials Design at the Exascale`_" (Horizon 2020 EINFRA-5, Grant No. 676598).
+      - |max|
+    * - The `swissuniversities P-5 project "Materials Cloud"`_.
+      - |swissuniversities|
+
+.. |marvel| image:: images/MARVEL.png
+    :width: 100%
+
+.. |max| image:: images/MaX.png
+    :width: 100%
+
+.. |swissuniversities| image:: images/swissuniversities.png
+    :width: 100%
+
+.. |AiiDA main paper| replace:: *AiiDA 1.0, a scalable computational infrastructure for automated reproducible workflows and data provenance*
+.. _AiiDA main paper: https://doi.org/10.1038/s41597-020-00638-4
+
+.. |AiiDA engine paper| replace:: *Workflows in AiiDA: Engineering a high-throughput, event-based engine for robust and modular computational workflows*
+.. _AiiDA engine paper: https://doi.org/10.1016/j.commatsci.2020.110086
+
+.. _NCCR MARVEL: http://nccr-marvel.ch/
+.. _MaX – Materials Design at the Exascale: http://www.max-centre.eu/
+.. _`swissuniversities P-5 project "Materials Cloud"`: https://www.materialscloud.org/swissuniversities

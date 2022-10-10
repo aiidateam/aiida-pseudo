@@ -28,7 +28,7 @@ def cmd_install():
 @options_core.DESCRIPTION(help='Description for the family.')
 @options.ARCHIVE_FORMAT()
 @options.FAMILY_TYPE(
-    type=types.PseudoPotentialFamilyTypeParam(exclude=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
+    type=types.PseudoPotentialFamilyTypeParam(blacklist=('pseudo.family.sssp', 'pseudo.family.pseudo_dojo'))
 )
 @options.PSEUDO_TYPE()
 @options.TRACEBACK()

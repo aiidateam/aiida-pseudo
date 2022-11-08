@@ -1,6 +1,6 @@
 # Change log
 
-## 0.7.0
+## `0.7.0` - 2022-04-28
 
 ### Fixes
 - CLI: Fix bug in `install family` when downloading from URL [[#110]](https://github.com/aiidateam/aiida-pseudo/pull/110)
@@ -26,7 +26,7 @@
 - Update the `pre-commit` configuration [[#113]](https://github.com/aiidateam/aiida-pseudo/pull/113)
 
 
-## 0.6.3
+## `0.6.3` - 2021-08-23
 
 ### Fixes
 - CLI: update base URL to SSSP files on Materials Cloud [[#104]](https://github.com/aiidateam/aiida-pseudo/pull/104)
@@ -36,7 +36,7 @@
 - Dependencies: put upper limit on psycopg2-binary [[#106]](https://github.com/aiidateam/aiida-pseudo/pull/106)
 
 
-## 0.6.2
+## `0.6.2` - 2021-05-17
 
 This release comes with the addition of the first version of the [online documentation](https://aiida-pseudo.readthedocs.io/en/latest/).
 It is now also possible to construct a new pseudopotential data node from a filepath on disk instead of a bytestream.
@@ -50,7 +50,7 @@ It is now also possible to construct a new pseudopotential data node from a file
 - Docs: add first version of documentation [[#88]](https://github.com/aiidateam/aiida-pseudo/pull/88)
 
 
-## 0.6.1
+## `0.6.1` - 2021-05-04
 
 This release contains two changes that would be breaking, but the `CutoffsFamily` was only intended for testing purposes and the command line option flag changes are unlikely to break code.
 Therefore this is released as a patch version such that plugins do not have to update their version requirements which are often limited to a particular minor version.
@@ -63,7 +63,7 @@ Therefore this is released as a patch version such that plugins do not have to u
 - CLI: change the `-F/--archive-format` to `-f/--archive-format` and `-T/--family-type` to `-F/--family-type` [[#80]](https://github.com/aiidateam/aiida-pseudo/pull/80)
 
 
-## 0.6.0
+## `0.6.0` - 2021-04-13
 
 The biggest change in this release is the addition of explicit units for the recommended cutoffs of pseudopotential families that support it.
 Before, the cutoffs always had to be specified in electronvolt, but now it is possible to define cutoffs in a variety of energy units.
@@ -90,14 +90,14 @@ Pseudopotential families that were installed with `aiida-pseudo>=0.4.0` should c
 - CLI: refactor download code from automated install commands [[#69]](https://github.com/aiidateam/aiida-pseudo/pull/69)
 
 
-## 0.5.0
+## `0.5.0` - 2021-01-13
 
 ### Changes
 - PseudoDojo: remove support for `v0.3` and enable fixed `v0.4` families [[#39]](https://github.com/aiidateam/aiida-pseudo/pull/39)
 - PseudoDojo: enable PAW based families and lower dual factors [[#42]](https://github.com/aiidateam/aiida-pseudo/pull/42)
 
 
-## 0.4.0
+## `0.4.0` - 2020-12-09
 
 This release significantly changes the design of the plugin with respect to how families are subclassed for different pseudopotential formats.
 Before, for each pseudopotential format, one would have to create a specific subclass of a family for it to be able to store pseudopotentials of the type.
@@ -122,7 +122,7 @@ However, each instance of a family will only ever host a single type of pseudopo
 - `PseudoPotentialFamily`: override `remove_nodes` and `clear` [[#29]](https://github.com/aiidateam/aiida-pseudo/pull/29)
 
 
-## 0.3.0
+## `0.3.0` - 2020-11-17
 
 ### Features
 - Add support for Python 3.9 [[#21]](https://github.com/aiidateam/aiida-pseudo/pull/21)
@@ -133,7 +133,7 @@ However, each instance of a family will only ever host a single type of pseudopo
 - `PseudoPotentialFamily.get_pseudos`: maintain structure kind names [[#20]](https://github.com/aiidateam/aiida-pseudo/pull/20)
 
 
-## 0.2.0
+## `0.2.0` - 2020-10-26
 
 ### Changes
 - `PseudoPotentialFamily.get_pseudos`: turn arguments into keyword only [[#7]](https://github.com/aiidateam/aiida-pseudo/pull/7)
@@ -155,6 +155,6 @@ However, each instance of a family will only ever host a single type of pseudopo
 - Pre-commit: replace old format string interpolation with f-strings [[`302fb105`]](https://github.com/aiidateam/aiida-pseudo/commit/302fb1056489e2d1e1e59bf5011ea28388e8b6f2)
 
 
-## 0.1.0
+## `0.1.0` - 2020-10-07
 
 First release of `aiida-pseudo`.

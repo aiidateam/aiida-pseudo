@@ -246,6 +246,7 @@ def test_install_sssp_monkeypatched(run_monkeypatched_install_sssp):
 
 
 @pytest.mark.usefixtures('clear_db')
+@pytest.mark.filterwarnings('ignore:filename .* does not have a supported extension.:UserWarning')
 def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command with a monkeypatched download function.
 

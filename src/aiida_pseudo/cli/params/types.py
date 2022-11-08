@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-self-use
 """Custom parameter types for command line interface commands."""
 from __future__ import annotations
 
@@ -152,7 +151,7 @@ class PathOrUrl(click.Path):
             return pathlib.Path(super().convert(value, param, ctx))
         except click.exceptions.BadParameter:
             with attempt(f'attempting to download data from `{value}`...'):
-                response = requests.get(value)
+                response = requests.get(value, timeout=30)
                 response.raise_for_status()
                 return response
 

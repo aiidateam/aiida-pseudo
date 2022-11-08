@@ -195,7 +195,7 @@ def test_parse_pseudos_from_directory_non_file_nested(tmp_path):
         PseudoPotentialFamily.parse_pseudos_from_directory(tmp_path)
 
 
-@pytest.mark.filterwarnings('ignore:no registered entry point for `SomeFamily` so its instances will not be storable.')
+@pytest.mark.filterwarnings('ignore:no registered entry point for `.*` so its instances will not be storable.')
 def test_parse_pseudos_from_directory_incorrect_pseudo_type(tmp_path):
     """Test the `PseudoPotentialFamily.parse_pseudos_from_directory` for invalid ``pseudo_type`` arguments.
 

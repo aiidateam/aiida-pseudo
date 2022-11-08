@@ -111,6 +111,9 @@ disable = [
 ]
 
 [tool.pytest.ini_options]
+filterwarnings = [
+    'ignore:Creating AiiDA configuration folder.*:UserWarning'
+]
 minversion = '6.0'
 testpaths = [
     'tests',

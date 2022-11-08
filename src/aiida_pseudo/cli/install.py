@@ -112,7 +112,7 @@ def download_sssp(
     # releases of the SSSP only contain bug fixes, there is no reason to have the user install an outdated patch
     # version. So, the latest patch version of the minor version that is specified by the user is always installed.
     with attempt('downloading patch versions information... ', include_traceback=traceback):
-        response = requests.get(url_template.format(filename='versions.yaml'))
+        response = requests.get(url_template.format(filename='versions.yaml'), timeout=30)
         response.raise_for_status()
         # The `version_mapping` is a dictionary that maps each minor version (key) to the latest patch version (value)
         version_mapping = yaml.load(response.content, Loader=yaml.SafeLoader)
@@ -127,14 +127,14 @@ def download_sssp(
     url_metadata = url_template.format(filename=metadata_filename)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
-        response = requests.get(url_archive)
+        response = requests.get(url_archive, timeout=30)
         response.raise_for_status()
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
     with attempt('downloading selected pseudopotentials metadata... ', include_traceback=traceback):
-        response = requests.get(url_metadata)
+        response = requests.get(url_metadata, timeout=30)
         response.raise_for_status()
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)
@@ -165,14 +165,14 @@ def download_pseudo_dojo(
     url_metadata = PseudoDojoFamily.get_url_metadata(label)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
-        response = requests.get(url_archive)
+        response = requests.get(url_archive, timeout=30)
         response.raise_for_status()
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
     with attempt('downloading selected pseudopotentials metadata archive... ', include_traceback=traceback):
-        response = requests.get(url_metadata)
+        response = requests.get(url_metadata, timeout=30)
         response.raise_for_status()
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)
@@ -358,7 +358,7 @@ def cmd_install_pseudo_dojo(
             adjusted_cutoffs = {}
             for stringency, str_cutoffs in cutoffs.items():
                 adjusted_cutoffs[stringency] = []
-                max_cutoff_wfc = max([cutoffs['cutoff_wfc'] for cutoffs in str_cutoffs.values()])
+                max_cutoff_wfc = max(cutoffs['cutoff_wfc'] for cutoffs in str_cutoffs.values())
                 filler_cutoff_wfc = max_cutoff_wfc * 1.5
                 for element, cutoff in str_cutoffs.items():
                     if cutoff['cutoff_wfc'] <= 0:

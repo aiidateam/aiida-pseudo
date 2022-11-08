@@ -8,7 +8,6 @@ from aiida.cmdline.params.types import GroupParamType
 import click
 import requests
 
-from ...common.units import U
 from ..utils import attempt
 
 __all__ = ('PseudoPotentialFamilyTypeParam', 'PseudoPotentialFamilyParam', 'PseudoPotentialTypeParam')
@@ -174,6 +173,8 @@ class UnitParamType(click.ParamType):
 
         :raises: ``click.BadParameter`` if the provided unit is not valid for the quantity defined for this instance.
         """
+        from ...common.units import U
+
         if value not in U:
             raise click.BadParameter(f'`{value}` is not a valid unit.')
 

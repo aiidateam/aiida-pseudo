@@ -4,6 +4,7 @@ import json
 import pathlib
 import shutil
 import tempfile
+import typing as t
 
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
@@ -11,10 +12,11 @@ import click
 import requests
 import yaml
 
-from aiida_pseudo.groups.family import PseudoDojoConfiguration, SsspConfiguration
-
 from .params import options, types
 from .root import cmd_root
+
+if t.TYPE_CHECKING:
+    from aiida_pseudo.groups.family import SsspConfiguration
 
 
 @cmd_root.group('install')
@@ -89,7 +91,7 @@ def cmd_install_family(archive, label, description, archive_format, family_type,
 
 
 def download_sssp(
-    configuration: SsspConfiguration,
+    configuration: 'SsspConfiguration',
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
     traceback: bool = False
@@ -144,7 +146,7 @@ def download_sssp(
 
 
 def download_pseudo_dojo(
-    configuration: SsspConfiguration,
+    configuration: 'SsspConfiguration',
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
     traceback: bool = False
@@ -197,7 +199,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
     from aiida.orm import Group, QueryBuilder
 
     from aiida_pseudo import __version__
-    from aiida_pseudo.groups.family import SsspFamily
+    from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
 
     from .utils import attempt, create_family_from_archive
 
@@ -280,7 +282,7 @@ def cmd_install_pseudo_dojo(
 
     from aiida_pseudo import __version__
     from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
-    from aiida_pseudo.groups.family import PseudoDojoFamily
+    from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
 
     from .utils import attempt, create_family_from_archive
 

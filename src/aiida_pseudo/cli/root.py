@@ -1,46 +1,29 @@
 # -*- coding: utf-8 -*-
 """Command line interface `aiida-pseudo`."""
-from aiida.cmdline.params import options, types
+from aiida.cmdline.groups.verdi import VerdiCommandGroup
 import click
 
+from .params import options
 
-class VerbosityGroup(click.Group):
-    """Custom command group that automatically adds the ``VERBOSITY`` option to all subcommands."""
+
+class CustomVerdiCommandGroup(VerdiCommandGroup):
+    """Subclass of :class:`aiida.cmdline.groups.verdi.VerdiCommandGroup` for the CLI.
+
+    This subclass overrides the verbosity option to use a custom one that removes the ``-v`` short version of the option
+    since that is used by other options in this CLI and so would clash.
+    """
 
     @staticmethod
     def add_verbosity_option(cmd):
-        """Apply the ``verbosity`` option to the command, which is common to all ``verdi`` commands."""
-        if 'verbosity' not in [param.name for param in cmd.params]:
+        """Apply the ``verbosity`` option to the command, which is common to all subcommands."""
+        if cmd is not None and 'verbosity' not in [param.name for param in cmd.params]:
             cmd = options.VERBOSITY()(cmd)
 
         return cmd
 
-    def group(self, *args, **kwargs):
-        """Ensure that sub command groups use the same class but do not override an explicitly set value."""
-        kwargs.setdefault('cls', self.__class__)
-        return super().group(*args, **kwargs)
 
-    def get_command(self, ctx, cmd_name):
-        """Return the command that corresponds to the requested ``cmd_name``.
-
-        This method is overridden from the base class in order to automatically add the verbosity option.
-
-        Note that if the command is not found and ``resilient_parsing`` is set to True on the context, then the latter
-        feature is disabled because most likely we are operating in tab-completion mode.
-        """
-        cmd = super().get_command(ctx, cmd_name)
-
-        if cmd is not None:
-            return self.add_verbosity_option(cmd)
-
-        if ctx.resilient_parsing:
-            return None
-
-        return ctx.fail(f'`{cmd_name}` is not a {self.name} command.')
-
-
-@click.group('aiida-pseudo', context_settings={'help_option_names': ['-h', '--help']})
-@options.PROFILE(type=types.ProfileParamType(load_profile=True), expose_value=False)
+@click.group('aiida-pseudo', cls=CustomVerdiCommandGroup, context_settings={'help_option_names': ['-h', '--help']})
 @options.VERBOSITY()
+@options.PROFILE()
 def cmd_root():
     """CLI for the ``aiida-pseudo`` plugin."""

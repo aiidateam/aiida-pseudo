@@ -1,5 +1,28 @@
 # Change log
 
+## `0.8.0` - 2022-11-08
+
+### Features
+- `PsmlData`: add parsing of Z-valence from file [[#125]](https://github.com/aiidateam/aiida-pseudo/pull/125)
+- CLI: reduce the load time significantly [[#142]](https://github.com/aiidateam/aiida-pseudo/pull/142)
+- CLI: filter cutoffs from JSON file for family cutoffs set [[#132]](https://github.com/aiidateam/aiida-pseudo/pull/132)
+- CLI: block family cutoffs set for established families [[#134]](https://github.com/aiidateam/aiida-pseudo/pull/134)
+
+### Dependencies
+- Update to be compatible with `aiida-core~=2.1` [[#136]](https://github.com/aiidateam/aiida-pseudo/pull/136)
+- Add support for Python 3.11 [[#139]](https://github.com/aiidateam/aiida-pseudo/pull/139)
+
+### Devops
+- Update all `pre-commit` dependencies [[#124]](https://github.com/aiidateam/aiida-pseudo/pull/124)
+- Update dependency `pylint==2.15.5` [[#137]](https://github.com/aiidateam/aiida-pseudo/pull/137)
+- Refactor: remove use of deprecated `distutils` module [[#126]](https://github.com/aiidateam/aiida-pseudo/pull/126)
+- Refactor: replace `tmpdir` fixture with `tmp_path` [[#127]](https://github.com/aiidateam/aiida-pseudo/pull/127)
+- Refactor: remove use of `os.path` in favor of `pathlib` [[#128]](https://github.com/aiidateam/aiida-pseudo/pull/128)
+- Docs: remove manual addition of package to `sys.path` [[#129]](https://github.com/aiidateam/aiida-pseudo/pull/129)
+- Docs: add acknowledgements [[#133]](https://github.com/aiidateam/aiida-pseudo/pull/133)
+- Tests: address warnings [[#138]](https://github.com/aiidateam/aiida-pseudo/pull/138)
+
+
 ## `0.7.0` - 2022-04-28
 
 ### Fixes

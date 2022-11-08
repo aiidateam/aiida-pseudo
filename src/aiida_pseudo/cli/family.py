@@ -6,7 +6,6 @@ from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
 import click
 
-from ..groups.mixins import RecommendedCutoffMixin
 from .params import arguments, options, types
 from .root import cmd_root
 
@@ -25,6 +24,8 @@ def cmd_family():
 def cmd_family_show(family, stringency, unit, raw):
     """Show details of pseudo potential family."""
     from tabulate import tabulate
+
+    from ..groups.mixins import RecommendedCutoffMixin
 
     if isinstance(family, RecommendedCutoffMixin):
 
@@ -79,6 +80,8 @@ def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
 
     where the cutoffs are expected to be in electronvolt by default.
     """
+    from ..groups.mixins import RecommendedCutoffMixin
+
     if not isinstance(family, RecommendedCutoffMixin):
         raise click.BadParameter(f'family `{family}` does not support recommended cutoffs to be set.')
 

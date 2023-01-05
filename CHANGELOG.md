@@ -1,5 +1,11 @@
 # Change log
 
+## `0.9.0` - 2023-01-05
+
+### Features
+
+- Add support for SSSP v1.2 [[#144]](https://github.com/aiidateam/aiida-pseudo/pull/144)
+
 ## `0.8.0` - 2022-11-08
 
 ### Features

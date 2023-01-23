@@ -216,7 +216,7 @@ class RecommendedCutoffMixin:
         cutoffs_dict.pop(stringency)
 
         cutoffs_unit_dict = self._get_cutoffs_unit_dict()
-        cutoffs_unit_dict.pop(stringency, None)  # `None` is added to support pseudo families installed with v0.5.0
+        cutoffs_unit_dict.pop(stringency)
 
         self.base.extras.set(self._key_cutoffs, cutoffs_dict)
         self.base.extras.set(self._key_cutoffs_unit, cutoffs_unit_dict)
@@ -261,16 +261,7 @@ class RecommendedCutoffMixin:
         """
         self.validate_stringency(stringency)
         stringency = stringency or self.get_default_stringency()
-
-        try:
-            return self._get_cutoffs_unit_dict()[stringency]
-        except KeyError:
-            # Workaround to deal with pseudo families installed in v0.5.0 - Set default unit in case it is not in extras
-            cutoffs_unit_dict = self._get_cutoffs_unit_dict()
-            cutoffs_unit_dict[stringency] = 'eV'
-            self.base.extras.set(self._key_cutoffs_unit, cutoffs_unit_dict)
-            return 'eV'
-            # End of workaround
+        return self._get_cutoffs_unit_dict()[stringency]
 
     def get_recommended_cutoffs(self, *, elements=None, structure=None, stringency=None, unit=None):
         """Return tuple of recommended wavefunction and density cutoffs for the given elements or ``StructureData``.

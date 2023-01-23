@@ -1,10 +1,20 @@
 # Change log
 
+## `1.0.0` - 2023-01-24
+
+As the package has been in production for quite some while, the current state, which was already released with `v0.9.0`, is released as the first stable major version.
+The only change is the removal of a workaround that was added to `v0.6.0` for backwards-compatibility.
+
+### Changes
+- `RecommendedCutoffMixin`: Remove workaround for stringency units [[#147]](https://github.com/aiidateam/aiida-pseudo/pull/147)
+
+
 ## `0.9.0` - 2023-01-05
 
 ### Features
 
 - Add support for SSSP v1.2 [[#144]](https://github.com/aiidateam/aiida-pseudo/pull/144)
+
 
 ## `0.8.0` - 2022-11-08
 

@@ -1,5 +1,18 @@
 # Change log
 
+## 0.6.4
+
+### Features
+- Add support for SSSP v1.2 [[#9396555b]]](https://github.com/aiidateam/aiida-pseudo/pull/9396555b1c87a65ac3e86ee1cd5253209241cb96)
+
+### Dependencies
+- Remove support for Python 3.6 [[#b5aef4f6]]](https://github.com/aiidateam/aiida-pseudo/pull/b5aef4f600a6cad0aab8bbf17e6a58be02293fe4)
+- Pin `pylint~=2.6.1` [[#89f015b9]]](https://github.com/aiidateam/aiida-pseudo/pull/89f015b9336c1761ae8ef1b331654fb8205269cc)
+
+### DevOps
+- Tests: do not rely on actual URL to test install family [[#5f196ecd]]](https://github.com/aiidateam/aiida-pseudo/pull/5f196ecde9f4eb9abc64976c7f66d8fc4b1fe2fb)
+
+
 ## 0.6.3
 
 ### Fixes

@@ -3,6 +3,7 @@
 import json
 import pathlib
 import shutil
+import sys
 import tempfile
 import typing as t
 
@@ -210,7 +211,8 @@ def cmd_install_sssp(version, functional, protocol, download_only, traceback):
         echo.echo_critical(f'{configuration} is not a valid configuration.')
 
     if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
-        echo.echo_critical(f'{SsspFamily.__name__}<{label}> is already installed')
+        echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
+        sys.exit(1)
 
     with tempfile.TemporaryDirectory() as dirpath:
 
@@ -315,7 +317,8 @@ def cmd_install_pseudo_dojo(
         echo.echo_critical(f'{configuration} is not a valid configuration')
 
     if not download_only and QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
-        echo.echo_critical(f'{PseudoDojoFamily.__name__}<{label}> is already installed.')
+        echo.echo_report(f'{PseudoDojoFamily.__name__}<{label}> is already installed.')
+        sys.exit(1)
 
     with tempfile.TemporaryDirectory() as dirpath:
 

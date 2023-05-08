@@ -13,7 +13,7 @@ The following table shows which versions of `aiida-pseudo` are compatible with w
 
 | Plugin | AiiDA | Python |
 |-       |-      |-       |
-| `v0.8.0 < v1.0.0` | ![Compatibility for v0.8][AiiDA v2.x] |  [![PyPI pyversions](https://img.shields.io/pypi/pyversions/aiida-pseudo/0.8.0.svg)](https://pypi.python.org/pypi/aiida-pseudo/) |
+| `v0.8.0 < v2.0.0` | ![Compatibility for v0.8][AiiDA v2.x] |  [![PyPI pyversions](https://img.shields.io/pypi/pyversions/aiida-pseudo/0.8.0.svg)](https://pypi.python.org/pypi/aiida-pseudo/) |
 | `v0.7.0 < v0.8.0` | ![Compatibility for v0.7][AiiDA v2.0.x] |  [![PyPI pyversions](https://img.shields.io/pypi/pyversions/aiida-pseudo/0.7.0.svg)](https://pypi.python.org/pypi/aiida-pseudo/) |
 | `v0.1.0 < v0.7.0` | ![Compatibility for v0.6][AiiDA v1.x] |  [![PyPI pyversions](https://img.shields.io/pypi/pyversions/aiida-pseudo/0.6.0.svg)](https://pypi.python.org/pypi/aiida-pseudo/) |
 

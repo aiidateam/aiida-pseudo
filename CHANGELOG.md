@@ -1,5 +1,20 @@
 # Change log
 
+## `1.0.1` - 2023-05-08
+
+### Fixes
+- CLI: Change `Critical` to `Report` if family exists in `install` command [[3887762]](https://github.com/aiidateam/aiida-pseudo/commit/38877622cb658d7b37fd0f93fbdd649256146aa2)
+
+### Dependencies
+- Update pre-commit requirement `isort==5.12.0` [[d3b494e]](https://github.com/aiidateam/aiida-pseudo/commit/d3b494e68444b68f200f8f01a3673b8d028ffa3e)
+
+### Devops
+- Update compatibility matrix in `README.md` [[c04a7a7]](https://github.com/aiidateam/aiida-pseudo/commit/c04a7a775ef80ad41642e9faf506a2c632860c17)
+- Update Python version and `setup-python` action in CI/CD [[a62ce90]](https://github.com/aiidateam/aiida-pseudo/commit/a62ce90183414ef948262024cd0b03552ef2a7c1)
+- Docs: Update the URL for the `aiida-core` intersphinx inventory [[6756d1b]](https://github.com/aiidateam/aiida-pseudo/commit/6756d1b3ca05d3017c2d829924da0f6fd8b7ccb4)
+- Docs: Update Python version on RTD to 3.11 [[853adbf]](https://github.com/aiidateam/aiida-pseudo/commit/853adbf86b539367d54cf83d470bcfd8a27196fd)
+
+
 ## `1.0.0` - 2023-01-24
 
 As the package has been in production for quite some while, the current state, which was already released with `v0.9.0`, is released as the first stable major version.

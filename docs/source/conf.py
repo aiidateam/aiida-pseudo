@@ -33,7 +33,7 @@ autoapi_ignore = ['*cli*']
 
 # Settings for the `sphinx.ext.intersphinx` extension
 intersphinx_mapping = {
-    'aiida': ('http://aiida_core.readthedocs.io/en/latest/', None),
+    'aiida': ('http://aiida-core.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

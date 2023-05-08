@@ -28,8 +28,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('GITHUB_REF', help='The GITHUB_REF environmental variable')
     args = parser.parse_args()
-    assert args.GITHUB_REF.startswith('refs/tags/v'), f'GITHUB_REF should start with "refs/tags/v": {args.GITHUB_REF}'
-    tag_version = args.GITHUB_REF[11:]
+    TAG_PREFIX = 'refs/tags/v'
+    assert args.GITHUB_REF.startswith(TAG_PREFIX), f'GITHUB_REF should start with "{TAG_PREFIX}": {args.GITHUB_REF}'
+    tag_version = args.GITHUB_REF.removeprefix(TAG_PREFIX)
     package_version = get_version_from_module(Path('src/aiida_pseudo/__init__.py').read_text(encoding='utf-8'))
     error_message = f'The tag version `{tag_version}` is different from the package version `{package_version}`'
     assert tag_version == package_version, error_message

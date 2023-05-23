@@ -33,7 +33,7 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
     label_template = 'SSSP/{version}/{functional}/{protocol}'
     filename_template = 'SSSP_{version}_{functional}_{protocol}'
-    default_configuration = SsspConfiguration('1.1', 'PBE', 'efficiency')
+    default_configuration = SsspConfiguration('1.3', 'PBE', 'precision')
     valid_configurations = (
         SsspConfiguration('1.0', 'PBE', 'efficiency'),
         SsspConfiguration('1.0', 'PBE', 'precision'),
@@ -45,6 +45,10 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         SsspConfiguration('1.2', 'PBE', 'precision'),
         SsspConfiguration('1.2', 'PBEsol', 'efficiency'),
         SsspConfiguration('1.2', 'PBEsol', 'precision'),
+        SsspConfiguration('1.3', 'PBE', 'efficiency'),
+        SsspConfiguration('1.3', 'PBE', 'precision'),
+        SsspConfiguration('1.3', 'PBEsol', 'efficiency'),
+        SsspConfiguration('1.3', 'PBEsol', 'precision'),
     )
 
     @classmethod

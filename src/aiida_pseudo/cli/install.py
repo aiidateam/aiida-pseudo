@@ -183,7 +183,7 @@ def download_pseudo_dojo(
 
 
 @cmd_install.command('sssp')
-@options.VERSION(type=click.Choice(['1.0', '1.1', '1.2']), default='1.2', show_default=True)
+@options.VERSION(type=click.Choice(['1.0', '1.1', '1.2', '1.3']), default='1.3', show_default=True)
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
 @options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
 @options.DOWNLOAD_ONLY()

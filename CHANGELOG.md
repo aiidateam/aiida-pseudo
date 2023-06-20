@@ -1,5 +1,12 @@
 # Change log
 
+## `1.1.0` - 2023-06-20
+
+### Features
+
+- Add support for SSSP v1.3 [[5709f27]](https://github.com/aiidateam/aiida-pseudo/commit/5709f275d217d2f509dcac6fb24436bc29bcd53a)
+
+
 ## `1.0.1` - 2023-05-08
 
 ### Fixes

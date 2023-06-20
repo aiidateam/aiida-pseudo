@@ -33,7 +33,7 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
     label_template = 'SSSP/{version}/{functional}/{protocol}'
     filename_template = 'SSSP_{version}_{functional}_{protocol}'
-    default_configuration = SsspConfiguration('1.3', 'PBE', 'precision')
+    default_configuration = SsspConfiguration('1.1', 'PBE', 'efficiency')
     valid_configurations = (
         SsspConfiguration('1.0', 'PBE', 'efficiency'),
         SsspConfiguration('1.0', 'PBE', 'precision'),

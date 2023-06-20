@@ -45,6 +45,10 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         SsspConfiguration('1.2', 'PBE', 'precision'),
         SsspConfiguration('1.2', 'PBEsol', 'efficiency'),
         SsspConfiguration('1.2', 'PBEsol', 'precision'),
+        SsspConfiguration('1.3', 'PBE', 'efficiency'),
+        SsspConfiguration('1.3', 'PBE', 'precision'),
+        SsspConfiguration('1.3', 'PBEsol', 'efficiency'),
+        SsspConfiguration('1.3', 'PBEsol', 'precision'),
     )
 
     @classmethod

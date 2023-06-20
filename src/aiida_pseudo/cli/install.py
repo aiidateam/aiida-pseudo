@@ -109,7 +109,8 @@ def download_sssp(
 
     from .utils import attempt
 
-    # The parent_id=19 point to the SSSP archives. Using parent_id will fetch the latest version of the SSSP archive record.
+    # The ``parent_id=19`` points to the SSSP entry on the Materials Cloud. Using ``parent_id`` will fetch the latest
+    # version of the SSSP archive record.
     url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
 
     # Download the dictionary mapping of the minor versions to the latest corresponding patch versions. Since patch

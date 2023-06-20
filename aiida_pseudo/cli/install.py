@@ -110,6 +110,8 @@ def download_sssp(
     from aiida_pseudo.groups.family import SsspFamily
     from .utils import attempt
 
+    # The ``parent_id=19`` points to the SSSP entry on the Materials Cloud. Using ``parent_id`` will fetch the latest
+    # version of the SSSP archive record.
     url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
 
     # Download the dictionary mapping of the minor versions to the latest corresponding patch versions. Since patch
@@ -183,7 +185,7 @@ def download_pseudo_dojo(
 
 
 @cmd_install.command('sssp')
-@options.VERSION(type=click.Choice(['1.0', '1.1', '1.2']), default='1.2', show_default=True)
+@options.VERSION(type=click.Choice(['1.0', '1.1', '1.2', '1.3']), default='1.3', show_default=True)
 @options.FUNCTIONAL(type=click.Choice(['PBE', 'PBEsol']), default='PBE', show_default=True)
 @options.PROTOCOL(type=click.Choice(['efficiency', 'precision']), default='efficiency', show_default=True)
 @options.DOWNLOAD_ONLY()

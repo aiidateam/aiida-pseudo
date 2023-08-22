@@ -77,6 +77,12 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         PseudoDojoConfiguration('0.4', 'PBE', 'FR', 'stringent', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'standard', 'psml'),
         PseudoDojoConfiguration('0.4', 'PBEsol', 'FR', 'stringent', 'psml'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'standard', 'psp8'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'stringent', 'psp8'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'standard', 'upf'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'stringent', 'upf'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'standard', 'psml'),
+        PseudoDojoConfiguration('0.5', 'PBE', 'SR', 'stringent', 'psml'),
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
@@ -119,6 +125,12 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         'PseudoDojo/0.4/PBE/FR/stringent/psml': 'nc-fr-04_pbe_stringent_psml',
         'PseudoDojo/0.4/PBEsol/FR/standard/psml': 'nc-fr-04_pbesol_standard_psml',
         'PseudoDojo/0.4/PBEsol/FR/stringent/psml': 'nc-fr-04_pbesol_stringent_psml',
+        'PseudoDojo/0.5/PBE/SR/standard/psp8': 'nc-sr-05_pbe_standard_psp8',
+        'PseudoDojo/0.5/PBE/SR/stringent/psp8': 'nc-sr-05_pbe_stringent_psp8',
+        'PseudoDojo/0.5/PBE/SR/standard/upf': 'nc-sr-05_pbe_standard_upf',
+        'PseudoDojo/0.5/PBE/SR/stringent/upf': 'nc-sr-05_pbe_stringent_upf',
+        'PseudoDojo/0.5/PBE/SR/standard/psml': 'nc-sr-05_pbe_standard_psml',
+        'PseudoDojo/0.5/PBE/SR/stringent/psml': 'nc-sr-05_pbe_stringent_psml',
         'PseudoDojo/1.0/PBE/SR/standard/jthxml': 'paw_pbe_standard_xml',
         'PseudoDojo/1.0/PBE/SR/stringent/jthxml': 'paw_pbe_stringent_xml',
         'PseudoDojo/1.0/LDA/SR/standard/jthxml': 'paw_pw_standard_xml',
@@ -198,7 +210,7 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         try:
             md5 = djrepo[md5_key]
         except KeyError as exception:
-            raise ParsingError(f'key `{cls.md5_key}` is not defined in the djrepo: {exception}') from exception
+            raise ParsingError(f'key `{md5_key}` is not defined in the djrepo: {exception}') from exception
 
         return md5
 
@@ -230,9 +242,9 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         cutoffs = {}
 
         try:
-            hints = djrepo['hints']
+            hints = djrepo.get('hints', None) or djrepo['ppgen_hints']
         except KeyError as exception:
-            raise ParsingError('key `hints` is not defined in the djrepo.') from exception
+            raise ParsingError('neither `hints` or `ppgen_hints` are defined in the djrepo.') from exception
 
         for stringency in ['low', 'normal', 'high']:
 

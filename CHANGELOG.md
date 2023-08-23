@@ -1,5 +1,12 @@
 # Change log
 
+## `1.2.0` - 2023-08-23
+
+### Features
+
+- Add support for Pseudo-dojo v0.5 [[2796a7f]](https://github.com/aiidateam/aiida-pseudo/commit/2796a7f012b19a8d2950dc13954ff9e7830c454d)
+
+
 ## `1.1.0` - 2023-06-20
 
 ### Features

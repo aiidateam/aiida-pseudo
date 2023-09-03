@@ -167,7 +167,8 @@ def install_sssp(
     # pylint: disable=too-many-locals
     from aiida.orm import Group
 
-    from ..groups.family.sssp import SsspFamily
+    from aiida_pseudo.groups.family.sssp import SsspFamily
+
     from .utils import attempt, create_family_from_archive
 
     with open(filepath_metadata, 'rb') as handle:
@@ -223,15 +224,13 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
 
     configuration = SsspConfiguration(version, functional, protocol)
 
-    if configuration not in SsspFamily.valid_configurations:
-        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
-
     with tempfile.TemporaryDirectory() as dirpath:
 
         dirpath = pathlib.Path(dirpath)
 
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
+        filepath_configuration = dirpath / 'configuration.json'
 
         if from_download is not None:
 
@@ -239,21 +238,24 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
             with tarfile.open(tarball_path, 'r') as handle:
                 handle.extractall(dirpath)
 
-            filepath_configuration = dirpath / 'configuration.json'
+            for filepath in (filepath_archive, filepath_metadata, filepath_configuration):
+                if not filepath.exists():
+                    echo.echo_critical(
+                        f'archive `{from_download}` did not contain required file `{filepath_archive.name}`'
+                    )
 
             with filepath_configuration.open('r') as handle:
                 configuration = SsspConfiguration(**json.load(handle))
-        else:
+
+        if configuration not in SsspFamily.valid_configurations:
+            echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+
+        if not from_download:
             download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
         label = SsspFamily.format_configuration_label(configuration)
 
-        if not download_only and QueryBuilder().append(SsspFamily, filters={'label': label}).first():
-            echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
-            sys.exit(1)
-
         if download_only:
-            filepath_configuration = dirpath / 'configuration.json'
 
             with filepath_configuration.open('w') as handle:
                 handle.write(json.dumps(configuration._asdict()))
@@ -268,6 +270,10 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
                     tarball_file.add(filepath, filepath.name)
             echo.echo_success(f'Pseudopotential archive written to: {tarball_path.name}')
             return
+
+        if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
+            echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
+            sys.exit(1)
 
         description = (
             f'SSSP v{configuration.version} {configuration.functional} {configuration.protocol} '

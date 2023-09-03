@@ -52,6 +52,7 @@
             "pytest~=5.4"
         ],
         "docs": [
+            "docutils<0.18",
             "sphinx~=3.2.1",
             "sphinx-copybutton~=0.3.0",
             "sphinx-book-theme~=0.0.39",

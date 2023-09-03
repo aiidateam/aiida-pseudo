@@ -28,12 +28,16 @@ Similar to the `SSSP`_ pseudopotential family, the options can be used to set ve
 Moreover, the format of the pseudopotentials can be specified, as well as the default stringency.
 Use ``aiida-pseudo install pseudo-dojo --help`` for more information.
 
+.. note::
+
+    In case you are unable to use these automated commands because of connection issues, please consult the :ref:`troubleshooting section <troubleshooting:automated-fail>`.
+
 .. _how-to:install_archive:
 
 Installing from archive or folder
 =================================
 
-In case the automated install commands fail, or the pseudopotential family you want to use is not supported, you can install the pseudopotential family manually with the following command:
+In case the pseudopotential family you want to use is not supported, you can install the pseudopotential family manually with the following command:
 
 .. code-block:: console
 
@@ -53,7 +57,7 @@ If this fails, you can specify the format manually with the ``--archive-format/-
 
     $ aiida-pseudo install family <ARCHIVE> <LABEL> -f gztar
 
-The valid archive formats are those [defined by the ``shutil.unpack_archive`` function](https://docs.python.org/3/library/shutil.html#shutil.unpack_archive) of the standard Python library.
+The valid archive formats are those defined by the `shutil.unpack_archive <https://docs.python.org/3/library/shutil.html#shutil.unpack_archive>`_ function of the standard Python library.
 
 Pseudopotential format
 ----------------------
@@ -93,6 +97,7 @@ The available pseudopotential family classes can be listed with the command:
 .. important::
 
     The ``pseudo.family.sssp`` and ``pseudo.family.pseudo_dojo`` family types are blacklisted since they have their own :ref:`dedicated install commands <how-to:install_automated>` in ``aiida-pseudo install sssp`` and ``aiida-pseudo install pseudo-dojo``, respectively.
+    In case you are unable to use these commands because of connection issues, please consult the :ref:`troubleshooting section <troubleshooting:automated-fail>`.
 
 Adding recommended cutoffs
 --------------------------

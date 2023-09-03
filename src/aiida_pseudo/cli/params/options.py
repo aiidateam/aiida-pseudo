@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reusable options for CLI commands."""
 import functools
+from pathlib import Path
 import shutil
 
 from aiida.cmdline.params import options as core_options
@@ -113,4 +114,13 @@ DOWNLOAD_ONLY = core_options.OverridableOption(
         'Only download the pseudopotential files to the current working directory, without installing the '
         'pseudopotential family.'
     )
+)
+
+FROM_DOWNLOAD = core_options.OverridableOption(
+    '--from-download',
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    required=False,
+    default=None,
+    show_default=False,
+    help='Install the pseudpotential family from the archive and metadata downloaded with the `--download-only` option.'
 )

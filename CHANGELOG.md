@@ -1,5 +1,18 @@
 # Change log
 
+## 0.6.5
+
+### Features
+- Add support for Pseudo-dojo v0.5 [[eb2c4c5]](https://github.com/aiidateam/aiida-pseudo/commit/eb2c4c5812402257d314fde44aa2a685ba75fb16)
+- Add support for SSSP v1.3 [[c1816f0]](https://github.com/aiidateam/aiida-pseudo/commit/c1816f0f104b8b867657f875052b018fdbf2031b)
+
+### Dependencies
+- Add upper limit for `docutils` [[2abced5]](https://github.com/aiidateam/aiida-pseudo/commit/2abced5ad5cb297a35927d549a4658cead6f69c1)
+
+### Devops
+- Add continuous-deployment workflow [[7352fe9]](https://github.com/aiidateam/aiida-pseudo/commit/7352fe9655ea1d24ea6741699121e2b8a1367039)
+
+
 ## 0.6.4
 
 ### Features

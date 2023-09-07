@@ -164,16 +164,13 @@ def install_sssp(
     :param description: description of the pseudopotential family group.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
     """
-    # pylint: disable=too-many-locals
     from aiida.orm import Group
 
     from aiida_pseudo.groups.family.sssp import SsspFamily
 
     from .utils import attempt, create_family_from_archive
 
-    with open(filepath_metadata, 'rb') as handle:
-        handle.seek(0)
-        metadata = json.load(handle)
+    metadata = json.loads(filepath_metadata.read_text())
 
     with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
         family = create_family_from_archive(SsspFamily, label, filepath_archive)
@@ -213,8 +210,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
     from aiida.orm import QueryBuilder
 
     from aiida_pseudo import __version__
-
-    from ..groups.family.sssp import SsspConfiguration, SsspFamily
+    from aiida_pseudo.groups.family.sssp import SsspConfiguration, SsspFamily
 
     if download_only and from_download is not None:
         raise click.BadParameter(
@@ -223,6 +219,10 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
         )
 
     configuration = SsspConfiguration(version, functional, protocol)
+    label = SsspFamily.format_configuration_label(configuration)
+
+    if configuration not in SsspFamily.valid_configurations:
+        echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
 
     with tempfile.TemporaryDirectory() as dirpath:
 
@@ -231,6 +231,25 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
         filepath_configuration = dirpath / 'configuration.json'
+
+        if download_only:
+
+            tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
+
+            if tarball_path.exists():
+                echo.echo_critical(f'the file `{tarball_path}` already exists.')
+
+            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
+
+            with filepath_configuration.open('w') as handle:
+                handle.write(json.dumps(configuration._asdict()))
+
+            with tarfile.open(tarball_path, 'w') as tarball_file:
+                for filepath in [filepath_configuration, filepath_metadata, filepath_archive]:
+                    tarball_file.add(filepath, filepath.name)
+
+            echo.echo_success(f'Pseudopotential archive written to: {tarball_path.name}')
+            return
 
         if from_download is not None:
 
@@ -247,29 +266,12 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
             with filepath_configuration.open('r') as handle:
                 configuration = SsspConfiguration(**json.load(handle))
 
-        if configuration not in SsspFamily.valid_configurations:
-            echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+            label = SsspFamily.format_configuration_label(configuration)
 
-        if not from_download:
+            if configuration not in SsspFamily.valid_configurations:
+                echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+        else:
             download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
-
-        label = SsspFamily.format_configuration_label(configuration)
-
-        if download_only:
-
-            with filepath_configuration.open('w') as handle:
-                handle.write(json.dumps(configuration._asdict()))
-
-            tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
-
-            if tarball_path.exists():
-                echo.echo_critical(f'the file `{tarball_path}` already exists.')
-
-            with tarfile.open(tarball_path, 'w') as tarball_file:
-                for filepath in [filepath_configuration, filepath_metadata, filepath_archive]:
-                    tarball_file.add(filepath, filepath.name)
-            echo.echo_success(f'Pseudopotential archive written to: {tarball_path.name}')
-            return
 
         if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
             echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
@@ -341,7 +343,8 @@ def install_pseudo_dojo(
     # pylint: disable=too-many-locals
     from aiida.orm import Group
 
-    from ..groups.family.pseudo_dojo import PseudoDojoConfiguration, PseudoDojoFamily
+    from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoConfiguration, PseudoDojoFamily
+
     from .utils import attempt, create_family_from_archive
 
     with attempt('unpacking archive and parsing pseudos... ', include_traceback=traceback):
@@ -437,11 +440,7 @@ def cmd_install_pseudo_dojo(
         'psml': PsmlData,
         'upf': UpfData,
     }
-
-    try:
-        pseudo_type = pseudo_type_mapping[pseudo_format]
-    except KeyError:
-        echo.echo_critical(f'{pseudo_format} is not a valid PseudoDojo pseudopotential format.')
+    pseudo_type = pseudo_type_mapping[pseudo_format]
 
     configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
     label = PseudoDojoFamily.format_configuration_label(configuration)
@@ -455,6 +454,26 @@ def cmd_install_pseudo_dojo(
 
         filepath_archive = dirpath / 'archive.tgz'
         filepath_metadata = dirpath / 'metadata.tgz'
+        filepath_configuration = dirpath / 'configuration.json'
+
+        if download_only:
+
+            tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
+
+            if tarball_path.exists():
+                echo.echo_critical(f'the file `{tarball_path}` already exists.')
+
+            download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
+
+            with filepath_configuration.open('w') as handle:
+                handle.write(json.dumps(configuration._asdict()))
+
+            with tarfile.open(tarball_path, 'w') as tarball_file:
+                for filepath in [filepath_configuration, filepath_metadata, filepath_archive]:
+                    tarball_file.add(filepath, filepath.name)
+
+            echo.echo_success(f'Pseudopotential archive written to: {tarball_path.name}')
+            return
 
         if from_download is not None:
 
@@ -462,41 +481,26 @@ def cmd_install_pseudo_dojo(
             with tarfile.open(tarball_path, 'r') as handle:
                 handle.extractall(dirpath)
 
-            filepath_configuration = dirpath / 'configuration.json'
-
             with filepath_configuration.open('r') as handle:
                 configuration = PseudoDojoConfiguration(**json.load(handle))
                 pseudo_type = pseudo_type_mapping[configuration.pseudo_format]
+
+            label = PseudoDojoFamily.format_configuration_label(configuration)
+
+            if configuration not in PseudoDojoFamily.valid_configurations:
+                echo.echo_critical(f'{configuration} is not a valid configuration')
         else:
             download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
-        label = PseudoDojoFamily.format_configuration_label(configuration)
-
-        if not download_only and QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
+        if QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
             echo.echo_report(f'{PseudoDojoFamily.__name__}<{label}> is already installed')
             sys.exit(1)
-
-        if download_only:
-            filepath_configuration = dirpath / 'configuration.json'
-
-            with filepath_configuration.open('w') as handle:
-                handle.write(json.dumps(configuration._asdict()))
-
-            tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
-
-            if tarball_path.exists():
-                echo.echo_critical(f'the file `{tarball_path}` already exists.')
-
-            with tarfile.open(tarball_path, 'w') as tarball_file:
-                for filepath in [filepath_configuration, filepath_metadata, filepath_archive]:
-                    tarball_file.add(filepath, filepath.name)
-            echo.echo_success(f'Pseudopotential archive written to: {tarball_path.name}')
-            return
 
         description = f'{configuration} installed with aiida-pseudo v{__version__}'
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'
         description += f'\nPseudo metadata md5: {md5_file(filepath_metadata)}'
 
-        install_pseudo_dojo(
+        family = install_pseudo_dojo(
             configuration, filepath_archive, filepath_metadata, pseudo_type, label, description, traceback
-        ).set_default_stringency(default_stringency)
+        )
+        family.set_default_stringency(default_stringency)

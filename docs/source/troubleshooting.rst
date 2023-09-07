@@ -11,7 +11,7 @@ The automated install commands fail
 ===================================
 
 These failures are often due to unstable internet connections causing the download of the pseudopotential archive from the web to fail.
-In this case, it is possible to download an ``.aiida_pseudo`` archive of the established family, transfer them to the machine where the pseudopotentials need to be installed and install directly from the archive.
+In this case, it is possible to download an ``.aiida_pseudo`` archive of the established family on a machine with a stable internet connection, transfer it to the machine where the pseudopotentials need to be installed and install directly from the archive.
 To download the archive, use the ``--download-only`` option:
 
 .. code-block:: console

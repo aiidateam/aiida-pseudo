@@ -120,7 +120,5 @@ FROM_DOWNLOAD = core_options.OverridableOption(
     '--from-download',
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
     required=False,
-    default=None,
-    show_default=False,
     help='Install the pseudpotential family from the archive and metadata downloaded with the `--download-only` option.'
 )

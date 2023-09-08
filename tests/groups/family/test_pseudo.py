@@ -153,7 +153,7 @@ def test_create_from_folder_duplicate_element(tmp_path, filepath_pseudos):
     dirpath = tmp_path / 'pseudos'
     shutil.copytree(filepath_pseudos(), dirpath)
 
-    (dirpath / 'Ar.UPF').touch()
+    (dirpath / 'Ar.upf_duplicate').touch()
 
     with pytest.raises(ValueError, match=r'directory `.*` contains pseudo potentials with duplicate elements'):
         PseudoPotentialFamily.create_from_folder(dirpath, 'label')

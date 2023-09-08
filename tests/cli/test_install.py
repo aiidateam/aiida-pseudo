@@ -277,7 +277,7 @@ def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     result = run_monkeypatched_install_sssp(options=options)
 
     assert SsspFamily.collection.count() == 0
-    assert 'written to the current directory.' in result.output
+    assert 'Success: Pseudopotential archive written to:' in result.output
 
 
 @pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
@@ -298,7 +298,25 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
     result = run_monkeypatched_install_sssp(options=options)
 
     assert SsspFamily.collection.count() == 1
-    assert 'written to the current directory.' in result.output
+    assert 'Success: Pseudopotential archive written to:' in result.output
+
+
+@pytest.mark.parametrize('configuration', SsspFamily.valid_configurations)
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+def test_install_sssp_from_download(run_monkeypatched_install_sssp, configuration):
+    """Test the ``aiida-pseudo install sssp`` command with the ``--from-download`` option."""
+    options = [
+        '--download-only', '-v', configuration.version, '-x', configuration.functional, '-p', configuration.protocol
+    ]
+    result = run_monkeypatched_install_sssp(options=options)
+
+    label = SsspFamily.format_configuration_label(configuration).replace('/', '_')
+    filepath = pathlib.Path.cwd() / f'{label}.aiida_pseudo'
+    options = ['--from-download', str(filepath)]
+
+    result = run_monkeypatched_install_sssp(options=options)
+    assert SsspFamily.collection.count() == 1
+    assert 'Success: installed `SSSP/' in result.output
 
 
 @pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
@@ -308,7 +326,7 @@ def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 
     assert PseudoDojoFamily.collection.count() == 0
-    assert 'written to the current directory.' in result.output
+    assert 'Success: Pseudopotential archive written to:' in result.output
 
 
 @pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
@@ -334,4 +352,27 @@ def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseu
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 
     assert PseudoDojoFamily.collection.count() == 1
-    assert 'written to the current directory.' in result.output
+    assert 'Success: Pseudopotential archive written to:' in result.output
+
+
+@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+def test_install_pseudo_dojo_from_download(run_monkeypatched_install_pseudo_dojo):
+    """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--from-download`` option."""
+    version = '1.0'
+    functional = 'LDA'
+    relativistic = 'SR'
+    protocol = 'stringent'
+    pseudo_format = 'jthxml'
+    configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
+    options = [
+        '--download-only', '-v', version, '-x', functional, '-r', relativistic, '-p', protocol, '-f', pseudo_format
+    ]
+    result = run_monkeypatched_install_pseudo_dojo(options=options)
+
+    label = PseudoDojoFamily.format_configuration_label(configuration).replace('/', '_')
+    filepath = pathlib.Path.cwd() / f'{label}.aiida_pseudo'
+    options = ['--from-download', str(filepath)]
+
+    result = run_monkeypatched_install_pseudo_dojo(options=options)
+    assert PseudoDojoFamily.collection.count() == 1
+    assert 'Success: installed `PseudoDojo' in result.output

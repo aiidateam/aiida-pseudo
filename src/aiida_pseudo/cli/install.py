@@ -270,12 +270,13 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
 
             if configuration not in SsspFamily.valid_configurations:
                 echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
-        else:
-            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
         if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
             echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
             sys.exit(1)
+
+        if not from_download:
+            download_sssp(configuration, filepath_archive, filepath_metadata, traceback)
 
         description = (
             f'SSSP v{configuration.version} {configuration.functional} {configuration.protocol} '
@@ -489,12 +490,13 @@ def cmd_install_pseudo_dojo(
 
             if configuration not in PseudoDojoFamily.valid_configurations:
                 echo.echo_critical(f'{configuration} is not a valid configuration')
-        else:
-            download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
         if QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
             echo.echo_report(f'{PseudoDojoFamily.__name__}<{label}> is already installed')
             sys.exit(1)
+
+        if not from_download:
+            download_pseudo_dojo(configuration, filepath_archive, filepath_metadata, traceback)
 
         description = f'{configuration} installed with aiida-pseudo v{__version__}'
         description += f'\nArchive pseudos md5: {md5_file(filepath_archive)}'

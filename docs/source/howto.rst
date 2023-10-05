@@ -45,10 +45,16 @@ In case the pseudopotential family you want to use is not supported, you can ins
 
 where ``<ARCHIVE_OR_FOLDER>`` should be replaced with the archive or folder that contains the pseudopotential files and ``<LABEL>`` with the label to give to the family.
 
-.. important::
+The unpacked archive should contain nothing else besides the pseudopotential files (i.e. no other files or folders) and the pseudopotentials should be present at the top level (not nested in subfolders).
+The command expects pseudopotential files to have the format ``ELEMENT.EXTENSION`` such that it can automatically parse the element for each pseudopotential.
+If the files do not respect this naming convention, the following error message is displayed:
 
-    In order to properly parse the elements from the pseudopotential files, they must adhere ``ELEMENT.EXTENSION`` filename format.
-    The unpacked archive should also contain nothing else besides the pseudopotential files (i.e. no other files or folders) and the pseudopotentials should be present at the top level (not nested in subfolders)..
+.. code-block:: console
+
+    Critical: ``PseudoPotentialData`` constructor did not define the element and could not parse a valid element symbol from the filename `{filename}` either.
+    It should have the format ``ELEMENT.EXTENSION``.
+
+Instead of renaming the files, specify the format of the pseudopotentials so the command can attempt to parse the element from the file itself, as explained :ref:`here <how-to:install_archive:pseudopotential_format>`.
 
 The command will attempt to automatically detect the compression format of the archive.
 If this fails, you can specify the format manually with the ``--archive-format/-f`` option, for example, for a ``.tar.gz`` archive:
@@ -58,6 +64,8 @@ If this fails, you can specify the format manually with the ``--archive-format/-
     $ aiida-pseudo install family <ARCHIVE> <LABEL> -f gztar
 
 The valid archive formats are those defined by the `shutil.unpack_archive <https://docs.python.org/3/library/shutil.html#shutil.unpack_archive>`_ function of the standard Python library.
+
+.. _how-to:install_archive:pseudopotential_format:
 
 Pseudopotential format
 ----------------------

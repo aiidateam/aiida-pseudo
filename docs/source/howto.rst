@@ -136,5 +136,52 @@ where ``<STRINGENCY>`` is a string that defines the recommended cutoffs, ``<FAMI
     The ``PseudoPotentialFamily`` base family type does not support setting recommended cutoffs.
     To be able to use this feature for a manually installed family, install it as a ``CutoffsPseudoPotentialFamily`` as expained :ref:`here <how-to:install_archive:family_type>`.
 
+
+.. _how-to:install_archive:migrate-legacy:
+
+Migrate from legacy ``UpfData`` from ``aiida-core``
+---------------------------------------------------
+
+Since the earliest versions, ``aiida-core`` provided its own data plugin to support UPF pseudopotentials as well as a concept of a pseudopotential family.
+The ``UpfData`` from ``aiida-core`` and related utilities are now deprecated and are replaced by ``aiida-pseudo``.
+To migrate an existing UPF family from ``aiida-core``, use the following snippet:
+
+.. code-block:: python
+
+    from aiida.orm import load_group
+    from aiida_pseudo.data.pseudo.upf import UpfData
+    from aiida_pseudo.groups.family import PseudoPotentialFamily
+
+    label = 'family-legacy'  # Replace this with the label of the family you want to migrate
+    label_new = 'family-migrated' # This will be the label of the migrated family
+
+    legacy_family = load_group(label)
+    family = PseudoPotentialFamily(label=label_new).store()
+    pseudos = []
+
+    for legacy_pseudo in legacy_family.nodes:
+        with legacy_pseudo.open(mode='rb') as handle:
+            pseudos.append(UpfData(handle, filename=legacy_pseudo.filename).store())
+
+    family.add_nodes(pseudos)
+    print(f'Migrated `{legacy_family}` to `{family}`.')
+
+If the snippet finishes successfully, you can run ``verdi group list -a`` which should show the original and migrated groups:
+
+.. code-block::
+
+    user@machine$ verdi group list -a
+      PK  Label                       Type string         User
+    ----  --------------------------  ------------------  ----------------------
+       1  family-legacy               core.upf            user@email.com
+       2  family-migrated             pseudo.family       user@email.com
+
+.. tip::
+
+    It is recommended to use a different label for the migrated family.
+    Although it is possible to use the same label (since the type string is different and the uniqueness constraint will not be violated) the groups can no longer be distinguished solely by their label.
+    This means, for example, that ``load_group('family-legacy')`` will raise a ``MultipleObjectsError`` since both groups will be matched.
+
+
 .. _SSSP: https://www.materialscloud.org/discover/sssp/table/efficiency
 .. _Pseudo Dojo: http://www.pseudo-dojo.org/

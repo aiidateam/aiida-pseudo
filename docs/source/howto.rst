@@ -142,8 +142,34 @@ where ``<STRINGENCY>`` is a string that defines the recommended cutoffs, ``<FAMI
 Migrate from legacy ``UpfData`` from ``aiida-core``
 ---------------------------------------------------
 
-Since the earliest versions, ``aiida-core`` provided its own data plugin to support UPF pseudopotentials as well as a concept of a pseudopotential family.
-The ``UpfData`` from ``aiida-core`` and related utilities are now deprecated and are replaced by ``aiida-pseudo``.
+Since the earliest versions, ``aiida-core`` provided its own data plugin ``UpfData`` (with the entry point ``core.upf``) to support UPF pseudopotentials as well as a concept of a pseudopotential family.
+That ``aiida.orm.nodes.data.upf`` module which defined the ``UpfData`` class and the ``verdi data core.upf`` command of ``aiida-core`` are now deprecated.
+This migration guide provides instructions how to replace the deprecated functionality with ``aiida-pseudo``.
+
+``UpfData``
+...........
+
+The ``UpfData`` class is replaced by the class of the same name from the ``aiida-pseudo`` package.
+The import ``from aiida.orm.nodes.data.upf import UpfData`` can be replaced by ``from aiida_pseudo.data.pseudo import UpfData``.
+The constructor of the two classes is almost identical, so this should be a drop-in replacement.
+
+``verdi data core.upf``
+.......................
+
+====================================    ===============================
+Deprecated                              Replacement
+====================================    ===============================
+``verdi data core.upf uploadfamily``    ``aiida-pseudo install family``
+``verdi data core.upf listfamilies``    ``aiida-pseudo list``
+``verdi data core.upf exportfamily``    Not yet implemented
+``verdi data core.upf import``          Not yet implemented
+``verdi data core.upf export``          Not yet implemented
+====================================    ===============================
+
+
+Migrating existing families
+...........................
+
 To migrate an existing UPF family from ``aiida-core``, use the following snippet:
 
 .. code-block:: python

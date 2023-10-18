@@ -1,5 +1,16 @@
 # Change log
 
+## `1.3.0` - 2023-10-18
+
+### Features
+- CLI: Add install `--from-download` for sssp and pseudo-dojo [[ea1cca9]](https://github.com/aiidateam/aiida-pseudo/commit/ea1cca9243e75305b2a99d3d18a9c48a314e5ed8)
+
+### Documentation
+- Update requirements of `docs` extra [[69e5959]](https://github.com/aiidateam/aiida-pseudo/commit/69e5959632ff18959ed46f2403f97caaa781cc5a)
+- Improve section on installing custom archive [[78d06b0]](https://github.com/aiidateam/aiida-pseudo/commit/78d06b0c75b4f36cd6d6df307bd0b490b7ce9e21)
+- Add how to migrate from legacy UPF family [[279d930]](https://github.com/aiidateam/aiida-pseudo/commit/279d9307924721d596f52d264cc20e1c3b5f76cb)
+- Add more information on migrating from legacy `aiida-core` [[c44aa73]](https://github.com/aiidateam/aiida-pseudo/commit/c44aa73c27f55d441e1bfd43661233341aa38404)
+
 ## `1.2.0` - 2023-08-23
 
 ### Features

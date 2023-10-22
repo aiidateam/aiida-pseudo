@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=redefined-outer-name
 """Tests for `aiida-pseudo install`."""
+import contextlib
 import json
 import pathlib
 
+from aiida.manage.configuration import Config
 from aiida.orm import QueryBuilder
 import pytest
 
@@ -14,8 +16,54 @@ from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoConfiguration, Pseu
 from aiida_pseudo.groups.family.sssp import SsspConfiguration, SsspFamily
 
 
+@contextlib.contextmanager
+def empty_config() -> Config:
+    """Provide a temporary empty configuration.
+
+    This creates a temporary directory with a clean `.aiida` folder and basic configuration file. The currently loaded
+    configuration and profile are stored in memory and are automatically restored at the end of this context manager.
+
+    :return: a new empty config instance.
+    """
+    import os
+    import tempfile
+
+    from aiida.manage import configuration, get_manager
+    from aiida.manage.configuration import settings
+
+    current_config = configuration.CONFIG
+    current_config_path = current_config.dirpath
+    current_profile = configuration.get_profile()
+    current_path_variable = os.environ.get(settings.DEFAULT_AIIDA_PATH_VARIABLE, None)
+
+    manager = get_manager()
+    manager.unload_profile()
+
+    with tempfile.TemporaryDirectory() as dirpath:
+        dirpath_config = pathlib.Path(dirpath) / 'config'
+        os.environ[settings.DEFAULT_AIIDA_PATH_VARIABLE] = str(dirpath_config)
+        settings.AIIDA_CONFIG_FOLDER = str(dirpath_config)
+        settings.set_configuration_directory()
+        configuration.CONFIG = configuration.load_config(create=True)
+
+        try:
+            yield configuration.CONFIG
+        finally:
+            if current_path_variable is None:
+                os.environ.pop(settings.DEFAULT_AIIDA_PATH_VARIABLE, None)
+            else:
+                os.environ[settings.DEFAULT_AIIDA_PATH_VARIABLE] = current_path_variable
+
+            settings.AIIDA_CONFIG_FOLDER = current_config_path
+            settings.set_configuration_directory()
+            configuration.CONFIG = current_config
+
+            if current_profile:
+                get_manager().load_profile(current_profile.name, allow_switch=True)
+
+
 @pytest.fixture
-def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, monkeypatch, tmp_path):
+def run_monkeypatched_install_sssp(run_cli_command, filepath_pseudos, monkeypatch, tmp_path):
     """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_sssp`` method and call the install cmd."""
 
     def download_sssp(
@@ -36,13 +84,10 @@ def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, m
         import shutil
 
         element = 'Ar'
-        pseudo = get_pseudo_potential_data(element)
-        filepath = tmp_path / pseudo.filename
-
-        with pseudo.open(mode='rb') as handle:
-            md5 = hashlib.md5(handle.read()).hexdigest()
-            handle.seek(0)
-            filepath.write_bytes(handle.read())
+        entry_point = 'upf'
+        filepath_pseudo = filepath_pseudos(entry_point) / f'{element}.{entry_point}'
+        (tmp_path / filepath_pseudo.name).write_bytes(filepath_pseudo.read_bytes())
+        md5 = hashlib.md5(filepath_pseudo.read_bytes()).hexdigest()
 
         filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmp_path, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
@@ -60,7 +105,7 @@ def run_monkeypatched_install_sssp(run_cli_command, get_pseudo_potential_data, m
 
 
 @pytest.fixture
-def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_data, monkeypatch, tmp_path):
+def run_monkeypatched_install_pseudo_dojo(run_cli_command, filepath_pseudos, monkeypatch, tmp_path):
     """Fixture to monkeypatch the ``aiida_pseudo.cli.install.download_pseudo_dojo`` method and call the install cmd."""
 
     def download_pseudo_dojo(
@@ -81,13 +126,10 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, get_pseudo_potential_
         import shutil
 
         element = 'Ar'
-        pseudo = get_pseudo_potential_data(element, entry_point='jthxml')
-        filepath = tmp_path / pseudo.filename
-
-        with pseudo.open(mode='rb') as handle:
-            md5 = hashlib.md5(handle.read()).hexdigest()
-            handle.seek(0)
-            filepath.write_bytes(handle.read())
+        entry_point = 'jthxml'
+        filepath_pseudo = filepath_pseudos(entry_point) / f'{element}.{entry_point}'
+        (tmp_path / filepath_pseudo.name).write_bytes(filepath_pseudo.read_bytes())
+        md5 = hashlib.md5(filepath_pseudo.read_bytes()).hexdigest()
 
         filename_archive = shutil.make_archive('temparchive', 'gztar', root_dir=tmp_path, base_dir='.')
         shutil.move(pathlib.Path.cwd() / filename_archive, filepath_archive)
@@ -272,9 +314,19 @@ def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo
 
 @pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_sssp_download_only(run_monkeypatched_install_sssp):
-    """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option."""
-    options = ['--download-only']
-    result = run_monkeypatched_install_sssp(options=options)
+    """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option.
+
+    The command should be callable with the ``--download-only`` option even if no profiles are defined for the current
+    AiiDA instance. To test this, the ``empty_config`` context manager temporarily unloads the profile that is loaded
+    for the test suite and replaces the config with an empty one. To verify that the ``empty_config`` context does its
+    job the command is first called without the ``--download-only`` option which should then raise. Then the command
+    is called again, this time with the option.
+    """
+    with empty_config():
+        result = run_monkeypatched_install_sssp(raises=True)
+
+    with empty_config():
+        result = run_monkeypatched_install_sssp(options=['--download-only'])
 
     assert SsspFamily.collection.count() == 0
     assert 'Success: Pseudopotential archive written to:' in result.output
@@ -321,9 +373,19 @@ def test_install_sssp_from_download(run_monkeypatched_install_sssp, configuratio
 
 @pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
 def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo):
-    """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--download-only`` option."""
-    options = ['--download-only']
-    result = run_monkeypatched_install_pseudo_dojo(options=options)
+    """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--download-only`` option.
+
+    The command should be callable with the ``--download-only`` option even if no profiles are defined for the current
+    AiiDA instance. To test this, the ``empty_config`` context manager temporarily unloads the profile that is loaded
+    for the test suite and replaces the config with an empty one. To verify that the ``empty_config`` context does its
+    job the command is first called without the ``--download-only`` option which should then raise. Then the command
+    is called again, this time with the option.
+    """
+    with empty_config():
+        result = run_monkeypatched_install_pseudo_dojo(raises=True)
+
+    with empty_config():
+        result = run_monkeypatched_install_pseudo_dojo(options=['--download-only'])
 
     assert PseudoDojoFamily.collection.count() == 0
     assert 'Success: Pseudopotential archive written to:' in result.output

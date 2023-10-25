@@ -1,5 +1,11 @@
 # Change log
 
+## `1.4.0` - 2023-10-25
+
+### Features
+- CLI: Enable install `--download-only` without available profile [[ef146e7]](https://github.com/aiidateam/aiida-pseudo/commit/ef146e7e18073cd0fa41ff444734dafe4f4db7c4)
+
+
 ## `1.3.0` - 2023-10-18
 
 ### Features

@@ -198,7 +198,6 @@ def install_sssp(
 @options.DOWNLOAD_ONLY()
 @options.FROM_DOWNLOAD()
 @options.TRACEBACK()
-@decorators.with_dbenv()
 def cmd_install_sssp(version, functional, protocol, download_only, from_download, traceback):
     """Install an SSSP configuration.
 
@@ -206,6 +205,8 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
     `SsspFamily`.
     """
     # pylint: disable=too-many-locals, too-many-statements
+    from aiida import load_profile
+    from aiida.common.exceptions import ConfigurationError
     from aiida.common.files import md5_file
     from aiida.orm import QueryBuilder
 
@@ -270,6 +271,13 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
 
             if configuration not in SsspFamily.valid_configurations:
                 echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
+
+        try:
+            load_profile()
+        except ConfigurationError:
+            echo.echo_critical(
+                'Could not load a valid AiiDA profile. Check `verdi profile list` to make sure you have one defined.'
+            )
 
         if QueryBuilder().append(SsspFamily, filters={'label': label}).first():
             echo.echo_report(f'{SsspFamily.__name__}<{label}> is already installed')
@@ -411,7 +419,6 @@ def install_pseudo_dojo(
 @options.DOWNLOAD_ONLY()
 @options.FROM_DOWNLOAD()
 @options.TRACEBACK()
-@decorators.with_dbenv()
 def cmd_install_pseudo_dojo(
     version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, from_download,
     traceback
@@ -422,6 +429,8 @@ def cmd_install_pseudo_dojo(
     `PseudoDojoFamily` subclass instance based on the specified pseudopotential format.
     """
     # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements
+    from aiida import load_profile
+    from aiida.common.exceptions import ConfigurationError
     from aiida.common.files import md5_file
     from aiida.orm import QueryBuilder
 
@@ -490,6 +499,13 @@ def cmd_install_pseudo_dojo(
 
             if configuration not in PseudoDojoFamily.valid_configurations:
                 echo.echo_critical(f'{configuration} is not a valid configuration')
+
+        try:
+            load_profile()
+        except ConfigurationError:
+            echo.echo_critical(
+                'Could not load a valid AiiDA profile. Check `verdi profile list` to make sure you have one defined.'
+            )
 
         if QueryBuilder().append(PseudoDojoFamily, filters={'label': label}).first():
             echo.echo_report(f'{PseudoDojoFamily.__name__}<{label}> is already installed')

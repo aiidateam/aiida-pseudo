@@ -209,3 +209,28 @@ def test_get_or_create(get_pseudo_potential_data):
     assert isinstance(different_class, PseudoPotentialData)
     assert not different_class.is_stored
     assert different_class.uuid != original.uuid
+
+
+@pytest.mark.parametrize(
+    'stream, filename, element, are_equal',
+    (
+        (b'content', 'filename.pseudo', 'Ar', True),
+        (b'content', 'filename.different', 'Ar', True),  # The filename should not affect the hash
+        (b'contenta', 'filename.pseudo', 'Ar', False),  # Different content should mean a different hash
+        (b'content', 'filename.pseudo', 'Kr', False),  # A different element should mean a different hash
+    ),
+)
+def test_hash(stream, filename, element, are_equal):
+    """Test the behavior of the hash of ``PseudoPotentialData`` nodes.
+
+    The hash should only be based on the contents of the file and the element.
+    """
+    left = PseudoPotentialData(io.BytesIO(b'content'), filename='filename.pseudo')
+    left.element = 'Ar'
+    left.store()
+
+    right = PseudoPotentialData(io.BytesIO(stream), filename=filename)
+    right.element = element
+    right.store()
+
+    assert (left.base.caching.get_hash() == right.base.caching.get_hash()) is are_equal

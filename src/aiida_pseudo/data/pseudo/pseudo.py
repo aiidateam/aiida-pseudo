@@ -1,4 +1,6 @@
 """Base class for data types representing pseudo potentials."""
+from __future__ import annotations
+
 import io
 import pathlib
 import typing
@@ -7,8 +9,17 @@ from aiida import orm, plugins
 from aiida.common.constants import elements
 from aiida.common.exceptions import StoringNotAllowed
 from aiida.common.files import md5_from_filelike
+from aiida.orm.nodes.caching import NodeCaching
 
 __all__ = ('PseudoPotentialData',)
+
+
+class PseudoPotentialDataCaching(NodeCaching):
+    """Class to define caching behavior of ``PseudoPotentialData`` nodes."""
+
+    def _get_objects_to_hash(self) -> list:
+        """Return a list of objects which should be included in the node hash."""
+        return [self._node.element, self._node.md5]
 
 
 class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
@@ -16,6 +27,8 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
 
     _key_element = 'element'
     _key_md5 = 'md5'
+
+    _CLS_NODE_CACHING = PseudoPotentialDataCaching
 
     @classmethod
     def get_or_create(

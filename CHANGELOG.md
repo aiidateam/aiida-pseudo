@@ -1,5 +1,23 @@
 # Change log
 
+## `1.5.0` - 2023-12-22
+
+### Changes
+- `PseudoPotentialData`: Base hash only on file content and element (#168) [[26a23aa]](https://github.com//commit/26a23aaef4ba31f0a975ea19312c06ad923f5798)
+
+### Dependencies
+- Update requirement `pint~=0.23.0` [[379d44c]](https://github.com//commit/379d44c6e9145c01cb7aff127d821c11bb1f79aa)
+- Drop support for Python 3.8 [[3ea6e5c]](https://github.com//commit/3ea6e5ce363b5fbb85503d7023e48ccc3ed62c29)
+- Add support for Python 3.12 [[ce092de]](https://github.com//commit/ce092def4df4f6a039f702d8942ab3bc080a1552)
+
+### Devops
+- Package: Merge `tests` and `pre-commit` extras into `dev` [[9ff55c1]](https://github.com//commit/9ff55c109e5ed82ec596948fe4617c15077b7a2b)
+- Pre-commit: Update `flynt` [[3f86c30]](https://github.com//commit/3f86c30917d784136001539f40cbe59017788754)
+- Pre-commit: Update pre-commit version and hook config [[92e1c24]](https://github.com//commit/92e1c24f2c88404496ca3684afe2209ea3799e15)
+- Pre-commit: Add formatters for TOML and YAML files [[357fc45]](https://github.com//commit/357fc45a611dca5117cac32eafa4c525faaca94b)
+- Pre-commit: Switch to `ruff` for linting and formatting [[ff01083]](https://github.com//commit/ff0108378660326c446310f25f12186c1db8c03c)
+
+
 ## `1.4.0` - 2023-10-25
 
 ### Features

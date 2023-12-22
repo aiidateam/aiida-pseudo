@@ -40,7 +40,7 @@ jobs:
         cache-dependency-path: pyproject.toml
 
     - name: Install Python package and dependencies
-      run: pip install -e .[pre-commit,tests]
+      run: pip install -e .[dev]
 
     - name: Run pre-commit
       run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
@@ -73,7 +73,7 @@ jobs:
         cache-dependency-path: pyproject.toml
 
     - name: Install Python package and dependencies
-      run: pip install -e .[tests]
+      run: pip install -e .[dev]
 
     - name: Run pytest
       run: pytest -sv tests

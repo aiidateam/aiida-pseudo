@@ -19,7 +19,7 @@ classifiers = [
 dependencies = [
   'aiida-core~=2.1',
   'click~=8.0',
-  'pint~=0.16.1',
+  'pint~=0.23.0',
   'requests~=2.20'
 ]
 dynamic = ['description', 'version']

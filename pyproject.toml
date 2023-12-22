@@ -1,57 +1,33 @@
 [build-system]
-requires = ['flit_core >=3.4,<4']
 build-backend = 'flit_core.buildapi'
+requires = ['flit_core >=3.4,<4']
 
 [project]
-name = 'aiida-pseudo'
-dynamic = ['description', 'version']
 authors = [{name = 'Sebastiaan P. Huber', email = 'mail@sphuber.net'}]
-readme = 'README.md'
-license = {file = 'LICENSE.txt'}
 classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Framework :: AiiDA',
-    'License :: OSI Approved :: MIT License',
-    'Operating System :: POSIX :: Linux',
-    'Operating System :: MacOS :: MacOS X',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
+  'Development Status :: 5 - Production/Stable',
+  'Framework :: AiiDA',
+  'License :: OSI Approved :: MIT License',
+  'Operating System :: POSIX :: Linux',
+  'Operating System :: MacOS :: MacOS X',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11'
 ]
-keywords = ['aiida', 'pseudopotentials']
-requires-python = '>=3.8'
 dependencies = [
-    'aiida-core~=2.1',
-    'click~=8.0',
-    'pint~=0.16.1',
-    'requests~=2.20',
+  'aiida-core~=2.1',
+  'click~=8.0',
+  'pint~=0.16.1',
+  'requests~=2.20'
 ]
-
-[project.urls]
-Home = 'https://github.com/aiidateam/aiida-pseudo'
-Source = 'https://github.com/aiidateam/aiida-pseudo'
-Documentation = 'https://aiida-pseudo.readthedocs.io'
-
-[project.optional-dependencies]
-docs = [
-    'sphinx~=6.0',
-    'sphinx-copybutton~=0.5.0',
-    'sphinx-book-theme~=1.0',
-    'sphinx-autoapi~=3.0',
-    'sphinx-click~=4.0',
-]
-pre-commit = [
-    'pre-commit~=2.2',
-]
-tests = [
-    'pgtest~=1.3',
-    'pytest>=6.0',
-]
-
-[project.scripts]
-aiida-pseudo = 'aiida_pseudo.cli:cmd_root'
+dynamic = ['description', 'version']
+keywords = ['aiida', 'pseudopotentials']
+license = {file = 'LICENSE.txt'}
+name = 'aiida-pseudo'
+readme = 'README.md'
+requires-python = '>=3.8'
 
 [project.entry-points.'aiida.data']
 'pseudo' = 'aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData'
@@ -68,28 +44,51 @@ aiida-pseudo = 'aiida_pseudo.cli:cmd_root'
 'pseudo.family.pseudo_dojo' = 'aiida_pseudo.groups.family.pseudo_dojo:PseudoDojoFamily'
 'pseudo.family.sssp' = 'aiida_pseudo.groups.family.sssp:SsspFamily'
 
+[project.optional-dependencies]
+docs = [
+  'sphinx~=6.0',
+  'sphinx-copybutton~=0.5.0',
+  'sphinx-book-theme~=1.0',
+  'sphinx-autoapi~=3.0',
+  'sphinx-click~=4.0'
+]
+pre-commit = [
+  'pre-commit~=2.2'
+]
+tests = [
+  'pgtest~=1.3',
+  'pytest>=6.0'
+]
+
+[project.scripts]
+aiida-pseudo = 'aiida_pseudo.cli:cmd_root'
+
+[project.urls]
+Documentation = 'https://aiida-pseudo.readthedocs.io'
+Home = 'https://github.com/aiidateam/aiida-pseudo'
+Source = 'https://github.com/aiidateam/aiida-pseudo'
+
 [tool.flit.module]
 name = 'aiida_pseudo'
 
 [tool.flit.sdist]
 exclude = [
-    '.github/',
-    'docs/',
-    'tests/',
+  '.github/',
+  'docs/',
+  'tests/'
 ]
 
 [tool.flynt]
-line-length = 120
 fail-on-change = true
-
+line-length = 120
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    'ignore:Creating AiiDA configuration folder.*:UserWarning'
+  'ignore:Creating AiiDA configuration folder.*:UserWarning'
 ]
 minversion = '6.0'
 testpaths = [
-    'tests',
+  'tests'
 ]
 
 [tool.ruff]

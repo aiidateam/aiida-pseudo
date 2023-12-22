@@ -11,7 +11,6 @@ classifiers = [
   'Operating System :: POSIX :: Linux',
   'Operating System :: MacOS :: MacOS X',
   'Programming Language :: Python',
-  'Programming Language :: Python :: 3.8',
   'Programming Language :: Python :: 3.9',
   'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
@@ -28,7 +27,7 @@ keywords = ['aiida', 'pseudopotentials']
 license = {file = 'LICENSE.txt'}
 name = 'aiida-pseudo'
 readme = 'README.md'
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 
 [project.entry-points.'aiida.data']
 'pseudo' = 'aiida_pseudo.data.pseudo.pseudo:PseudoPotentialData'

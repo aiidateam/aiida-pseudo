@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Mixin that adds support of recommended cutoffs to a ``Group`` subclass, using its extras."""
-from typing import Optional
 import warnings
+from typing import Optional
 
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory
 
 from aiida_pseudo.common.units import U
 
-StructureData = DataFactory('core.structure')  # pylint: disable=invalid-name
+StructureData = DataFactory('core.structure')
 
 __all__ = ('RecommendedCutoffMixin',)
 
@@ -146,7 +146,7 @@ class RecommendedCutoffMixin:
         """
         return tuple(self._get_cutoffs_dict().keys())
 
-    def set_cutoffs(self, cutoffs: dict, stringency: str, unit: str = None) -> None:
+    def set_cutoffs(self, cutoffs: dict, stringency: str, unit: Optional[str] = None) -> None:
         """Set the recommended cutoffs for the pseudos in this family and a specified stringency.
 
         .. note: If, after the cutoffs have been set, there is only one stringency defined for the pseudo family, this
@@ -188,7 +188,7 @@ class RecommendedCutoffMixin:
         if len(cutoffs_dict) == 1:
             self.set_default_stringency(stringency)
 
-    def get_cutoffs(self, stringency: str = None) -> dict:
+    def get_cutoffs(self, stringency: Optional[str] = None) -> dict:
         """Return a set of cutoffs for the given stringency.
 
         :param stringency: optional stringency for which to retrieve the cutoffs. If not specified, the default
@@ -234,11 +234,9 @@ class RecommendedCutoffMixin:
 
         if assign_new_default:
             if len(cutoffs_dict) == 0:
-                warning += (
-                    ' Since no other stringencies are defined for this family, no new default can be specified.'
-                )
+                warning += ' Since no other stringencies are defined for this family, no new default can be specified.'
             elif len(cutoffs_dict) == 1:
-                final_stringency = list(cutoffs_dict.keys())[0]
+                final_stringency = next(iter(cutoffs_dict.keys()))
                 self.set_default_stringency(final_stringency)
                 warning += f' Setting `{final_stringency}` as the default since it is now the only defined stringency.'
             else:
@@ -250,7 +248,7 @@ class RecommendedCutoffMixin:
         if len(warning) > 0:
             warnings.warn(warning)
 
-    def get_cutoffs_unit(self, stringency: str = None) -> str:
+    def get_cutoffs_unit(self, stringency: Optional[str] = None) -> str:
         """Return the cutoffs unit for the specified or family default stringency.
 
         :param stringency: optional stringency for which to retrieve the unit. If not specified, the default stringency
@@ -298,7 +296,6 @@ class RecommendedCutoffMixin:
         cutoffs = self.get_cutoffs(stringency)
 
         for element in symbols:
-
             if element not in cutoffs:
                 raise ValueError(f'family does not contain a pseudo for element `{element}`.')
 

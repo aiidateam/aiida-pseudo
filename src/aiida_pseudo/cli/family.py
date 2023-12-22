@@ -2,9 +2,9 @@
 """Commands to inspect or modify the contents of pseudo potential families."""
 import json
 
+import click
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
-import click
 
 from .params import arguments, options, types
 from .root import cmd_root
@@ -28,7 +28,6 @@ def cmd_family_show(family, stringency, unit, raw):
     from ..groups.mixins import RecommendedCutoffMixin
 
     if isinstance(family, RecommendedCutoffMixin):
-
         try:
             family.validate_stringency(stringency)
         except ValueError as exception:
@@ -37,10 +36,15 @@ def cmd_family_show(family, stringency, unit, raw):
         unit = unit or family.get_cutoffs_unit(stringency)
 
         headers = ['Element', 'Pseudo', 'MD5', f'Wavefunction ({unit})', f'Charge density ({unit})']
-        rows = [[
-            pseudo.element, pseudo.filename, pseudo.md5,
-            *family.get_recommended_cutoffs(elements=pseudo.element, stringency=stringency, unit=unit)
-        ] for pseudo in family.nodes]
+        rows = [
+            [
+                pseudo.element,
+                pseudo.filename,
+                pseudo.md5,
+                *family.get_recommended_cutoffs(elements=pseudo.element, stringency=stringency, unit=unit),
+            ]
+            for pseudo in family.nodes
+        ]
     else:
         headers = ['Element', 'Pseudo', 'MD5']
         rows = [[pseudo.element, pseudo.filename, pseudo.md5] for pseudo in family.nodes]
@@ -64,7 +68,7 @@ def cmd_family_cutoffs():
 @options.STRINGENCY(required=True)
 @options.UNIT()
 @decorators.with_dbenv()
-def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):  # noqa: D301
+def cmd_family_cutoffs_set(family, cutoffs, stringency, unit):
     """Set the recommended cutoffs for a pseudo potential family and a specified stringency.
 
     The cutoffs should be provided as a JSON file through the argument `CUTOFFS` which should have the structure:

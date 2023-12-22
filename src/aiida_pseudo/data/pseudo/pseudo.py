@@ -19,7 +19,9 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
     _key_md5 = 'md5'
 
     @classmethod
-    def get_or_create(cls, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: str = None):
+    def get_or_create(
+        cls, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: typing.Optional[str] = None
+    ):
         """Get pseudopotenial data node from database with matching md5 checksum or create a new one if not existent.
 
         :param source: the source pseudopotential content, either a binary stream, or a ``str`` or ``Path`` to the path
@@ -49,6 +51,7 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
         :return: the entry point name.
         """
         from aiida.plugins.entry_point import get_entry_point_from_class
+
         _, entry_point = get_entry_point_from_class(cls.__module__, cls.__name__)
         return entry_point.name
 
@@ -59,9 +62,8 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
         :param stream: the object to analyse.
         :returns: True if ``stream`` appears to be a readable filelike object in binary mode, False otherwise.
         """
-        return (
-            isinstance(stream, io.BytesIO) or
-            (hasattr(stream, 'read') and hasattr(stream, 'mode') and 'b' in stream.mode)
+        return isinstance(stream, io.BytesIO) or (
+            hasattr(stream, 'read') and hasattr(stream, 'mode') and 'b' in stream.mode
         )
 
     @classmethod
@@ -107,7 +109,9 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
             if md5 != md5_file:
                 raise ValueError(f'md5 does not match that of stored file: {md5} != {md5_file}')
 
-    def set_file(self, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: str = None, **kwargs):
+    def set_file(
+        self, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: typing.Optional[str] = None, **kwargs
+    ):
         """Set the file content.
 
         .. note:: this method will first analyse the type of the ``source`` and if it is a filepath will convert it

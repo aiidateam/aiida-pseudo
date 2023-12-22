@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Command line interface `aiida-pseudo`."""
-from aiida.cmdline.groups.verdi import VerdiCommandGroup
 import click
+from aiida.cmdline.groups.verdi import VerdiCommandGroup
 
 from .params import options
 

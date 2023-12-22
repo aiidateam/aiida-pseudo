@@ -2,7 +2,6 @@
 """Tests for the :mod:`~aiida_pseudo.cli.params.types` module."""
 import click
 import pytest
-
 from aiida_pseudo.cli.params import types
 from aiida_pseudo.groups.family import PseudoPotentialFamily
 

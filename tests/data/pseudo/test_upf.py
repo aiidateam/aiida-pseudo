@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.upf` module."""
 import io
 import pathlib
 
-from aiida.common.exceptions import ModificationNotAllowed
 import pytest
-
+from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import UpfData
 from aiida_pseudo.data.pseudo.upf import parse_z_valence
 
@@ -65,7 +63,8 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
 
 
 @pytest.mark.parametrize(
-    'content', (
+    'content',
+    (
         'z_valence="1"',
         'z_valence="1.0"',
         'z_valence="1.000"',
@@ -75,7 +74,7 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
         'z_valence="    1"',
         'z_valence="1    "',
         '1.0     Z valence',
-    )
+    ),
 )
 def test_parse_z_valence(content):
     """Test the ``parse_z_valence`` method."""

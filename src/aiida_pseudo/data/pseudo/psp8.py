@@ -40,7 +40,9 @@ def parse_element(stream: typing.BinaryIO):
 class Psp8Data(PseudoPotentialData):
     """Data plugin to represent a pseudo potential in Psp8 (Abinit) format."""
 
-    def set_file(self, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: str = None, **kwargs):  # pylint: disable=arguments-differ
+    def set_file(
+        self, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: typing.Optional[str] = None, **kwargs
+    ):
         """Set the file content and parse other optional attributes from the content.
 
         .. note:: this method will first analyse the type of the ``source`` and if it is a filepath will convert it

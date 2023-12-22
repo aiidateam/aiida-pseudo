@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Subclass of `PseudoPotentialFamily` designed to represent a PseudoDojo configuration."""
+from __future__ import annotations
+
 import json
 import pathlib
 import re
-from typing import NamedTuple, Sequence
 import warnings
+from typing import ClassVar, NamedTuple, Sequence
 
 from aiida.common.exceptions import ParsingError
 
@@ -42,7 +44,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
     label_template = 'PseudoDojo/{version}/{functional}/{relativistic}/{protocol}/{pseudo_format}'
     default_configuration = PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'psp8')
-    # yapf: disable
     valid_configurations = (
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'psp8'),
         PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'stringent', 'psp8'),
@@ -86,12 +87,11 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
-        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml'),
     )
-    # yapf: enable
 
     url_base = 'http://www.pseudo-dojo.org/pseudos/'
-    urls = {
+    urls: ClassVar[dict[str, str]] = {
         'PseudoDojo/0.4/PBE/SR/standard/psp8': 'nc-sr-04_pbe_standard_psp8',
         'PseudoDojo/0.4/PBE/SR/stringent/psp8': 'nc-sr-04_pbe_stringent_psp8',
         'PseudoDojo/0.4/PBEsol/SR/standard/psp8': 'nc-sr-04_pbesol_standard_psp8',
@@ -247,7 +247,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
             raise ParsingError('neither `hints` or `ppgen_hints` are defined in the djrepo.') from exception
 
         for stringency in ['low', 'normal', 'high']:
-
             try:
                 ecutwfc = hints.get(stringency, {})['ecut']
             except KeyError as exception:
@@ -259,7 +258,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
 
     @classmethod
     def parse_djrepos_from_folder(cls, dirpath: pathlib.Path, pseudo_type):
-        # pylint: disable=too-many-locals,too-many-branches
         """Parse the djrepo files in the given directory into a list of data nodes.
 
         .. note:: The directory pointed to by `dirpath` should only contain djrepo files. Optionally, it can contain
@@ -279,7 +277,6 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         dirpath = cls._validate_dirpath(dirpath)
 
         for filepath in dirpath.iterdir():
-
             filename = filepath.name
 
             if not filepath.is_file():

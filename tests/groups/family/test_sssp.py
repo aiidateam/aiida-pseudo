@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument,pointless-statement
 """Tests for the `SsspFamily` class."""
 import pytest
-
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
 
 
 def test_type_string(clear_db):
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
-    assert SsspFamily._type_string == 'pseudo.family.sssp'  # pylint: disable=protected-access
+    assert SsspFamily._type_string == 'pseudo.family.sssp'
 
 
 def test_pseudo_types():

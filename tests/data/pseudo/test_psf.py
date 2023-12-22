@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.psf` module."""
 import io
 import pathlib
 
-from aiida.common.exceptions import ModificationNotAllowed
 import pytest
-
+from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import PsfData
 from aiida_pseudo.data.pseudo.psf import parse_element
 
 
-@pytest.mark.parametrize(('string', 'element'), [
-    (b'c other\n', 'C'),
-    (b'C other\n', 'C'),
-    (b' C other\n', 'C'),
-    (b'ca other\n', 'Ca'),
-    (b'Ca other\n', 'Ca'),
-    (b' Ca other\n', 'Ca'),
-])
+@pytest.mark.parametrize(
+    ('string', 'element'),
+    [
+        (b'c other\n', 'C'),
+        (b'C other\n', 'C'),
+        (b' C other\n', 'C'),
+        (b'ca other\n', 'Ca'),
+        (b'Ca other\n', 'Ca'),
+        (b' Ca other\n', 'Ca'),
+    ],
+)
 def test_parse_element(string, element):
     """Test the `parse_element` method."""
     assert parse_element(io.BytesIO(string)) == element

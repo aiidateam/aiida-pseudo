@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.psml` module."""
 import io
 import pathlib
 
-from aiida.common.exceptions import ModificationNotAllowed
 import pytest
-
+from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import PsmlData
 
 

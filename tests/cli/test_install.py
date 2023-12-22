@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for `aiida-pseudo install`."""
 import contextlib
 import json
 import pathlib
 
+import pytest
 from aiida.manage.configuration import Config
 from aiida.orm import QueryBuilder
-import pytest
-
 from aiida_pseudo.cli import cmd_install_family, cmd_install_pseudo_dojo, cmd_install_sssp, install
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily
@@ -70,9 +68,8 @@ def run_monkeypatched_install_sssp(run_cli_command, filepath_pseudos, monkeypatc
         configuration: SsspConfiguration,
         filepath_archive: pathlib.Path,
         filepath_metadata: pathlib.Path,
-        traceback: bool = False
+        traceback: bool = False,
     ) -> None:
-        # pylint: disable=unused-argument
         """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
 
         :param configuration: the SSSP configuration to download.
@@ -112,9 +109,8 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, filepath_pseudos, mon
         configuration: PseudoDojoConfiguration,
         filepath_archive: pathlib.Path,
         filepath_metadata: pathlib.Path,
-        traceback: bool = False
+        traceback: bool = False,
     ) -> None:
-        # pylint: disable=unused-argument
         """Download the pseudopotential archive and metadata for a PseudoDojo configuration to a path on disk.
 
         :param configuration: the PseudoDojo configuration to download.
@@ -209,6 +205,7 @@ def test_install_family_url(run_cli_command, get_pseudo_archive, monkeypatch):
 
     def convert(*_, **__):
         from collections import namedtuple
+
         Archive = namedtuple('Archive', ['content'])
         archive = Archive(get_pseudo_archive(fmt=fmt).read_bytes())
         return archive
@@ -358,7 +355,13 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
 def test_install_sssp_from_download(run_monkeypatched_install_sssp, configuration):
     """Test the ``aiida-pseudo install sssp`` command with the ``--from-download`` option."""
     options = [
-        '--download-only', '-v', configuration.version, '-x', configuration.functional, '-p', configuration.protocol
+        '--download-only',
+        '-v',
+        configuration.version,
+        '-x',
+        configuration.functional,
+        '-p',
+        configuration.protocol,
     ]
     result = run_monkeypatched_install_sssp(options=options)
 
@@ -409,7 +412,17 @@ def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseu
     get_pseudo_family(cls=PseudoDojoFamily, pseudo_type=UpfData, label=label)
 
     options = [
-        '--download-only', '-v', version, '-x', functional, '-r', relativistic, '-p', protocol, '-f', pseudo_format
+        '--download-only',
+        '-v',
+        version,
+        '-x',
+        functional,
+        '-r',
+        relativistic,
+        '-p',
+        protocol,
+        '-f',
+        pseudo_format,
     ]
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 
@@ -427,7 +440,17 @@ def test_install_pseudo_dojo_from_download(run_monkeypatched_install_pseudo_dojo
     pseudo_format = 'jthxml'
     configuration = PseudoDojoConfiguration(version, functional, relativistic, protocol, pseudo_format)
     options = [
-        '--download-only', '-v', version, '-x', functional, '-r', relativistic, '-p', protocol, '-f', pseudo_format
+        '--download-only',
+        '-v',
+        version,
+        '-x',
+        functional,
+        '-r',
+        relativistic,
+        '-p',
+        protocol,
+        '-f',
+        pseudo_format,
     ]
     result = run_monkeypatched_install_pseudo_dojo(options=options)
 

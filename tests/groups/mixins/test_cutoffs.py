@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :mod:`aiida_pseudo.groups.mixins.cutoffs` module."""
 import copy
 
 import pytest
-
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily
 
 
@@ -12,25 +10,25 @@ from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily
 def test_get_cutoffs_dict(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily._get_cutoffs_dict`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
-    assert family._get_cutoffs_dict() == {}  # pylint: disable=protected-access
+    assert family._get_cutoffs_dict() == {}
 
     for stringency, cutoffs in generate_cutoffs_dict(family).items():
         family.set_cutoffs(cutoffs, stringency)
-    assert family._get_cutoffs_dict() == generate_cutoffs_dict(family)  # pylint: disable=protected-access
+    assert family._get_cutoffs_dict() == generate_cutoffs_dict(family)
 
 
 @pytest.mark.usefixtures('clear_db')
 def test_get_cutoffs_unit_dict(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily._get_cutoffs_unit_dict`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
-    assert family._get_cutoffs_unit_dict() == {}  # pylint: disable=protected-access
+    assert family._get_cutoffs_unit_dict() == {}
 
     default_units_dict = {}
     for stringency, cutoffs in generate_cutoffs_dict(family).items():
         family.set_cutoffs(cutoffs, stringency)
         default_units_dict[stringency] = CutoffsPseudoPotentialFamily.DEFAULT_UNIT
 
-    assert family._get_cutoffs_unit_dict() == default_units_dict  # pylint: disable=protected-access
+    assert family._get_cutoffs_unit_dict() == default_units_dict
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -185,7 +183,6 @@ def test_set_cutoffs_multiple_units(get_pseudo_family, generate_cutoffs):
     cutoffs_unit_dict[stringency] = unit
     assert family.get_cutoffs_unit(stringency) == unit
 
-    # pylint: disable=protected-access
     assert family._get_cutoffs_unit_dict() == {'default': 'hartree', 'rydberg': 'Ry'}
 
 

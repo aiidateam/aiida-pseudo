@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument
 """Test the command line interface utilities."""
 import shutil
 import tarfile
 import tempfile
 
 import pytest
-
 from aiida_pseudo.cli.utils import attempt, create_family_from_archive
 from aiida_pseudo.groups.family import PseudoPotentialFamily
 
@@ -35,7 +33,6 @@ def test_create_family_from_archive_incorrect_filetype(tmp_path):
 def test_create_family_from_archive_incorrect_format(tmp_path):
     """Test the `create_family_from_archive` utility function for invalid archive content."""
     with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:
-
         with tarfile.open(filepath_archive.name, 'w:gz') as tar:
             tar.add(tmp_path, arcname='.')
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name,unused-argument
 """Configuration and fixtures for unit test suite."""
 import io
 import os
@@ -7,14 +6,13 @@ import pathlib
 import re
 import shutil
 
-from aiida.plugins import DataFactory
 import click
 import pytest
-
+from aiida.plugins import DataFactory
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
 
-pytest_plugins = ['aiida.manage.tests.pytest_fixtures']  # pylint: disable=invalid-name
+pytest_plugins = ['aiida.manage.tests.pytest_fixtures']
 
 
 @pytest.fixture
@@ -166,7 +164,7 @@ def get_pseudo_family(tmp_path, filepath_pseudos):
         elements=None,
         cutoffs_dict=None,
         unit=None,
-        default_stringency=None
+        default_stringency=None,
     ) -> PseudoPotentialFamily:
         """Return an instance of `PseudoPotentialFamily` or subclass containing the given elements.
 
@@ -188,7 +186,7 @@ def get_pseudo_family(tmp_path, filepath_pseudos):
             # There is no actual pseudopotential file fixtures for the base class, so default back to `.upf` files
             extension = 'upf'
         else:
-            extension = pseudo_type.get_entry_point_name()[len('pseudo.'):]
+            extension = pseudo_type.get_entry_point_name()[len('pseudo.') :]
 
         dirpath = filepath_pseudos(extension)
 
@@ -199,7 +197,7 @@ def get_pseudo_family(tmp_path, filepath_pseudos):
         family = cls.create_from_folder(tmp_path, label, pseudo_type=pseudo_type)
 
         if cutoffs_dict is not None and isinstance(family, CutoffsPseudoPotentialFamily):
-            default_stringency = default_stringency or list(cutoffs_dict.keys())[0]
+            default_stringency = default_stringency or next(iter(cutoffs_dict.keys()))
             for stringency, cutoff_values in cutoffs_dict.items():
                 family.set_cutoffs(cutoff_values, stringency, unit)
             family.set_default_stringency(default_stringency)
@@ -216,7 +214,7 @@ def get_pseudo_archive(tmp_path, filepath_pseudos):
     def _get_pseudo_archive(fmt='gztar'):
         shutil.make_archive(tmp_path / 'archive', fmt, filepath_pseudos('upf'))
         # The created archive should be the only file in ``tmp_path`` so just get first entry from the iterator.
-        return list(tmp_path.iterdir())[0]
+        return next(iter(tmp_path.iterdir()))
 
     return _get_pseudo_archive
 

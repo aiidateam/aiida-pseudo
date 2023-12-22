@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument
 """Tests for the command `aiida-pseudo list`."""
 from aiida_pseudo.cli import cmd_list
 from aiida_pseudo.cli.list import PROJECTIONS_VALID
@@ -34,7 +33,7 @@ def test_list_project(clear_db, run_cli_command, get_pseudo_family):
 
     # Test that all `PROJECTIONS_VALID` can actually be projected and don't except
     for option in ['-P', '--project']:
-        run_cli_command(cmd_list, [option] + list(PROJECTIONS_VALID))
+        run_cli_command(cmd_list, [option, *list(PROJECTIONS_VALID)])
 
     result = run_cli_command(cmd_list, ['--raw', '-P', 'label'])
     assert len(result.output_lines) == 1

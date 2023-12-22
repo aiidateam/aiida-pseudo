@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pathlib
 
-from aiida.cmdline.params.types import GroupParamType
 import click
 import requests
+from aiida.cmdline.params.types import GroupParamType
 
 from ..utils import attempt
 
@@ -49,6 +49,7 @@ class PseudoPotentialTypeParam(click.ParamType):
         :returns: list of tuples of valid entry points (matching incomplete) and a description
         """
         from aiida.plugins.entry_point import get_entry_point_names
+
         entry_points = get_entry_point_names('aiida.data')
         return [(ep, '') for ep in entry_points if (ep.startswith('pseudo') and ep.startswith(incomplete))]
 
@@ -127,6 +128,7 @@ class PseudoPotentialFamilyTypeParam(click.ParamType):
         :returns: list of tuples of valid entry points (matching incomplete) and a description
         """
         from aiida.plugins.entry_point import get_entry_point_names
+
         entry_points = get_entry_point_names('aiida.groups')
         return [(ep, '') for ep in entry_points if (ep.startswith('pseudo.family') and ep.startswith(incomplete))]
 

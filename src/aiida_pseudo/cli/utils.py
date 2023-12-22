@@ -22,7 +22,7 @@ def attempt(message, exception_types=Exception, include_traceback=False):
 
     try:
         yield
-    except exception_types as exception:  # pylint: disable=broad-except
+    except exception_types as exception:
         echo.echo(' [FAILED]', fg='red', bold=True)
         message = str(exception)
         if include_traceback:
@@ -51,7 +51,6 @@ def create_family_from_archive(cls, label, filepath_archive: Path, fmt=None, pse
     import tempfile
 
     with tempfile.TemporaryDirectory() as dirpath:
-
         try:
             shutil.unpack_archive(filepath_archive, dirpath, format=fmt)
         except shutil.ReadError as exception:

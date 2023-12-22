@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument,redefined-outer-name
 """Tests for the command `aiida-pseudo family`."""
-from copy import deepcopy
 import json
+from copy import deepcopy
 
-from aiida.orm import Group
-from numpy.testing import assert_almost_equal
 import pytest
-
+from aiida.orm import Group
 from aiida_pseudo.cli.family import cmd_family_cutoffs_set, cmd_family_show
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
 from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoFamily
 from aiida_pseudo.groups.family.sssp import SsspFamily
+from numpy.testing import assert_almost_equal
 
 
 @pytest.mark.usefixtures('clear_db')
@@ -97,8 +95,8 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
 
 
 @pytest.mark.parametrize(
-    'family_cls,label', [(SsspFamily, 'SSSP/1.1/PBE/efficiency'),
-                         (PseudoDojoFamily, 'PseudoDojo/0.4/PBE/SR/standard/psp8')]
+    'family_cls,label',
+    [(SsspFamily, 'SSSP/1.1/PBE/efficiency'), (PseudoDojoFamily, 'PseudoDojo/0.4/PBE/SR/standard/psp8')],
 )
 @pytest.mark.usefixtures('clear_db')
 def test_family_cutoffs_set_established(
@@ -145,7 +143,6 @@ def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_f
 
     # Test the command for default and explicit stringency
     for stringency in [None, 'high']:
-
         if stringency is not None:
             result = run_cli_command(cmd_family_show, [family.label, '--stringency', stringency, '--raw'])
         else:

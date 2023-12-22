@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Subclass of ``Group`` that serves as a base class for representing pseudo potential families."""
 import re
-from typing import List, Mapping, Tuple, Union
+from typing import List, Mapping, Optional, Tuple, Union
 
 from aiida.common import exceptions
 from aiida.common.lang import classproperty, type_check
@@ -38,15 +38,17 @@ class PseudoPotentialFamily(Group):
 
     def __init__(self, *args, **kwargs):
         """Validate that the ``_pseudo_types`` class attribute is a tuple of ``PseudoPotentialData`` subclasses."""
-        if not self._pseudo_types or not isinstance(self._pseudo_types, tuple) or any(
-            not issubclass(pseudo_type, PseudoPotentialData) for pseudo_type in self._pseudo_types
+        if (
+            not self._pseudo_types
+            or not isinstance(self._pseudo_types, tuple)
+            or any(not issubclass(pseudo_type, PseudoPotentialData) for pseudo_type in self._pseudo_types)
         ):
             raise RuntimeError('`_pseudo_types` should be a tuple of `PseudoPotentialData` subclasses.')
 
         super().__init__(*args, **kwargs)
 
     @classproperty
-    def pseudo_types(cls):  # pylint: disable=no-self-argument
+    def pseudo_types(cls):  # noqa: N805
         """Return the pseudo potential types that this family accepts.
 
         :return: the tuple of subclasses of ``PseudoPotentialData`` that this family can host nodes of. If it returns
@@ -115,7 +117,6 @@ class PseudoPotentialFamily(Group):
         pseudo_type = cls._validate_pseudo_type(pseudo_type)
 
         for filepath in dirpath.iterdir():
-
             filename = filepath.name
 
             if not filepath.is_file():
@@ -199,7 +200,7 @@ class PseudoPotentialFamily(Group):
 
         if pseudo_types:
             assert len(pseudo_types) == 1, 'Family contains pseudopotential data nodes of various types.'
-            entry_point_name = tuple(pseudo_types)[0].get_entry_point_name()
+            entry_point_name = next(iter(pseudo_types)).get_entry_point_name()
         else:
             entry_point_name = None
 
@@ -307,7 +308,7 @@ class PseudoPotentialFamily(Group):
     def get_pseudos(
         self,
         *,
-        elements: Union[List[str], Tuple[str]] = None,
+        elements: Optional[Union[List[str], Tuple[str]]] = None,
         structure: StructureData = None,
     ) -> Mapping[str, StructureData]:
         """Return the mapping of kind names on pseudo potential data nodes for the given list of elements or structure.

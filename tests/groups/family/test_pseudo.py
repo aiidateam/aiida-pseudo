@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the `PseudoPotentialFamily` class."""
 import shutil
 
+import pytest
 from aiida.common import exceptions
 from aiida.orm import QueryBuilder
-import pytest
-
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
 
 
 def test_type_string():
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
-    assert PseudoPotentialFamily._type_string == 'pseudo.family'  # pylint: disable=protected-access
+    assert PseudoPotentialFamily._type_string == 'pseudo.family'
 
 
 def test_pseudo_types():

@@ -7,11 +7,11 @@ import tarfile
 import tempfile
 import typing as t
 
-from aiida.cmdline.params import options as options_core
-from aiida.cmdline.utils import decorators, echo
 import click
 import requests
 import yaml
+from aiida.cmdline.params import options as options_core
+from aiida.cmdline.utils import decorators, echo
 
 from .params import options, types
 from .root import cmd_root
@@ -37,7 +37,7 @@ def cmd_install():
 @options.PSEUDO_TYPE()
 @options.TRACEBACK()
 @decorators.with_dbenv()
-def cmd_install_family(archive, label, description, archive_format, family_type, pseudo_type, traceback):  # pylint: disable=too-many-arguments
+def cmd_install_family(archive, label, description, archive_format, family_type, pseudo_type, traceback):
     """Install a standard pseudopotential family from an ARCHIVE.
 
     The ARCHIVE can be a (compressed) archive of a directory containing the pseudopotentials on the local file system or
@@ -96,7 +96,7 @@ def download_sssp(
     configuration: 'SsspConfiguration',
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
-    traceback: bool = False
+    traceback: bool = False,
 ) -> str:
     """Download the pseudopotential archive and metadata for an SSSP configuration to a path on disk.
 
@@ -154,7 +154,7 @@ def install_sssp(
     filepath_metadata: pathlib.Path,
     label: str,
     description: str = '',
-    traceback: bool = False
+    traceback: bool = False,
 ) -> None:
     """Install the ``SsspFamily`` and set the recommended cutoffs.
 
@@ -204,7 +204,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
     The SSSP configuration will be automatically downloaded from the Materials Cloud Archive entry to create a new
     `SsspFamily`.
     """
-    # pylint: disable=too-many-locals, too-many-statements
+
     from aiida import load_profile
     from aiida.common.exceptions import ConfigurationError
     from aiida.common.files import md5_file
@@ -216,7 +216,7 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
     if download_only and from_download is not None:
         raise click.BadParameter(
             'cannot specify both `--download-only` and `--from-download`.',
-            param_hint="'--download-only' / '--from-download'"
+            param_hint="'--download-only' / '--from-download'",
         )
 
     configuration = SsspConfiguration(version, functional, protocol)
@@ -225,16 +225,14 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
     if configuration not in SsspFamily.valid_configurations:
         echo.echo_critical(f'{version} {functional} {protocol} is not a valid SSSP configuration')
 
-    with tempfile.TemporaryDirectory() as dirpath:
-
-        dirpath = pathlib.Path(dirpath)
+    with tempfile.TemporaryDirectory() as tmppath:
+        dirpath = pathlib.Path(tmppath)
 
         filepath_archive = dirpath / 'archive.tar.gz'
         filepath_metadata = dirpath / 'metadata.json'
         filepath_configuration = dirpath / 'configuration.json'
 
         if download_only:
-
             tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
 
             if tarball_path.exists():
@@ -253,7 +251,6 @@ def cmd_install_sssp(version, functional, protocol, download_only, from_download
             return
 
         if from_download is not None:
-
             tarball_path = pathlib.Path(from_download).absolute()
             with tarfile.open(tarball_path, 'r') as handle:
                 handle.extractall(dirpath)
@@ -300,7 +297,7 @@ def download_pseudo_dojo(
     configuration: 'PseudoDojoConfiguration',
     filepath_archive: pathlib.Path,
     filepath_metadata: pathlib.Path,
-    traceback: bool = False
+    traceback: bool = False,
 ) -> None:
     """Download the pseudopotential archive and metadata for a PseudoDojo configuration to a path on disk.
 
@@ -338,7 +335,7 @@ def install_pseudo_dojo(
     pseudo_type: 'PseudoPotentialData',
     label: str,
     description: str = '',
-    traceback: bool = False
+    traceback: bool = False,
 ) -> 'PseudoDojoFamily':
     """Install the ``PseudoDojoFamily`` and set the recommended cutoffs.
 
@@ -349,7 +346,7 @@ def install_pseudo_dojo(
     :param description: description of the pseudopotential family group.
     :param traceback: boolean, if true, print the traceback when an exception occurs.
     """
-    # pylint: disable=too-many-locals
+
     from aiida.orm import Group
 
     from aiida_pseudo.groups.family.pseudo_dojo import PseudoDojoConfiguration, PseudoDojoFamily
@@ -368,14 +365,12 @@ def install_pseudo_dojo(
             msg = f'md5 of pseudo for element {element} does not match that of the metadata {md5}'
             echo.echo_critical(msg)
 
-    # yapf: disable
     paw_configurations = (
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'standard', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'PBE', 'SR', 'stringent', 'jthxml'),
         PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'standard', 'jthxml'),
-        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml')
+        PseudoDojoConfiguration('1.0', 'LDA', 'SR', 'stringent', 'jthxml'),
     )
-    # yapf: enable
 
     # The PAW configurations have missing cutoffs for the Lanthanides, which have ben replaced with a placeholder
     # value of `-1`. We replace these with the 1.5 * the maximum cutoff from the same stringency so that these
@@ -395,9 +390,11 @@ def install_pseudo_dojo(
                     adjusted_cutoffs[stringency].append(element)
 
         for stringency, elements in adjusted_cutoffs.items():
-            msg = f'stringency `{stringency}` has missing recommended cutoffs for elements ' \
-                f'{", ".join(elements)}: as a substitute, 1.5 * the maximum cutoff of the stringency ' \
+            msg = (
+                f'stringency `{stringency}` has missing recommended cutoffs for elements '
+                f'{", ".join(elements)}: as a substitute, 1.5 * the maximum cutoff of the stringency '
                 'was set for these elements. USE WITH CAUTION!'
+            )
             echo.echo_warning(msg)
 
     family.description = description
@@ -420,15 +417,22 @@ def install_pseudo_dojo(
 @options.FROM_DOWNLOAD()
 @options.TRACEBACK()
 def cmd_install_pseudo_dojo(
-    version, functional, relativistic, protocol, pseudo_format, default_stringency, download_only, from_download,
-    traceback
+    version,
+    functional,
+    relativistic,
+    protocol,
+    pseudo_format,
+    default_stringency,
+    download_only,
+    from_download,
+    traceback,
 ):
     """Install a PseudoDojo configuration.
 
     The PseudoDojo configuration will be automatically downloaded from pseudo-dojo.org to create a new
     `PseudoDojoFamily` subclass instance based on the specified pseudopotential format.
     """
-    # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements
+
     from aiida import load_profile
     from aiida.common.exceptions import ConfigurationError
     from aiida.common.files import md5_file
@@ -441,7 +445,7 @@ def cmd_install_pseudo_dojo(
     if download_only and from_download is not None:
         raise click.BadParameter(
             'cannot specify both `--download-only` and `--from-download`.',
-            param_hint="'--download-only' / '--from-download'"
+            param_hint="'--download-only' / '--from-download'",
         )
 
     pseudo_type_mapping = {
@@ -458,16 +462,14 @@ def cmd_install_pseudo_dojo(
     if configuration not in PseudoDojoFamily.valid_configurations:
         echo.echo_critical(f'{configuration} is not a valid configuration')
 
-    with tempfile.TemporaryDirectory() as dirpath:
-
-        dirpath = pathlib.Path(dirpath)
+    with tempfile.TemporaryDirectory() as tmppath:
+        dirpath = pathlib.Path(tmppath)
 
         filepath_archive = dirpath / 'archive.tgz'
         filepath_metadata = dirpath / 'metadata.tgz'
         filepath_configuration = dirpath / 'configuration.json'
 
         if download_only:
-
             tarball_path = pathlib.Path.cwd() / f'{label}.aiida_pseudo'.replace('/', '_')
 
             if tarball_path.exists():
@@ -486,7 +488,6 @@ def cmd_install_pseudo_dojo(
             return
 
         if from_download is not None:
-
             tarball_path = pathlib.Path(from_download).absolute()
             with tarfile.open(tarball_path, 'r') as handle:
                 handle.extractall(dirpath)

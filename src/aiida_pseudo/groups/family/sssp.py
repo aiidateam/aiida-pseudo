@@ -83,9 +83,12 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         """
         version = configuration.version if patch_version is None else patch_version
 
-        return cls.filename_template.format(
-            version=version, functional=configuration.functional, protocol=configuration.protocol
-        ) + f'.{extension}'
+        return (
+            cls.filename_template.format(
+                version=version, functional=configuration.functional, protocol=configuration.protocol
+            )
+            + f'.{extension}'
+        )
 
     def __init__(self, label=None, **kwargs):
         """Construct a new instance, validating that the label matches the required format."""

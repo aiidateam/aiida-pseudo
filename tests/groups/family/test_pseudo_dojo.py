@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument,pointless-statement
 """Tests for the `PseudoDojoFamily` class."""
 import pytest
-
 from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
 from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
 
 
 def test_type_string(clear_db):
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
-    assert PseudoDojoFamily._type_string == 'pseudo.family.pseudo_dojo'  # pylint: disable=protected-access
+    assert PseudoDojoFamily._type_string == 'pseudo.family.pseudo_dojo'
 
 
 def test_pseudo_types():

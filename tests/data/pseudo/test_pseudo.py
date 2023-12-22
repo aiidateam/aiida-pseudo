@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :py:mod:`~aiida_pseudo.data.pseudo.pseudo` module."""
 import io
 import pathlib
 
+import pytest
 from aiida.common.exceptions import ModificationNotAllowed, StoringNotAllowed
 from aiida.common.files import md5_from_filelike
 from aiida.common.links import LinkType
 from aiida.orm import CalcJobNode
-import pytest
-
 from aiida_pseudo.data.pseudo import PseudoPotentialData, UpfData
 
 
@@ -38,7 +36,7 @@ def test_constructor_source_types(source):
 def test_constructor_invalid():
     """Test the constructor for invalid arguments."""
     with pytest.raises(TypeError, match='missing 1 required positional argument'):
-        PseudoPotentialData()  # pylint: disable=no-value-for-parameter
+        PseudoPotentialData()
 
 
 @pytest.mark.usefixtures('chdir_tmp_path')
@@ -77,11 +75,14 @@ def test_constructor_filename(get_pseudo_potential_data, implicit, source_type):
         assert node.filename == explicit_filename
 
 
-@pytest.mark.parametrize(('value, exception, pattern'), (
-    (io.StringIO('content'), TypeError, r'`source` should be a `str` or `pathlib.Path` filepath .*'),
-    ('non-existing/path', FileNotFoundError, r'No such file or directory: .*'),
-    (pathlib.Path('non-existing/path'), FileNotFoundError, r'No such file or directory: .*'),
-))
+@pytest.mark.parametrize(
+    ('value, exception, pattern'),
+    (
+        (io.StringIO('content'), TypeError, r'`source` should be a `str` or `pathlib.Path` filepath .*'),
+        ('non-existing/path', FileNotFoundError, r'No such file or directory: .*'),
+        (pathlib.Path('non-existing/path'), FileNotFoundError, r'No such file or directory: .*'),
+    ),
+)
 def test_prepare_source_excepts(value, exception, pattern):
     """Test the ``PseudoPotentialData.prepare_source`` method when it is supposed to except."""
     with pytest.raises(exception, match=pattern):
@@ -112,7 +113,7 @@ def test_store():
         pseudo.store()
 
     pseudo.element = 'Ar'
-    pseudo.base.attributes.set(PseudoPotentialData._key_md5, md5_incorrect)  # pylint: disable=protected-access
+    pseudo.base.attributes.set(PseudoPotentialData._key_md5, md5_incorrect)
 
     with pytest.raises(StoringNotAllowed, match=r'md5 does not match that of stored file:'):
         pseudo.store()

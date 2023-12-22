@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=redefined-outer-name
 """Tests for the :py:`~aiida_pseudo.data.pseudo.vps` module."""
 import io
 import pathlib
 
-from aiida.common.exceptions import ModificationNotAllowed
 import pytest
-
+from aiida.common.exceptions import ModificationNotAllowed
 from aiida_pseudo.data.pseudo import VpsData
 from aiida_pseudo.data.pseudo.vps import parse_xc_type, parse_z_valence
 
@@ -65,13 +63,13 @@ def test_set_file(filepath_pseudos, get_pseudo_potential_data):
 
 
 @pytest.mark.parametrize(
-    'content', (
+    'content',
+    (
         'valence.electron 1.0',
         'valence.electron 1',
         'VALENCE.ELECTRON 1.0',
-        'Valence.Electron 1.0'
-        'valence.electron 1.0 # Z valence',
-    )
+        'Valence.Electron 1.0' 'valence.electron 1.0 # Z valence',
+    ),
 )
 def test_parse_z_valence(content):
     """Test the ``parse_z_valence`` method."""

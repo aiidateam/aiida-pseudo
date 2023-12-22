@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Commands to list instances of `PseudoPotentialFamily`."""
+import click
 from aiida.cmdline.params import options as options_core
 from aiida.cmdline.utils import decorators, echo
-import click
 
 from .params import options
 from .root import cmd_root
@@ -44,8 +44,7 @@ def cmd_list(project, raw, family_type):
 
     rows = []
 
-    for group, in get_families_builder().iterall():
-
+    for (group,) in get_families_builder().iterall():
         if family_type and family_type.entry_point != group.type_string:
             continue
 

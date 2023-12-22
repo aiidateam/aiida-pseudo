@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing various mixins for ``Group`` subclasses."""
 from .cutoffs import *
 

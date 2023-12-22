@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for `aiida-pseudo install`."""
 import contextlib
 import json

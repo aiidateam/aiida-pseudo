@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the `PseudoDojoFamily` class."""
 import pytest
 from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData

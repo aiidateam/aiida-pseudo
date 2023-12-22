@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the :mod:`~aiida_pseudo.cli.params.types` module."""
 import click
 import pytest

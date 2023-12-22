@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Subclass of ``Group`` that serves as a base class for representing pseudo potential families."""
 import re
 from typing import List, Mapping, Optional, Tuple, Union

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the `SsspFamily` class."""
 import pytest
 from aiida_pseudo.data.pseudo.upf import UpfData

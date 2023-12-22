@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests that are common to all data plugins in the :py:mod:`~aiida_pseudo.data.pseudo` module."""
 import pytest
 from aiida import plugins

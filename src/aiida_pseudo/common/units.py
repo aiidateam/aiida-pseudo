@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module with constants for unit conversions."""
 from pint import UnitRegistry
 

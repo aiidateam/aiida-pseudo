@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Command line interface utilities."""
 from contextlib import contextmanager
 from pathlib import Path

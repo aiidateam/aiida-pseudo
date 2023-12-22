@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Subclass of ``PseudoPotentialFamily`` designed to represent an SSSP configuration."""
 from typing import NamedTuple, Optional, Sequence
 

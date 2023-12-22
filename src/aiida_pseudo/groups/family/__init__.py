@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module with group plugins to represent pseudo potential families."""
 from .cutoffs import *
 from .pseudo import *

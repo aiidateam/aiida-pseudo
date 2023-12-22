@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the command `aiida-pseudo family`."""
 import json
 from copy import deepcopy

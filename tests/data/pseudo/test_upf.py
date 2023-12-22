@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the :py:`~aiida_pseudo.data.pseudo.upf` module."""
 import io
 import pathlib

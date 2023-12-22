@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Base class for data types representing pseudo potentials."""
 import io
 import pathlib

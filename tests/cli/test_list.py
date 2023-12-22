@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the command `aiida-pseudo list`."""
 from aiida_pseudo.cli import cmd_list
 from aiida_pseudo.cli.list import PROJECTIONS_VALID

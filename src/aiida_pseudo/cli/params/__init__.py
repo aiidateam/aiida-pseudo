@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module for command line interface parameters."""
 from .options import *
 from .types import *

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test the command line interface utilities."""
 import shutil
 import tarfile

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Commands to list instances of `PseudoPotentialFamily`."""
 import click
 from aiida.cmdline.params import options as options_core

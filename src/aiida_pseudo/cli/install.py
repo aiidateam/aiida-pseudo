@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Command to install a pseudo potential family."""
 import json
 import pathlib

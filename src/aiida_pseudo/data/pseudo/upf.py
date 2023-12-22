@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module for data plugin to represent a pseudo potential in UPF format."""
 import pathlib
 import re

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module with data plugins to represent pseudo potentials."""
 from .jthxml import *
 from .pseudo import *

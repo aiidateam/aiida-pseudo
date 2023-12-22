@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the :py:`~aiida_pseudo.data.pseudo.psml` module."""
 import io
 import pathlib

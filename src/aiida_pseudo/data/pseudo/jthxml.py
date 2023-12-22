@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module for data plugin to represent a pseudo potential in JTH XML format."""
 import pathlib
 import re

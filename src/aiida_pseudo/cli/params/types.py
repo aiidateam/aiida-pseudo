@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Custom parameter types for command line interface commands."""
 from __future__ import annotations
 

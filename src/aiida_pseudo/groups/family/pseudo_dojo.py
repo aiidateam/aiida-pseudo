@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Subclass of `PseudoPotentialFamily` designed to represent a PseudoDojo configuration."""
 from __future__ import annotations
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Commands to inspect or modify the contents of pseudo potential families."""
 import json
 

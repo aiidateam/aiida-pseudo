@@ -211,3 +211,33 @@ If the snippet finishes successfully, you can run ``verdi group list -a`` which 
 
 .. _SSSP: https://www.materialscloud.org/discover/sssp/table/efficiency
 .. _Pseudo Dojo: http://www.pseudo-dojo.org/
+
+
+Working with families
+=====================
+
+Since a :class:`~aiida_pseudo.groups.family.PseudoPotentialFamily` is a subclass of AiiDA's :class:`~aiida.orm.groups.Group`, they share the same API.
+That means you can use `AiiDA's group API <https://aiida.readthedocs.io/projects/aiida-core/en/latest/howto/data.html#organizing-data>`_ as well as the ``verdi group`` CLI to work with pseudopotential families.
+For example, to load a family in the Python API, simply use :func:`aiida.orm.utils.loaders.load_group`:
+
+.. code-block:: python
+
+    from aiida.orm import load_group
+    family = load_group('family-label')
+
+Once loaded, the :class:`~aiida.orm.groups.Group` API can be used to modify the family:
+
+.. code-block:: python
+
+    from aiida.orm import load_group
+    family = load_group('family-label')
+    pseudo = list(family.nodes)[0]  # Get a random pseudo
+    family.remove_nodes([pseudo])  # Remove the pseudo from the family
+    family.add_nodes([pseudo])  # Add the removed pseudo again
+
+Like the Python API, the commands of AiiDA's CLI ``verdi group`` also accept pseudopotential families.
+
+.. note::
+
+    ``verdi group list`` does not list ``aiida-pseudo`` families by default, because they are a custom ``Group`` plugin.
+    To include pseudopotential families, add the ``-a`` option, i.e., ``verdi group list -a``.

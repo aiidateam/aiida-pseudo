@@ -53,6 +53,12 @@ Families
 ========
 
 Having loose pseudopotentials floating around is not very practical, so groups of related pseudopotentials can be organized into "families", which are implemented as group plugins with the base class :py:class:`~aiida_pseudo.groups.family.PseudoPotentialFamily`.
+
+.. tip::
+
+    Since a :py:class:`~aiida_pseudo.groups.family.PseudoPotentialFamily` is a subclass of AiiDA's :py:class:`~aiida.orm.groups.Group`, they share the same API.
+    That means you can use `AiiDA's group API <https://aiida.readthedocs.io/projects/aiida-core/en/latest/howto/data.html#organizing-data>`_ as well as the ``verdi group`` CLI to work with families of ``aiida-pseudo``.
+
 A family class can in principle support many pseudopotential formats, however, a family instance can only contain pseudopotentials of a single format.
 For example, the :py:class:`~aiida_pseudo.groups.family.PseudoPotentialFamily` class supports all of the pseudopotential formats that are supported by this plugin.
 However, any instance can only contain pseudopotentials of the same format (e.g. *all* UPF or *all* PSP8, not a mixture).

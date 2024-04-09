@@ -17,9 +17,9 @@ __all__ = ('PseudoPotentialData',)
 class PseudoPotentialDataCaching(NodeCaching):
     """Class to define caching behavior of ``PseudoPotentialData`` nodes."""
 
-    def get_objects_to_hash(self) -> list:
+    def get_objects_to_hash(self) -> dict[str, str]:
         """Return a list of objects which should be included in the node hash."""
-        return [self._node.element, self._node.md5]
+        return {'element': self._node.element, 'md5': self._node.md5}
 
 
 class PseudoPotentialData(plugins.DataFactory('core.singlefile')):

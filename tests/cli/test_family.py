@@ -12,7 +12,7 @@ from aiida_pseudo.groups.family.sssp import SsspFamily
 from numpy.testing import assert_almost_equal
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs_dict, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -60,7 +60,7 @@ def test_family_cutoffs_set(run_cli_command, get_pseudo_family, generate_cutoffs
     assert family.get_cutoffs(stringency) == cutoffs_dict['high']
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cutoffs, tmp_path):
     """Test the `aiida-pseudo family cutoffs set` command with the ``--unit`` flag."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -97,7 +97,7 @@ def test_family_cutoffs_set_unit(run_cli_command, get_pseudo_family, generate_cu
     'family_cls,label',
     [(SsspFamily, 'SSSP/1.1/PBE/efficiency'), (PseudoDojoFamily, 'PseudoDojo/0.4/PBE/SR/standard/psp8')],
 )
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_family_cutoffs_set_established(
     run_cli_command, get_pseudo_family, generate_cutoffs, tmp_path, family_cls, label
 ):
@@ -117,7 +117,7 @@ def test_family_cutoffs_set_established(
     assert f"Invalid value for 'FAMILY': The value `{family}` is not allowed for this parameter." in result.output
 
 
-def test_family_show(clear_db, run_cli_command, get_pseudo_family):
+def test_family_show(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `aiida-pseudo show` command."""
     family = get_pseudo_family()
     result = run_cli_command(cmd_family_show, [family.label])
@@ -127,7 +127,9 @@ def test_family_show(clear_db, run_cli_command, get_pseudo_family):
         assert node.filename in result.output
 
 
-def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_family, generate_cutoffs_dict):
+def test_family_show_recommended_cutoffs(
+    aiida_profile_clean, run_cli_command, get_pseudo_family, generate_cutoffs_dict
+):
     """Test the `aiida-pseudo show` command for a family with recommended cutoffs."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
     stringencies = ('normal', 'high')
@@ -157,7 +159,7 @@ def test_family_show_recommended_cutoffs(clear_db, run_cli_command, get_pseudo_f
             assert_almost_equal(cutoffs[1], float(fields[4]))
 
 
-def test_family_show_argument_type(clear_db, run_cli_command, get_pseudo_family):
+def test_family_show_argument_type(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test that `aiida-pseudo show` only accepts instances of `PseudoPotentialFamily` or subclasses as argument."""
     pseudo_family = get_pseudo_family(label='pseudo-family', cls=PseudoPotentialFamily)
     normal_group = Group('normal-group').store()
@@ -166,7 +168,7 @@ def test_family_show_argument_type(clear_db, run_cli_command, get_pseudo_family)
     run_cli_command(cmd_family_show, [normal_group.label], raises=SystemExit)
 
 
-def test_family_show_raw(clear_db, run_cli_command, get_pseudo_family):
+def test_family_show_raw(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `-r/--raw` option."""
     family = get_pseudo_family()
 
@@ -175,7 +177,7 @@ def test_family_show_raw(clear_db, run_cli_command, get_pseudo_family):
         assert len(result.output_lines) == len(family.nodes)
 
 
-def test_family_show_unit_default(clear_db, run_cli_command, get_pseudo_family):
+def test_family_show_unit_default(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `family show` command with default unit."""
     elements = ['Ar', 'Kr']
     cutoff_dict = {'normal': {'Ar': {'cutoff_wfc': 50, 'cutoff_rho': 200}, 'Kr': {'cutoff_wfc': 25, 'cutoff_rho': 100}}}
@@ -199,7 +201,7 @@ def test_family_show_unit_default(clear_db, run_cli_command, get_pseudo_family):
 
 
 @pytest.mark.parametrize('unit', ['Ry', 'eV', 'hartree', 'aJ'])
-def test_family_show_unit(clear_db, run_cli_command, get_pseudo_family, unit):
+def test_family_show_unit(aiida_profile_clean, run_cli_command, get_pseudo_family, unit):
     """Test the `-u/--unit` option."""
     elements = [
         'Ar',

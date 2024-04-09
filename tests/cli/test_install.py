@@ -147,7 +147,7 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, filepath_pseudos, mon
     return _run_monkeypatched_install_pseudo_dojo
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_family(run_cli_command, get_pseudo_archive):
     """Test ``aiida-pseudo install family``."""
     label = 'family'
@@ -165,7 +165,7 @@ def test_install_family(run_cli_command, get_pseudo_archive):
     assert len(family.pseudos) != 0
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_family_folder(run_cli_command, filepath_pseudos):
     """Test ``aiida-pseudo install family` from folder`."""
     label = 'family_test'
@@ -183,7 +183,7 @@ def test_install_family_folder(run_cli_command, filepath_pseudos):
     assert len(family.pseudos) != 0
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_family_url(run_cli_command, get_pseudo_archive, monkeypatch):
     """Test ``aiida-pseudo install family`` when installing from a URL.
 
@@ -222,7 +222,7 @@ def test_install_family_url(run_cli_command, get_pseudo_archive, monkeypatch):
     assert len(family.pseudos) != 0
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_sssp(run_cli_command):
     """Test the ``aiida-pseudo install sssp`` command."""
     from aiida_pseudo import __version__
@@ -241,7 +241,7 @@ def test_install_sssp(run_cli_command):
     assert 'is already installed' in result.output
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_pseudo_dojo(run_cli_command):
     """Test the ``aiida-pseudo install pseudo-dojo`` command."""
     from aiida_pseudo import __version__
@@ -260,7 +260,7 @@ def test_install_pseudo_dojo(run_cli_command):
     assert 'is already installed' in result.output
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_install_sssp_monkeypatched(run_monkeypatched_install_sssp):
     """Test the ``aiida-pseudo install sssp`` command with a monkeypatched download function.
 
@@ -283,7 +283,7 @@ def test_install_sssp_monkeypatched(run_monkeypatched_install_sssp):
     assert family.label == label
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 @pytest.mark.filterwarnings('ignore:filename .* does not have a supported extension.:UserWarning')
 def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command with a monkeypatched download function.
@@ -308,7 +308,7 @@ def test_install_pseudo_dojo_monkeypatched(run_monkeypatched_install_pseudo_dojo
     assert family.label == label
 
 
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option.
 
@@ -328,7 +328,7 @@ def test_install_sssp_download_only(run_monkeypatched_install_sssp):
     assert 'Success: Pseudopotential archive written to:' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_pseudo_family):
     """Test the ``aiida-pseudo install sssp`` command with the ``--download-only`` option.
 
@@ -350,7 +350,7 @@ def test_install_sssp_download_only_exists(run_monkeypatched_install_sssp, get_p
 
 
 @pytest.mark.parametrize('configuration', SsspFamily.valid_configurations)
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_sssp_from_download(run_monkeypatched_install_sssp, configuration):
     """Test the ``aiida-pseudo install sssp`` command with the ``--from-download`` option."""
     options = [
@@ -373,7 +373,7 @@ def test_install_sssp_from_download(run_monkeypatched_install_sssp, configuratio
     assert 'Success: installed `SSSP/' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--download-only`` option.
 
@@ -393,7 +393,7 @@ def test_install_pseudo_dojo_download_only(run_monkeypatched_install_pseudo_dojo
     assert 'Success: Pseudopotential archive written to:' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseudo_dojo, get_pseudo_family):
     """Test the ``aiida-pseudo install pseudo_dojo`` command with the ``--download-only`` option.
 
@@ -429,7 +429,7 @@ def test_install_pseudo_dojo_download_only_exists(run_monkeypatched_install_pseu
     assert 'Success: Pseudopotential archive written to:' in result.output
 
 
-@pytest.mark.usefixtures('clear_db', 'chdir_tmp_path')
+@pytest.mark.usefixtures('aiida_profile_clean', 'chdir_tmp_path')
 def test_install_pseudo_dojo_from_download(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command with the ``--from-download`` option."""
     version = '1.0'

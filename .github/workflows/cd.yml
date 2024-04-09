@@ -54,14 +54,6 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
 
-    services:
-      postgres:
-        image: postgres:12
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-        - 5672:5672
-
     steps:
     - uses: actions/checkout@v2
 

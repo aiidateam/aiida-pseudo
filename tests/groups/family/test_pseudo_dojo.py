@@ -4,7 +4,7 @@ from aiida_pseudo.data.pseudo import JthXmlData, PsmlData, Psp8Data, UpfData
 from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily
 
 
-def test_type_string(clear_db):
+def test_type_string(aiida_profile_clean):
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
     assert PseudoDojoFamily._type_string == 'pseudo.family.pseudo_dojo'
 
@@ -56,7 +56,7 @@ def test_constructor():
     assert isinstance(family, PseudoDojoFamily)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder(filepath_pseudos):
     """Test the `PseudoDojoFamily.create_from_folder` class method."""
     family = PseudoDojoFamily.create_from_folder(
@@ -65,7 +65,7 @@ def test_create_from_folder(filepath_pseudos):
     assert isinstance(family, PseudoDojoFamily)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_duplicate(filepath_pseudos):
     """Test that `PseudoDojoFamily.create_from_folder` raises for duplicate label."""
     label = 'PseudoDojo/0.4/PBE/SR/standard/psp8'

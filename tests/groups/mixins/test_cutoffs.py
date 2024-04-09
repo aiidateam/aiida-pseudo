@@ -5,7 +5,7 @@ import pytest
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_cutoffs_dict(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily._get_cutoffs_dict`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -16,7 +16,7 @@ def test_get_cutoffs_dict(get_pseudo_family, generate_cutoffs_dict):
     assert family._get_cutoffs_dict() == generate_cutoffs_dict(family)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_cutoffs_unit_dict(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily._get_cutoffs_unit_dict`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -30,7 +30,7 @@ def test_get_cutoffs_unit_dict(get_pseudo_family, generate_cutoffs_dict):
     assert family._get_cutoffs_unit_dict() == default_units_dict
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_validate_cutoffs_unit():
     """Test the ``CutoffsPseudoPotentialFamily.validate_cutoffs_unit`` method."""
     with pytest.raises(TypeError):
@@ -43,7 +43,7 @@ def test_validate_cutoffs_unit():
         CutoffsPseudoPotentialFamily.validate_cutoffs_unit('watt')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_validate_stringency(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.validate_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -61,7 +61,7 @@ def test_validate_stringency(get_pseudo_family, generate_cutoffs):
     family.validate_stringency(stringency)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_default_stringency(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.get_default_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -76,7 +76,7 @@ def test_get_default_stringency(get_pseudo_family, generate_cutoffs):
     assert family.get_default_stringency() == stringency
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_default_stringency(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily.set_default_stringency`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -98,7 +98,7 @@ def test_set_default_stringency(get_pseudo_family, generate_cutoffs_dict):
     assert family.get_default_stringency() == 'normal'
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_cutoff_stringencies(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily.get_cutoff_stringencies`` method."""
     family = get_pseudo_family(cls=CutoffsPseudoPotentialFamily)
@@ -111,7 +111,7 @@ def test_get_cutoff_stringencies(get_pseudo_family, generate_cutoffs_dict):
     assert sorted(family.get_cutoff_stringencies()) == sorted(stringencies)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_cutoffs(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.set_cutoffs`` method."""
     elements = ['Ar', 'He']
@@ -149,7 +149,7 @@ def test_set_cutoffs(get_pseudo_family, generate_cutoffs):
         family.set_cutoffs(cutoffs_invalid, stringency)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_cutoffs_unit_default(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.set_cutoffs`` sets a default unit if not specified."""
     elements = ['Ar']
@@ -161,7 +161,7 @@ def test_set_cutoffs_unit_default(get_pseudo_family, generate_cutoffs):
     assert family.get_cutoffs_unit() == CutoffsPseudoPotentialFamily.DEFAULT_UNIT
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_cutoffs_multiple_units(get_pseudo_family, generate_cutoffs):
     """Test ``CutoffsPseudoPotentialFamily.set_cutoffs`` correctly sets separate units for different stringencies."""
     elements = ['Ar']
@@ -185,7 +185,7 @@ def test_set_cutoffs_multiple_units(get_pseudo_family, generate_cutoffs):
     assert family._get_cutoffs_unit_dict() == {'default': 'hartree', 'rydberg': 'Ry'}
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_cutoffs_auto_default(get_pseudo_family, generate_cutoffs):
     """Test that the ``CutoffsPseudoPotentialFamily.set_cutoffs`` method specifies the correct default stringency.
 
@@ -201,7 +201,7 @@ def test_set_cutoffs_auto_default(get_pseudo_family, generate_cutoffs):
     assert family.get_default_stringency() == 'default'
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_cutoffs(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.get_cutoffs`` method."""
     elements = ['Ar', 'He']
@@ -225,7 +225,7 @@ def test_get_cutoffs(get_pseudo_family, generate_cutoffs):
     assert family.get_cutoffs('low') == low_cutoffs
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_recommended_cutoffs(get_pseudo_family, generate_structure, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.get_recommended_cutoffs`` method."""
     elements = ['Ar', 'He']
@@ -264,7 +264,7 @@ def test_get_recommended_cutoffs(get_pseudo_family, generate_structure, generate
     assert family.get_recommended_cutoffs(structure=structure) == (expected['cutoff_wfc'], expected['cutoff_rho'])
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_recommended_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.get_recommended_cutoffs`` method with the ``unit`` argument."""
     elements = ['Ar', 'He']
@@ -283,7 +283,7 @@ def test_get_recommended_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     assert family.get_recommended_cutoffs(elements='Ar', unit='Ry') == expected
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     """Test the ``CutoffsPseudoPotentialFamily.get_cutoffs_unit`` method."""
     elements = ['Ar', 'He']
@@ -303,7 +303,7 @@ def test_get_cutoffs_unit(get_pseudo_family, generate_cutoffs):
     assert family.get_cutoffs_unit() == 'Eh'
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_delete_cutoffs(get_pseudo_family, generate_cutoffs_dict):
     """Test the ``CutoffsPseudoPotentialFamily.delete_cutoffs`` method."""
     elements = ['Ar', 'He']

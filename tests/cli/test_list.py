@@ -5,7 +5,7 @@ from aiida_pseudo.data.pseudo import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily, SsspFamily
 
 
-def test_list(clear_db, run_cli_command, get_pseudo_family):
+def test_list(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `aiida-pseudo list` command."""
     result = run_cli_command(cmd_list)
     assert 'no pseudo potential families have been installed yet: use `aiida-pseudo install`.' in result.output
@@ -17,7 +17,7 @@ def test_list(clear_db, run_cli_command, get_pseudo_family):
     assert family.label in result.output
 
 
-def test_list_raw(clear_db, run_cli_command, get_pseudo_family):
+def test_list_raw(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `-r/--raw` option."""
     get_pseudo_family()
 
@@ -26,7 +26,7 @@ def test_list_raw(clear_db, run_cli_command, get_pseudo_family):
         assert len(result.output_lines) == 1
 
 
-def test_list_project(clear_db, run_cli_command, get_pseudo_family):
+def test_list_project(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the `-p/--project` option."""
     family = get_pseudo_family()
 
@@ -39,7 +39,7 @@ def test_list_project(clear_db, run_cli_command, get_pseudo_family):
     assert family.label in result.output
 
 
-def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
+def test_list_filter(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the filtering option `-F`."""
     family_base = get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
     family_sssp = get_pseudo_family(label='SSSP/1.0/PBE/efficiency', cls=SsspFamily, pseudo_type=UpfData)
@@ -57,7 +57,7 @@ def test_list_filter(clear_db, run_cli_command, get_pseudo_family):
     assert family_sssp.label in result.output
 
 
-def test_list_filter_no_result(clear_db, run_cli_command, get_pseudo_family):
+def test_list_filter_no_result(aiida_profile_clean, run_cli_command, get_pseudo_family):
     """Test the filtering option `-F` for a type for which no families exist."""
     get_pseudo_family(label='Pseudo potential family', cls=PseudoPotentialFamily)
 

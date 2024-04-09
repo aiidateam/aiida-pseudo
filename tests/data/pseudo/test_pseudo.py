@@ -98,7 +98,7 @@ def test_prepare_source(source):
         assert PseudoPotentialData.prepare_source(source) is source
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_store():
     """Test the `PseudoPotentialData.store` method."""
     stream = io.BytesIO(b'pseudo')
@@ -123,7 +123,7 @@ def test_store():
     assert pseudo.is_stored
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_element():
     """Test the `PseudoPotentialData.element` property."""
     element = 'Ar'
@@ -143,7 +143,7 @@ def test_element():
         pseudo.element = element
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_md5():
     """Test the `PseudoPotentialData.md5` property."""
     stream = io.BytesIO(b'pseudo')
@@ -163,7 +163,7 @@ def test_md5():
         pseudo.md5 = md5
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_store_indirect():
     """Test the `PseudoPotentialData.store` method when called indirectly because its is an input."""
     pseudo = PseudoPotentialData(io.BytesIO(b'pseudo'))
@@ -174,7 +174,7 @@ def test_store_indirect():
     node.store_all()
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_or_create(get_pseudo_potential_data):
     """Test the ``PseudoPotentialData.get_or_create`` classmethod."""
     upf = get_pseudo_potential_data(entry_point='upf')

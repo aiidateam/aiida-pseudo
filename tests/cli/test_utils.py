@@ -8,7 +8,7 @@ from aiida_pseudo.cli.utils import attempt, create_family_from_archive
 from aiida_pseudo.groups.family import PseudoPotentialFamily
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 @pytest.mark.parametrize(('fmt',), [(fmt[0],) for fmt in shutil.get_archive_formats()])
 def test_create_family_from_archive(get_pseudo_archive, fmt):
     """Test the `create_family_from_archive` utility function."""
@@ -21,14 +21,14 @@ def test_create_family_from_archive(get_pseudo_archive, fmt):
     assert family.count() != 0
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_family_from_archive_incorrect_filetype(tmp_path):
     """Test the `create_family_from_archive` utility function for incorrect archive filetype."""
     with pytest.raises(OSError, match=r'failed to unpack the archive.*'):
         create_family_from_archive(PseudoPotentialFamily, 'label', tmp_path)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_family_from_archive_incorrect_format(tmp_path):
     """Test the `create_family_from_archive` utility function for invalid archive content."""
     with tempfile.NamedTemporaryFile(suffix='.tar.gz') as filepath_archive:

@@ -32,7 +32,7 @@ def test_pseudo_types_validation(pseudo_types):
         CustomFamily(label='custom')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_pseudo_type(get_pseudo_potential_data):
     """Test ``PseudoPotentialFamily.pseudo_type`` property."""
     family = PseudoPotentialFamily(label='label').store()
@@ -52,7 +52,7 @@ def test_pseudo_type(get_pseudo_potential_data):
     assert family.pseudo_type is None
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_construct():
     """Test the construction of `PseudoPotentialFamily` works."""
     label = 'label'
@@ -70,7 +70,7 @@ def test_construct():
     assert family.description == description
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder(filepath_pseudos):
     """Test the `PseudoPotentialFamily.create_from_folder` class method."""
     label = 'label'
@@ -81,7 +81,7 @@ def test_create_from_folder(filepath_pseudos):
     assert len(family.nodes) == len(list(filepath_pseudos().iterdir()))
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_nested(filepath_pseudos, tmp_path):
     """Test the `PseudoPotentialFamily.create_from_folder` class method when the pseudos are in a subfolder."""
     shutil.copytree(filepath_pseudos(), tmp_path / 'subdirectory')
@@ -94,7 +94,7 @@ def test_create_from_folder_nested(filepath_pseudos, tmp_path):
     assert len(family.nodes) == len(list(filepath_pseudos().iterdir()))
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 @pytest.mark.parametrize('deduplicate', (True, False))
 def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
     """Test the `PseudoPotentialFamily.create_from_folder` class method."""
@@ -123,7 +123,7 @@ def test_create_from_folder_deduplicate(filepath_pseudos, deduplicate):
         assert not original_pseudos.intersection(family_pseudos)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_parse_fail(tmp_path):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for file that fails to parse.
 
@@ -137,14 +137,14 @@ def test_create_from_folder_parse_fail(tmp_path):
         PseudoPotentialFamily.create_from_folder(tmp_path, 'label')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_empty(tmp_path):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for empty folder."""
     with pytest.raises(ValueError, match=r'no pseudo potentials were parsed from.*'):
         PseudoPotentialFamily.create_from_folder(tmp_path, 'label')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_duplicate_element(tmp_path, filepath_pseudos):
     """Test the `PseudoPotentialFamily.create_from_folder` class method for folder containing duplicate element."""
     dirpath = tmp_path / 'pseudos'
@@ -156,7 +156,7 @@ def test_create_from_folder_duplicate_element(tmp_path, filepath_pseudos):
         PseudoPotentialFamily.create_from_folder(dirpath, 'label')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_duplicate(filepath_pseudos):
     """Test that `PseudoPotentialFamily.create_from_folder` raises for duplicate label."""
     label = 'label'
@@ -213,7 +213,7 @@ def test_parse_pseudos_from_directory_incorrect_pseudo_type(tmp_path):
         SomeFamily.parse_pseudos_from_directory(tmp_path, pseudo_type=PsmlData)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_add_nodes(get_pseudo_family, get_pseudo_potential_data):
     """Test that `PseudoPotentialFamily.add_nodes` method."""
     family = get_pseudo_family(elements=('Rn',))
@@ -249,7 +249,7 @@ def nodes_unstored(get_pseudo_potential_data, request):
     return [get_pseudo_potential_data(), get_pseudo_potential_data('Ne')]
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 @pytest.mark.parametrize('nodes_unstored', ['single', 'tuple', 'list'], indirect=True)
 def test_add_nodes_unstored(get_pseudo_family, nodes_unstored):
     """Test that `PseudoPotentialFamily.add_nodes` fails if one or more nodes are unstored."""
@@ -276,7 +276,7 @@ def nodes_incorrect_type(get_pseudo_potential_data, request):
     return [get_pseudo_potential_data().store(), Data().store()]
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 @pytest.mark.parametrize('nodes_incorrect_type', ['single', 'tuple', 'list'], indirect=True)
 def test_add_nodes_incorrect_type(get_pseudo_family, nodes_incorrect_type):
     """Test that `PseudoPotentialFamily.add_nodes` fails if one or more nodes has the incorrect type.
@@ -293,7 +293,7 @@ def test_add_nodes_incorrect_type(get_pseudo_family, nodes_incorrect_type):
     assert family.count() == count
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_add_nodes_duplicate_element(get_pseudo_family, get_pseudo_potential_data):
     """Test that `PseudoPotentialFamily.add_nodes` fails if a pseudo is added whose element already exists."""
     family = get_pseudo_family(elements=('Ar',))
@@ -303,7 +303,7 @@ def test_add_nodes_duplicate_element(get_pseudo_family, get_pseudo_potential_dat
         family.add_nodes(pseudo)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_remove_nodes(get_pseudo_family):
     """Test the ``PseudoPotentialFamily.remove_nodes`` method."""
     elements = ('Ar', 'He', 'Kr')
@@ -320,7 +320,7 @@ def test_remove_nodes(get_pseudo_family):
     assert family.pseudos == {}
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_remove_nodes_not_existing(get_pseudo_family, get_pseudo_potential_data):
     """Test the ``PseudoPotentialFamily.remove_nodes`` method works even when passing a non-existing pseudo.
 
@@ -337,7 +337,7 @@ def test_remove_nodes_not_existing(get_pseudo_family, get_pseudo_potential_data)
     assert tuple(family.pseudos.keys()) == ('Ar',)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_clear(get_pseudo_family):
     """Test the ``PseudoPotentialFamily.clear`` method."""
     family = get_pseudo_family(elements=('Ar', 'He', 'Kr'))
@@ -348,7 +348,7 @@ def test_clear(get_pseudo_family):
     assert family.count() == 0
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_pseudos(get_pseudo_potential_data):
     """Test the `PseudoPotentialFamily.pseudos` property."""
     pseudos = {
@@ -360,7 +360,7 @@ def test_pseudos(get_pseudo_potential_data):
     assert family.pseudos == pseudos
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_pseudos_mutate(get_pseudo_family, get_pseudo_potential_data):
     """Test that `PseudoPotentialFamily.pseudos` property does not act as a setter."""
     family = get_pseudo_family()
@@ -369,7 +369,7 @@ def test_pseudos_mutate(get_pseudo_family, get_pseudo_potential_data):
         family.pseudos = {'He': get_pseudo_potential_data('He')}
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_elements(get_pseudo_family):
     """Test the `PseudoPotentialFamily.elements` property."""
     elements = ['Ar', 'He']
@@ -380,7 +380,7 @@ def test_elements(get_pseudo_family):
     assert family.elements == []
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudo(get_pseudo_family):
     """Test the `PseudoPotentialFamily.get_pseudo` method."""
     element = 'Ar'
@@ -392,7 +392,7 @@ def test_get_pseudo(get_pseudo_family):
         family.get_pseudo('He')
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_raise(get_pseudo_family, generate_structure):
     """Test the `PseudoPotentialFamily.get_pseudos` method when it is supposed to raise."""
     elements = ('Ar', 'He', 'Ne')
@@ -418,7 +418,7 @@ def test_get_pseudos_raise(get_pseudo_family, generate_structure):
         family.get_pseudos(structure=structure)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_list(get_pseudo_family):
     """Test the `PseudoPotentialFamily.get_pseudos` method when passing a list of elements."""
     elements = ('Ar', 'He', 'Ne')
@@ -430,7 +430,7 @@ def test_get_pseudos_list(get_pseudo_family):
         assert isinstance(pseudos[element], PseudoPotentialData)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_structure(get_pseudo_family, generate_structure):
     """Test the `PseudoPotentialFamily.get_pseudos` method when passing a ``StructureData`` instance."""
     elements = ('Ar', 'He', 'Ne')
@@ -443,7 +443,7 @@ def test_get_pseudos_structure(get_pseudo_family, generate_structure):
         assert isinstance(pseudos[element], PseudoPotentialData)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_structure_kinds(get_pseudo_family, generate_structure):
     """Test the `PseudoPotentialFamily.get_pseudos` for ``StructureData`` with kind names including digits."""
     elements = ('Ar1', 'Ar2')

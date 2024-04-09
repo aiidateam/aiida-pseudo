@@ -4,7 +4,7 @@ from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import SsspConfiguration, SsspFamily
 
 
-def test_type_string(clear_db):
+def test_type_string(aiida_profile_clean):
     """Verify the `_type_string` class attribute is correctly set to the corresponding entry point name."""
     assert SsspFamily._type_string == 'pseudo.family.sssp'
 
@@ -56,14 +56,14 @@ def test_constructor():
     assert isinstance(family, SsspFamily)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder(filepath_pseudos):
     """Test the `SsspFamily.create_from_folder` class method."""
     family = SsspFamily.create_from_folder(filepath_pseudos('upf'), 'SSSP/1.1/PBE/efficiency', pseudo_type=UpfData)
     assert isinstance(family, SsspFamily)
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_create_from_folder_duplicate(filepath_pseudos):
     """Test that `SsspFamily.create_from_folder` raises for duplicate label."""
     label = 'SSSP/1.1/PBE/efficiency'

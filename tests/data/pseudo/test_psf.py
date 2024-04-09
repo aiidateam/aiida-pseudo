@@ -56,7 +56,7 @@ def test_constructor(filepath_pseudos):
             assert pseudo.element == filepath.name.split('.')[0]
 
 
-@pytest.mark.usefixtures('clear_db')
+@pytest.mark.usefixtures('aiida_profile_clean')
 def test_set_file(filepath_pseudos, get_pseudo_potential_data):
     """Test the `PsfData.set_file` method.
 

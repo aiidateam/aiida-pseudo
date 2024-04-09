@@ -11,13 +11,7 @@ from aiida.plugins import DataFactory
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family import CutoffsPseudoPotentialFamily, PseudoPotentialFamily
 
-pytest_plugins = ['aiida.manage.tests.pytest_fixtures']
-
-
-@pytest.fixture
-def clear_db(aiida_profile_clean):
-    """Alias for the `aiida_profile_clean` fixture from `aiida-core`."""
-    yield
+pytest_plugins = 'aiida.tools.pytest_fixtures'
 
 
 @pytest.fixture

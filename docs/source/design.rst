@@ -77,7 +77,7 @@ A pseudopotential family can be constructed manually, by first constructing the 
 
     for filepath in ['Ga.upf', 'As.upf']:
         with open(filepath, 'rb') as stream:
-            pseudo = UpfData(file=stream)
+            pseudo = UpfData(stream)
             pseudos.append(pseudo.store())
 
     family = PseudoPotentialFamily(label='pseudos/upf').store()

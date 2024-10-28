@@ -71,7 +71,7 @@ A pseudopotential family can be constructed manually, by first constructing the 
     from aiida import plugins
 
     UpfData = plugins.DataFactory('pseudo.upf')
-    PseudoPotentialFamily = plugins.GroupFactory(entry_point_name='pseudo.family')
+    PseudoPotentialFamily = plugins.GroupFactory('pseudo.family')
 
     pseudos = []
 

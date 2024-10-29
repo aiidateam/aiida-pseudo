@@ -17,7 +17,7 @@ __all__ = ('PseudoPotentialData',)
 class PseudoPotentialDataCaching(NodeCaching):
     """Class to define caching behavior of ``PseudoPotentialData`` nodes."""
 
-    def _get_objects_to_hash(self) -> list:
+    def get_objects_to_hash(self) -> list:
         """Return a list of objects which should be included in the node hash."""
         return [self._node.element, self._node.md5]
 

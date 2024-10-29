@@ -233,4 +233,4 @@ def test_hash(stream, filename, element, are_equal):
     right.element = element
     right.store()
 
-    assert (left.base.caching.get_hash() == right.base.caching.get_hash()) is are_equal
+    assert (left.base.caching.compute_hash() == right.base.caching.compute_hash()) is are_equal

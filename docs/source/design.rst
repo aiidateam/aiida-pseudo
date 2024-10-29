@@ -71,17 +71,17 @@ A pseudopotential family can be constructed manually, by first constructing the 
     from aiida import plugins
 
     UpfData = plugins.DataFactory('pseudo.upf')
-    PseudoPotentialFamily = plugins.GroupFactory('pseudo')
+    PseudoPotentialFamily = plugins.GroupFactory('pseudo.family')
 
     pseudos = []
 
     for filepath in ['Ga.upf', 'As.upf']:
         with open(filepath, 'rb') as stream:
             pseudo = UpfData(stream)
-            pseudos.append(pseudo)
+            pseudos.append(pseudo.store())
 
     family = PseudoPotentialFamily(label='pseudos/upf').store()
-    family.append(pseudos)
+    family.add_nodes(pseudos)
 
 Note that as with any :py:class:`~aiida.orm.Group`, it has to be stored before nodes can be added.
 If you have a folder on disk that contains various pseudopotentials for different elements, there is an even easier way to create the family automatically:

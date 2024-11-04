@@ -1,9 +1,23 @@
 # Change log
 
+## `1.6.0` - 2024-11-04
+
+### Dependencies
+- `PseudoPotentialData`: Adapt to caching changes in `aiida-core==2.6` [[bcc0129]](https://github.com/aiidateam/aiida-pseudo/commit/bcc0129cc0b1b6fa5ddfe7d91f09d805ceb40d15)
+- `PseudoPotentialData`: Change return type of `get_objects_to_hash` [[6d1459b]](https://github.com/aiidateam/aiida-pseudo/commit/6d1459b3a803cc93367ca74b204e7d4d1c52c3cb)
+- Fix broken import of `aiida.manage.configuration.Config` [[647194b]](https://github.com/aiidateam/aiida-pseudo/commit/647194beff324019c9e3f3fcccee022dc9a0b6b4)
+
+### Devops
+- Make use of the improved fixtures in `aiida-core` [[a73028f]](https://github.com/aiidateam/aiida-pseudo/commit/a73028fc2a48938dffe92ed9abff0207f818bc0c)
+
+### Documentation
+- Correct example snippet for creating a pseudo family [[6d5afb6]](https://github.com/aiidateam/aiida-pseudo/commit/6d5afb63b89b8aa885debd9ecb85d4a5886af5af)
+- Explicitly state that AiiDA's `Group` API and CLI can be used [[8b2d464]](https://github.com/aiidateam/aiida-pseudo/commit/8b2d464e47d4e9ab1cbb54224673bab7f5e2fd16)
+
 ## `1.5.0` - 2023-12-22
 
 ### Changes
-- `PseudoPotentialData`: Base hash only on file content and element (#168) [[26a23aa]](https://github.com//commit/26a23aaef4ba31f0a975ea19312c06ad923f5798)
+- `PseudoPotentialData`: Base hash only on file content and element [[26a23aa]](https://github.com//commit/26a23aaef4ba31f0a975ea19312c06ad923f5798)
 
 ### Dependencies
 - Update requirement `pint~=0.23.0` [[379d44c]](https://github.com//commit/379d44c6e9145c01cb7aff127d821c11bb1f79aa)

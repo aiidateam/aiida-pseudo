@@ -4,11 +4,18 @@ import shutil
 import pytest
 from aiida.common import exceptions
 from aiida.orm import QueryBuilder
-from aiida.orm.nodes.data.structure import has_atomistic
+from aiida.plugins import DataFactory
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
 
-skip_atomistic = pytest.mark.skipif(not has_atomistic(), reason='Unable to import aiida-atomistic')
+try:
+    DataFactory('atomistic.structure')
+except exceptions.MissingEntryPointError:
+    has_atomistic = False
+else:
+    has_atomistic = True
+
+skip_atomistic = pytest.mark.skipif(not has_atomistic, reason='Unable to import aiida-atomistic')
 
 
 def test_type_string():
@@ -411,7 +418,9 @@ def test_get_pseudos_raise(get_pseudo_family, generate_structure):
     with pytest.raises(ValueError, match='elements should be a list or tuple of symbols.'):
         family.get_pseudos(elements={'He', 'Ar'})
 
-    with pytest.raises(ValueError, match='structure should be a `StructureData` or `LegacyStructureData` instance'):
+    with pytest.raises(
+        ValueError, match=r"but should be of: \(<class 'aiida.orm.nodes.data.structure.StructureData'>,"
+    ):
         family.get_pseudos(structure={'He', 'Ar'})
 
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):

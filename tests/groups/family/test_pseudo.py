@@ -4,8 +4,18 @@ import shutil
 import pytest
 from aiida.common import exceptions
 from aiida.orm import QueryBuilder
+from aiida.plugins import DataFactory
 from aiida_pseudo.data.pseudo import PseudoPotentialData
 from aiida_pseudo.groups.family.pseudo import PseudoPotentialFamily
+
+try:
+    DataFactory('atomistic.structure')
+except exceptions.MissingEntryPointError:
+    has_atomistic = False
+else:
+    has_atomistic = True
+
+skip_atomistic = pytest.mark.skipif(not has_atomistic, reason='Unable to import aiida-atomistic')
 
 
 def test_type_string():
@@ -408,7 +418,9 @@ def test_get_pseudos_raise(get_pseudo_family, generate_structure):
     with pytest.raises(ValueError, match='elements should be a list or tuple of symbols.'):
         family.get_pseudos(elements={'He', 'Ar'})
 
-    with pytest.raises(ValueError, match='structure should be a `StructureData` instance.'):
+    with pytest.raises(
+        ValueError, match=r"but should be of: \(<class 'aiida.orm.nodes.data.structure.StructureData'>,"
+    ):
         family.get_pseudos(structure={'He', 'Ar'})
 
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
@@ -448,6 +460,44 @@ def test_get_pseudos_structure_kinds(get_pseudo_family, generate_structure):
     """Test the `PseudoPotentialFamily.get_pseudos` for ``StructureData`` with kind names including digits."""
     elements = ('Ar1', 'Ar2')
     structure = generate_structure(elements)
+    family = get_pseudo_family(elements=elements)
+
+    pseudos = family.get_pseudos(structure=structure)
+    assert isinstance(pseudos, dict)
+    for element in elements:
+        assert isinstance(pseudos[element], PseudoPotentialData)
+
+
+@skip_atomistic
+@pytest.mark.usefixtures('aiida_profile_clean')
+def test_get_pseudos_atomsitic_structure(get_pseudo_family, generate_structure):
+    """
+    Test the `PseudoPotentialFamily.get_pseudos` method when passing
+    an aiida-atomistic ``StructureData`` instance.
+    """
+
+    elements = ('Ar', 'He', 'Ne')
+    orm_structure = generate_structure(elements)
+    structure = orm_structure.to_atomistic()
+    family = get_pseudo_family(elements=elements)
+
+    pseudos = family.get_pseudos(structure=structure)
+    assert isinstance(pseudos, dict)
+    for element in elements:
+        assert isinstance(pseudos[element], PseudoPotentialData)
+
+
+@skip_atomistic
+@pytest.mark.usefixtures('aiida_profile_clean')
+def test_get_pseudos_atomistic_structure_kinds(get_pseudo_family, generate_structure):
+    """
+    Test the `PseudoPotentialFamily.get_pseudos` for
+    an aiida-atomistic ``StructureData`` with kind names including digits.
+    """
+
+    elements = ('Ar1', 'Ar2')
+    orm_structure = generate_structure(elements)
+    structure = orm_structure.to_atomistic()
     family = get_pseudo_family(elements=elements)
 
     pseudos = family.get_pseudos(structure=structure)

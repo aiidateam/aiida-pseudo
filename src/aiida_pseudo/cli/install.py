@@ -313,14 +313,14 @@ def download_pseudo_dojo(
     url_metadata = PseudoDojoFamily.get_url_metadata(label)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
-        response = requests.get(url_archive, timeout=30)
+        response = requests.get(url_archive, timeout=30, verify=False)
         response.raise_for_status()
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
     with attempt('downloading selected pseudopotentials metadata archive... ', include_traceback=traceback):
-        response = requests.get(url_metadata, timeout=30)
+        response = requests.get(url_metadata, timeout=30, verify=False)
         response.raise_for_status()
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)

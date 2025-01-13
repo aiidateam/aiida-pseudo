@@ -1,5 +1,20 @@
 # Change log
 
+## `1.7.0` - 2025-01-13
+
+### ✨ New features
+
+* Add support for `StructureData from `aiida-atomistic` [[9b29ae7](https://github.com/aiidateam/aiida-pseudo/commit/9b29ae7ca95222b46f89d5909fedeb009cb021e9)]
+
+### 👌 Improvements
+
+* Bypass the certificate check for pseudo dojo.  [[ac84418](https://github.com/aiidateam/aiida-pseudo/commit/ac84418d3fe28415d0535856ecbaa551962ccf86)]
+
+### 🔧 Maintenance
+
+* Add path to sphinx `conf.py` to RTD configuration [[27e9e10](https://github.com/aiidateam/aiida-pseudo/commit/27e9e10794ec50741f53e1eb0b2aa3fbe33ed1d6)]
+* Pin requirement `sphinx-autoapi~=3.3.3` [[36c4e6f](https://github.com/aiidateam/aiida-pseudo/commit/36c4e6fb9a754de400ac6ca8a16f97d1e25f5494)]
+
 ## `1.6.0` - 2024-11-04
 
 ### Dependencies

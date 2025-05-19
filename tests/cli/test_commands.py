@@ -5,11 +5,10 @@ import subprocess
 
 import click
 import pytest
-
 from aiida_pseudo.cli import cmd_root
 
 
-def recurse_commands(command: click.Command, parents: list[str]|None = None):
+def recurse_commands(command: click.Command, parents: list[str] | None = None):
     """Recursively return all subcommands that are part of ``command``.
 
     :param command: The click command to start with.

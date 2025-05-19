@@ -106,6 +106,7 @@ select = [
   'F',  # pyflakes
   'I',  # isort
   'N',  # pep8-naming
+  'FLY',  # flynt (prefer f-strings)
   'PLC',  # pylint-convention
   'PLE',  # pylint-error
   'PLR',  # pylint-refactor

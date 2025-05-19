@@ -12,11 +12,6 @@ repos:
     args: [--fix=lf]
   - id: trailing-whitespace
 
-- repo: https://github.com/ikamensh/flynt/
-  rev: 1.0.1
-  hooks:
-  - id: flynt
-
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.1.9
   hooks:

@@ -76,10 +76,6 @@ exclude = [
   'tests/'
 ]
 
-[tool.flynt]
-fail-on-change = true
-line-length = 120
-
 [tool.pytest.ini_options]
 filterwarnings = [
   'ignore:Creating AiiDA configuration folder.*:UserWarning',
@@ -107,6 +103,7 @@ select = [
   'F',  # pyflakes
   'I',  # isort
   'N',  # pep8-naming
+  'FLY',  # flynt (prefer f-strings)
   'PLC',  # pylint-convention
   'PLE',  # pylint-error
   'PLR',  # pylint-refactor

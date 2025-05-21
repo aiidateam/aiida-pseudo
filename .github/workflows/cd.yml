@@ -5,6 +5,9 @@ on:
     tags:
     - v[0-9]+.[0-9]+.[0-9]+*
 
+env:
+  FORCE_COLOR: 1
+
 jobs:
 
   validate-release-tag:
@@ -14,12 +17,12 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Install Python 3.10
-      uses: actions/setup-python@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Validate the tag version against the package version
       run: python .github/workflows/validate_release_tag.py $GITHUB_REF
@@ -30,17 +33,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
-        cache: pip
-        cache-dependency-path: pyproject.toml
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: '3.11'
+        activate-environment: true
 
     - name: Install Python package and dependencies
-      run: pip install -e .[dev]
+      run: uv pip install -e .[dev]
 
     - name: Run pre-commit
       run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
@@ -55,17 +62,21 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-        cache: pip
-        cache-dependency-path: pyproject.toml
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+        activate-environment: true
 
     - name: Install Python package and dependencies
-      run: pip install -e .[dev]
+      run: uv pip install -e .[dev]
 
     - name: Run pytest
       run: pytest -sv tests
@@ -78,15 +89,21 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Install Python 3.10
-      uses: actions/setup-python@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: '3.11'
+        activate-environment: true
 
     - name: Install flit
-      run: pip install flit~=3.4
+      run: uv pip install flit~=3.4
 
     - name: Build and publish
       run: flit publish

@@ -1,5 +1,16 @@
 # Change log
 
+## `1.7.1` - 2025-05-21
+
+### Dependencies
+- Add support for Python 3.13 [[a78f711]](https://github.com/aiidateam/aiida-pseudo/commit/a78f71172d9e29125aa71deac4ef5d4944846018)
+- Relax requirements for `pint` [[8bc1f60]](https://github.com/aiidateam/aiida-pseudo/commit/8bc1f60848aff1f6bdfe271c6554698cdae8854d)
+- Add upper pin `click<8.2` [[a36ded6]](https://github.com/aiidateam/aiida-pseudo/commit/a36ded647683235d777d1230b4cd504ee96d42fc)
+
+### Devops
+- Update CI and CD pipelines [[9e6c2b5]](https://github.com/aiidateam/aiida-pseudo/commit/9e6c2b5f9ed838f2b493f1ac3eef8b62011fc57c)
+
+
 ## `1.7.0` - 2025-01-13
 
 ### ✨ New features

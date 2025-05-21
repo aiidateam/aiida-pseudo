@@ -75,10 +75,6 @@ exclude = [
   'tests/'
 ]
 
-[tool.flynt]
-fail-on-change = true
-line-length = 120
-
 [tool.pytest.ini_options]
 filterwarnings = [
   'ignore:Creating AiiDA configuration folder.*:UserWarning',

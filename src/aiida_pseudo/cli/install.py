@@ -109,9 +109,15 @@ def download_sssp(
 
     from .utils import attempt
 
-    # The ``parent_id=19`` points to the SSSP entry on the Materials Cloud. Using ``parent_id`` will fetch the latest
-    # version of the SSSP archive record.
-    url_template = 'https://archive.materialscloud.org/record/file?filename={filename}&parent_id=19'
+    # Get the id of the latest record version from the id of the first record version
+    record_id_first = 'e67tc-6b197'
+    url_latest_record = f'https://archive.materialscloud.org/api/records/{record_id_first}/versions/latest'
+    response = requests.get(url_latest_record)
+    data = response.json()
+    record_id_latest = data.get('id')
+
+    # Url template to get a file from the latest record version
+    url_template = f'https://archive.materialscloud.org/api/records/{record_id_latest}/files/{{filename}}/content'
 
     # Download the dictionary mapping of the minor versions to the latest corresponding patch versions. Since patch
     # releases of the SSSP only contain bug fixes, there is no reason to have the user install an outdated patch

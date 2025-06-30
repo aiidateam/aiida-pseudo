@@ -29,7 +29,7 @@ def empty_config() -> Config:
     from aiida.manage.configuration import settings
 
     current_config = configuration.CONFIG
-    current_config_path = current_config.dirpath
+    current_config_path = pathlib.Path(current_config.dirpath)
     current_profile = configuration.get_profile()
     current_path_variable = os.environ.get(settings.DEFAULT_AIIDA_PATH_VARIABLE, None)
 
@@ -39,8 +39,7 @@ def empty_config() -> Config:
     with tempfile.TemporaryDirectory() as dirpath:
         dirpath_config = pathlib.Path(dirpath) / 'config'
         os.environ[settings.DEFAULT_AIIDA_PATH_VARIABLE] = str(dirpath_config)
-        settings.AIIDA_CONFIG_FOLDER = str(dirpath_config)
-        settings.set_configuration_directory()
+        settings.AiiDAConfigDir.set(dirpath_config)
         configuration.CONFIG = configuration.load_config(create=True)
 
         try:
@@ -51,8 +50,7 @@ def empty_config() -> Config:
             else:
                 os.environ[settings.DEFAULT_AIIDA_PATH_VARIABLE] = current_path_variable
 
-            settings.AIIDA_CONFIG_FOLDER = current_config_path
-            settings.set_configuration_directory()
+            settings.AiiDAConfigDir.set(current_config_path)
             configuration.CONFIG = current_config
 
             if current_profile:

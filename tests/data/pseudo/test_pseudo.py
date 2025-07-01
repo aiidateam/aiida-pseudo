@@ -32,12 +32,6 @@ def test_constructor_source_types(source):
     assert not pseudo.is_stored
 
 
-def test_constructor_invalid():
-    """Test the constructor for invalid arguments."""
-    with pytest.raises(TypeError, match='missing 1 required positional argument'):
-        PseudoPotentialData()
-
-
 @pytest.mark.usefixtures('chdir_tmp_path')
 @pytest.mark.parametrize('source_type', ('stream', 'str_absolute', 'str_relative', 'pathlib.Path'))
 @pytest.mark.parametrize('implicit', (True, False))

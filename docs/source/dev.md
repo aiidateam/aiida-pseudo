@@ -41,17 +41,16 @@ This will automatically add:
 2. The list of commits since the previous release, with links to them.
 
 Sort the commit items into the correct subsection of the change log.
-Ideally, the main changes or new features are also described at the top of the change log message, providing code snippets where it's useful.
+Ideally, describe the main changes or new features at the top of the change log message, providing code snippets where it's useful.
 
-Once you've prepared the release branch locally, commit  and push it to Github:
+Once you've prepared the release branch locally, commit and push it to Github:
 
     git commit -am '🚀 Release `v1.7.2`'
     git push -u origin release/1.7.2
 
-Now that the release branch is ready, merge it into `main` via a pull request.
-Make sure the remote `release/1.7.2` branch is up to date by pushing the local changes, then go to Github and create a pull request to the `main` branch of the official repository.
+Now that the release branch is ready, push the local changes to the remote `release/1.7.2` branch, then go to Github and create a pull request to the `main` branch of the official repository.
 
-After the pull request has been approved, merge the PR using the "Squash and Merge", and make sure the commit is simply named e.g. "🚀 Release `v1.7.2`".
+After the pull request has been approved, merge the PR using the **"Squash and Merge"**, and make sure the commit is simply named e.g. "🚀 Release `v1.7.2`".
 
 Once this is complete, fetch all the changes locally, checkout the `main` branch and make sure it's up to date with the remote:
 

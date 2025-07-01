@@ -1,5 +1,16 @@
 # Change log
 
+## `1.7.2` - 2025-07-01
+
+### 🐛 Bug fixes
+
+* Update url template for fetching MC files  [[625c1be](https://github.com/aiidateam/aiida-pseudo/commit/625c1be68ff66ac467bc9b61f5e495b6e1bc185b)]
+
+### 🧪 Tests
+
+* Remove `test_constructor_invalid` test [[251895b](https://github.com/aiidateam/aiida-pseudo/commit/251895bc492875a850b5104aa5819ce12bf560d8)]
+* Fix `empty_config` context manager [[f49234b](https://github.com/aiidateam/aiida-pseudo/commit/f49234bce621a6783987bfa004b5485e87d47fc8)]
+
 ## `1.7.1` - 2025-05-21
 
 ### Dependencies

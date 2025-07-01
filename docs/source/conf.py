@@ -19,7 +19,7 @@ release = aiida_pseudo.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_copybutton', 'autoapi.extension', 'sphinx_click', 'sphinx.ext.intersphinx']
+extensions = ['sphinx_copybutton', 'autoapi.extension', 'sphinx_click', 'sphinx.ext.intersphinx', 'myst_parser']
 
 # Settings for the `sphinx_copybutton` extension
 copybutton_selector = 'div:not(.no-copy)>div.highlight pre'

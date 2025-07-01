@@ -59,6 +59,7 @@ Contents
    design
    howto
    troubleshooting
+   dev
    autoapi/index.rst
    cli
 

@@ -401,6 +401,8 @@ def test_get_pseudo(get_pseudo_family):
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
         family.get_pseudo('He')
 
+    assert family.get_pseudo('He', none_if_missing=True) is None
+
 
 @pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_raise(get_pseudo_family, generate_structure):
@@ -429,6 +431,7 @@ def test_get_pseudos_raise(get_pseudo_family, generate_structure):
     with pytest.raises(ValueError, match=r'family `.*` does not contain pseudo for element `.*`'):
         family.get_pseudos(structure=structure)
 
+    assert family.get_pseudos(structure=structure, none_if_missing=True)['He'] is None
 
 @pytest.mark.usefixtures('aiida_profile_clean')
 def test_get_pseudos_list(get_pseudo_family):

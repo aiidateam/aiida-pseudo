@@ -284,11 +284,13 @@ class PseudoPotentialFamily(Group):
         """
         return list(self.pseudos.keys())
 
-    def get_pseudo(self, element):
+    def get_pseudo(self, element, none_if_missing=False):
         """Return the pseudo potential for the given element.
 
         :param element: the element for which to return the corresponding pseudo potential.
-        :return: pseudo potential instance if it exists
+        :param none_if_missing: if `True`, return `None` if the family does not contain a pseudo potential for the
+            given element, else raise an error
+        :return: pseudo potential instance if it exists, `None` if `none_if_missing` is `True`
         :raises ValueError: if the family does not contain a pseudo potential for the given element
         """
         try:
@@ -301,8 +303,12 @@ class PseudoPotentialFamily(Group):
             try:
                 pseudo = builder.one()[0]
             except exceptions.MultipleObjectsError as exception:
+                if none_if_missing:
+                    return None
                 raise RuntimeError(f'family `{self.label}` contains multiple pseudos for `{element}`') from exception
             except exceptions.NotExistent as exception:
+                if none_if_missing:
+                    return None
                 raise ValueError(
                     f'family `{self.label}` does not contain pseudo for element `{element}`'
                 ) from exception
@@ -316,11 +322,14 @@ class PseudoPotentialFamily(Group):
         *,
         elements: Optional[Union[List[str], Tuple[str]]] = None,
         structure: Union[structures_classes] = None,
+        none_if_missing: bool = False,
     ) -> Mapping[str, Union[structures_classes]]:
         """Return the mapping of kind names on pseudo potential data nodes for the given list of elements or structure.
 
         :param elements: list of element symbols.
         :param structure: the ``StructureData``  or ``LegacyStructureData`` node.
+        :param none_if_missing: if `True`, return `None` for any element that does not have a pseudo potential in this
+            family, else raise an error
         :return: dictionary mapping the kind names of a structure on the corresponding pseudo potential data nodes.
         :raises ValueError: if the family does not contain a pseudo for any of the elements of the given structure.
         """
@@ -337,6 +346,12 @@ class PseudoPotentialFamily(Group):
             raise ValueError(f'structure is of type {type(structure)} but should be of: {structures_classes}')
 
         if structure is not None:
-            return {kind.name: self.get_pseudo(kind.symbol) for kind in structure.kinds}
+            return {
+                kind.name: self.get_pseudo(kind.symbol, none_if_missing=none_if_missing)
+                for kind in structure.kinds
+            }
 
-        return {element: self.get_pseudo(element) for element in elements}
+        return {
+            element: self.get_pseudo(element, none_if_missing=none_if_missing)
+            for element in elements
+        }

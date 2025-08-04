@@ -347,11 +347,7 @@ class PseudoPotentialFamily(Group):
 
         if structure is not None:
             return {
-                kind.name: self.get_pseudo(kind.symbol, none_if_missing=none_if_missing)
-                for kind in structure.kinds
+                kind.name: self.get_pseudo(kind.symbol, none_if_missing=none_if_missing) for kind in structure.kinds
             }
 
-        return {
-            element: self.get_pseudo(element, none_if_missing=none_if_missing)
-            for element in elements
-        }
+        return {element: self.get_pseudo(element, none_if_missing=none_if_missing) for element in elements}

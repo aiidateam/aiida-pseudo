@@ -30,6 +30,13 @@ class PseudoPotentialData(plugins.DataFactory('core.singlefile')):
 
     _CLS_NODE_CACHING = PseudoPotentialDataCaching
 
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}[{self.element}] (pk: {self.pk})>'
+
+    def get_description(self) -> str:
+        """Returns a string that describes the pseudopotential"""
+        return repr(self)
+
     @classmethod
     def get_or_create(
         cls, source: typing.Union[str, pathlib.Path, typing.BinaryIO], filename: typing.Optional[str] = None

@@ -1,5 +1,15 @@
 # Change log
 
+## v1.8.0
+
+### 👌 Improvements
+
+* `PseudoPotentialData`: Improve string representation [[2098a1b](https://github.com/aiidateam/aiida-pseudo/commit/2098a1b9ceea7419e98f535a653b4a6766c3418f)]
+
+### 📚 Documentation
+
+* Add developer release instructions [[0b542c2](https://github.com/aiidateam/aiida-pseudo/commit/0b542c2e2e22214ab636f0decb2f9ade3655199f)]
+
 ## `1.7.2` - 2025-07-01
 
 ### 🐛 Bug fixes

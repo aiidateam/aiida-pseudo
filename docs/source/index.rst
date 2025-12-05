@@ -24,6 +24,12 @@ For example, to install a configuration of the `SSSP`_, just run:
     $ aiida-pseudo install sssp
 
 The version, functional, and protocol can be controlled with various options; use ``aiida-pseudo install sssp --help`` to see their description.
+To install all SSSP configurations (PBE and PBEsol, with both efficiency and precision) for the latest version, use the ``--all`` flag:
+
+.. code-block:: console
+
+    $ aiida-pseudo install sssp --all
+
 If you are experiencing problems with this automated install method, see the :ref:`Troubleshooting section <troubleshooting>` for help.
 Installed pseudopotential families can be listed using:
 

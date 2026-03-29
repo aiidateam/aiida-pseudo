@@ -2,7 +2,7 @@
 import warnings
 from typing import Optional
 
-from aiida.common.exceptions import MissingEntryPointError
+from aiida.common import exceptions
 from aiida.common.lang import type_check
 from aiida.plugins import DataFactory
 
@@ -12,7 +12,7 @@ LegacyStructureData = DataFactory('core.structure')  # pylint: disable=invalid-n
 
 try:
     StructureData = DataFactory('atomistic.structure')
-except MissingEntryPointError:
+except exceptions.MissingEntryPointError:
     structures_classes = (LegacyStructureData,)
 else:
     structures_classes = (LegacyStructureData, StructureData)
@@ -286,7 +286,7 @@ class RecommendedCutoffMixin:
             raise ValueError('at least one and only one of `elements` or `structure` should be defined')
 
         type_check(elements, (tuple, str), allow_none=True)
-        type_check(structure, (structures_classes), allow_none=True)
+        type_check(structure, structures_classes, allow_none=True)
 
         if unit is not None:
             self.validate_cutoffs_unit(unit)

@@ -315,8 +315,8 @@ class PseudoPotentialFamily(Group):
         self,
         *,
         elements: Optional[Union[List[str], Tuple[str]]] = None,
-        structure: Union[structures_classes] = None,
-    ) -> Mapping[str, Union[structures_classes]]:
+        structure: Union[structures_classes] = None, # type: ignore
+    ) -> Mapping[str, Union[structures_classes]]: # type: ignore
         """Return the mapping of kind names on pseudo potential data nodes for the given list of elements or structure.
 
         :param elements: list of element symbols.
@@ -337,6 +337,11 @@ class PseudoPotentialFamily(Group):
             raise ValueError(f'structure is of type {type(structure)} but should be of: {structures_classes}')
 
         if structure is not None:
-            return {kind.name: self.get_pseudo(kind.symbol) for kind in structure.kinds}
+            if isinstance(structure, LegacyStructureData):
+                return {kind.name: self.get_pseudo(kind.symbol) for kind in structure.kinds}
+            elif structure.properties.kind_names:
+                return {kind.kind_name: self.get_pseudo(kind.symbol) for kind in structure.kinds}
+            else:
+                return {symbol: self.get_pseudo(symbol) for symbol in structure.symbols}
 
         return {element: self.get_pseudo(element) for element in elements}

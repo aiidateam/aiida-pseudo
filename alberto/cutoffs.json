@@ -1,0 +1,382 @@
+{
+    "H": {
+        "cutoff_wfc": 45,
+        "cutoff_rho": 360
+    },
+    "He": {
+        "cutoff_wfc": 100,
+        "cutoff_rho": 800
+    },
+    "Li": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Be": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "B": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "C": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "N": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "O": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 600
+    },
+    "F": {
+        "cutoff_wfc": 75,
+        "cutoff_rho": 600
+    },
+    "Ne": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Na": {
+        "cutoff_wfc": 55,
+        "cutoff_rho": 440
+    },
+    "Mg": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Al": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Si": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "P": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "S": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Cl": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 280
+    },
+    "Ar": {
+        "cutoff_wfc": 120,
+        "cutoff_rho": 960
+    },
+    "K": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Ca": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Sc": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Ti": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 280
+    },
+    "V": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Cr": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 480
+    },
+    "Mn": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 480
+    },
+    "Fe": {
+        "cutoff_wfc": 90,
+        "cutoff_rho": 1080
+    },
+    "Co": {
+        "cutoff_wfc": 55,
+        "cutoff_rho": 660
+    },
+    "Ni": {
+        "cutoff_wfc": 65,
+        "cutoff_rho": 780
+    },
+    "Cu": {
+        "cutoff_wfc": 55,
+        "cutoff_rho": 440
+    },
+    "Zn": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Ga": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Ge": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "As": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Se": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Br": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 120
+    },
+    "Kr": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Rb": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Sr": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Y": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Zr": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Nb": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Mo": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Tc": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Ru": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Rh": {
+        "cutoff_wfc": 45,
+        "cutoff_rho": 180
+    },
+    "Pd": {
+        "cutoff_wfc": 45,
+        "cutoff_rho": 180
+    },
+    "Ag": {
+        "cutoff_wfc": 45,
+        "cutoff_rho": 180
+    },
+    "Cd": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "In": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Sn": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "Sb": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 200
+    },
+    "Te": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "I": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Xe": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 600
+    },
+    "Cs": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 160
+    },
+    "Ba": {
+        "cutoff_wfc": 55,
+        "cutoff_rho": 220
+    },
+    "La": {
+        "cutoff_wfc": 60,
+        "cutoff_rho": 480
+    },
+    "Ce": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 280
+    },
+    "Pr": {
+        "cutoff_wfc": 90,
+        "cutoff_rho": 720
+    },
+    "Nd": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Pm": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Sm": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Eu": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 280
+    },
+    "Gd": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Tb": {
+        "cutoff_wfc": 55,
+        "cutoff_rho": 440
+    },
+    "Dy": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Ho": {
+        "cutoff_wfc": 120,
+        "cutoff_rho": 960
+    },
+    "Er": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "Tm": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Yb": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "Lu": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Hf": {
+        "cutoff_wfc": 60,
+        "cutoff_rho": 240
+    },
+    "Ta": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 120
+    },
+    "W": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 120
+    },
+    "Re": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Os": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Ir": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 120
+    },
+    "Pt": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 280
+    },
+    "Au": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Hg": {
+        "cutoff_wfc": 30,
+        "cutoff_rho": 240
+    },
+    "Tl": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Pb": {
+        "cutoff_wfc": 35,
+        "cutoff_rho": 140
+    },
+    "Bi": {
+        "cutoff_wfc": 45,
+        "cutoff_rho": 360
+    },
+    "Po": {
+        "cutoff_wfc": 65,
+        "cutoff_rho": 260
+    },
+    "At": {
+        "cutoff_wfc": 120,
+        "cutoff_rho": 960
+    },
+    "Rn": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Fr": {
+        "cutoff_wfc": 200,
+        "cutoff_rho": 1600
+    },
+    "Ra": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "Ac": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "Th": {
+        "cutoff_wfc": 80,
+        "cutoff_rho": 640
+    },
+    "Pa": {
+        "cutoff_wfc": 40,
+        "cutoff_rho": 320
+    },
+    "U": {
+        "cutoff_wfc": 50,
+        "cutoff_rho": 400
+    },
+    "Np": {
+        "cutoff_wfc": 150,
+        "cutoff_rho": 1200
+    },
+    "Pu": {
+        "cutoff_wfc": 60,
+        "cutoff_rho": 480
+    },
+    "Am": {
+        "cutoff_wfc": 65,
+        "cutoff_rho": 520
+    }
+}

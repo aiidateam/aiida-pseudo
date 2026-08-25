@@ -1,5 +1,13 @@
 # Change log
 
+## v1.9.0
+
+### Dependencies
+
+* Drop support for Python 3.9 and add support for Python 3.14 [[ee6872d](https://github.com/aiidateam/aiida-pseudo/commit/ee6872dd19c31b2c0836a338739f4287d375dc14)]
+* Relax the `aiida-core` requirement to `>=2.6` [[4b969a1](https://github.com/aiidateam/aiida-pseudo/commit/4b969a14904eec85799a9d1b09c35f7444e04c60)]
+* Update the supported `click` versions to `>=8.1.0,<8.3` [[7ea7bd5](https://github.com/aiidateam/aiida-pseudo/commit/7ea7bd5df5ca6e6c0889f0f61d7485420588a045)]
+
 ## v1.8.0
 
 ### 👌 Improvements

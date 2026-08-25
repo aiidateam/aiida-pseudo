@@ -103,7 +103,7 @@ jobs:
         activate-environment: true
 
     - name: Install flit
-      run: uv pip install flit~=3.4
+      run: uv pip install flit~=4.0.2
 
     - name: Build and publish
       run: flit publish

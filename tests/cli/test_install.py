@@ -235,7 +235,7 @@ def test_install_sssp(run_cli_command):
     assert 'Archive pseudos md5: ' in family.description
     assert 'Pseudo metadata md5: ' in family.description
 
-    result = run_cli_command(cmd_install_sssp, raises=SystemExit)
+    result = run_cli_command(cmd_install_sssp)
     assert 'is already installed' in result.output
 
 
@@ -254,7 +254,7 @@ def test_install_pseudo_dojo(run_cli_command):
     assert 'Archive pseudos md5: a43737369e8a0a4417ccf364397298b3' in family.description
     assert 'Pseudo metadata md5: d0c0057f16cb905bb2d43382146ffad2' in family.description
 
-    result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
+    result = run_cli_command(cmd_install_pseudo_dojo)
     assert 'is already installed' in result.output
 
 

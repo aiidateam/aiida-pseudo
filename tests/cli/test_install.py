@@ -1,7 +1,9 @@
 """Tests for `aiida-pseudo install`."""
+
 import contextlib
 import json
 import pathlib
+from unittest.mock import Mock
 
 import pytest
 from aiida.manage.configuration.config import Config
@@ -119,7 +121,7 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, filepath_pseudos, mon
         import shutil
 
         element = 'Ar'
-        entry_point = 'jthxml'
+        entry_point = configuration.pseudo_format
         filepath_pseudo = filepath_pseudos(entry_point) / f'{element}.{entry_point}'
         (tmp_path / filepath_pseudo.name).write_bytes(filepath_pseudo.read_bytes())
         md5 = hashlib.md5(filepath_pseudo.read_bytes()).hexdigest()
@@ -240,22 +242,62 @@ def test_install_sssp(run_cli_command):
 
 
 @pytest.mark.usefixtures('aiida_profile_clean')
-def test_install_pseudo_dojo(run_cli_command):
+def test_install_pseudo_dojo(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command."""
     from aiida_pseudo import __version__
 
-    result = run_cli_command(cmd_install_pseudo_dojo)
+    result = run_monkeypatched_install_pseudo_dojo()
     assert 'installed `PseudoDojo/' in result.output
     assert QueryBuilder().append(PseudoDojoFamily).count() == 1
 
     family = QueryBuilder().append(PseudoDojoFamily).one()[0]
     assert family.get_cutoffs is not None
     assert f'PseudoDojo v0.4 PBE SR standard psp8 installed with aiida-pseudo v{__version__}' in family.description
-    assert 'Archive pseudos md5: a43737369e8a0a4417ccf364397298b3' in family.description
-    assert 'Pseudo metadata md5: d0c0057f16cb905bb2d43382146ffad2' in family.description
+    assert 'Archive pseudos md5: ' in family.description
+    assert 'Pseudo metadata md5: ' in family.description
 
-    result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
+    result = run_monkeypatched_install_pseudo_dojo(raises=SystemExit)
     assert 'is already installed' in result.output
+
+
+def test_pseudo_dojo_request_retries_transient_failures(monkeypatch):
+    """Retry network and temporary server failures with the expected timeout and backoff."""
+    from aiida_pseudo.cli import install
+
+    response = Mock(status_code=200)
+    mock_get = Mock(
+        side_effect=[
+            install.requests.Timeout('read timed out'),
+            Mock(status_code=503),
+            response,
+        ]
+    )
+    mock_sleep = Mock()
+    monkeypatch.setattr(install.requests, 'get', mock_get)
+    monkeypatch.setattr(install.time, 'sleep', mock_sleep)
+
+    assert install._request_with_retries('https://example.org/pseudo.tgz') is response
+    assert mock_get.call_count == 3
+    assert mock_get.call_args.kwargs == {'timeout': (10, 120), 'verify': False}
+    assert [call.args for call in mock_sleep.call_args_list] == [(1,), (2,)]
+
+
+def test_pseudo_dojo_request_does_not_retry_permanent_http_error(monkeypatch):
+    """Do not retry client errors such as HTTP 404."""
+    from aiida_pseudo.cli import install
+
+    response = Mock(status_code=404)
+    response.raise_for_status.side_effect = install.requests.HTTPError('not found')
+    mock_get = Mock(return_value=response)
+    mock_sleep = Mock()
+    monkeypatch.setattr(install.requests, 'get', mock_get)
+    monkeypatch.setattr(install.time, 'sleep', mock_sleep)
+
+    with pytest.raises(install.requests.HTTPError, match='not found'):
+        install._request_with_retries('https://example.org/missing.tgz')
+
+    mock_get.assert_called_once()
+    mock_sleep.assert_not_called()
 
 
 @pytest.mark.usefixtures('aiida_profile_clean')

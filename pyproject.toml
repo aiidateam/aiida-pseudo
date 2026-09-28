@@ -3,7 +3,7 @@ build-backend = 'flit_core.buildapi'
 requires = ['flit_core >=4.0.2,<5']
 
 [project]
-authors = [{name = 'Sebastiaan P. Huber', email = 'mail@sphuber.net'}]
+authors = [{ name = 'Sebastiaan P. Huber', email = 'mail@sphuber.net' }]
 classifiers = [
   'Development Status :: 5 - Production/Stable',
   'Framework :: AiiDA',
@@ -25,7 +25,7 @@ dependencies = [
 ]
 dynamic = ['description', 'version']
 keywords = ['aiida', 'pseudopotentials']
-license = {file = 'LICENSE.txt'}
+license = { file = 'LICENSE.txt' }
 name = 'aiida-pseudo'
 readme = 'README.md'
 requires-python = '>=3.10'

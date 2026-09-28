@@ -1,5 +1,11 @@
 # Change log
 
+## v1.10.0
+
+### 👌 Improvements
+
+* Implement a retry mechanism for PsuedoDojo download  [[ea6de3c](https://github.com/aiidateam/aiida-pseudo/commit/ea6de3c5bee4c1fb0b571d1a6fabb811a9f666c1)]
+
 ## v1.9.0
 
 ### Dependencies

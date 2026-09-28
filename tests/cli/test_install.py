@@ -8,7 +8,6 @@ from unittest.mock import Mock
 import pytest
 from aiida.manage.configuration.config import Config
 from aiida.orm import QueryBuilder
-
 from aiida_pseudo.cli import cmd_install_family, cmd_install_pseudo_dojo, cmd_install_sssp, install
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily

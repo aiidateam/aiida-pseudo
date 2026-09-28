@@ -1,11 +1,14 @@
 """Tests for `aiida-pseudo install`."""
+
 import contextlib
 import json
 import pathlib
+from unittest.mock import Mock
 
 import pytest
 from aiida.manage.configuration.config import Config
 from aiida.orm import QueryBuilder
+
 from aiida_pseudo.cli import cmd_install_family, cmd_install_pseudo_dojo, cmd_install_sssp, install
 from aiida_pseudo.data.pseudo.upf import UpfData
 from aiida_pseudo.groups.family import PseudoPotentialFamily
@@ -256,6 +259,46 @@ def test_install_pseudo_dojo(run_cli_command):
 
     result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
     assert 'is already installed' in result.output
+
+
+def test_pseudo_dojo_request_retries_transient_failures(monkeypatch):
+    """Retry network and temporary server failures with the expected timeout and backoff."""
+    from aiida_pseudo.cli import install
+
+    response = Mock(status_code=200)
+    mock_get = Mock(
+        side_effect=[
+            install.requests.Timeout('read timed out'),
+            Mock(status_code=503),
+            response,
+        ]
+    )
+    mock_sleep = Mock()
+    monkeypatch.setattr(install.requests, 'get', mock_get)
+    monkeypatch.setattr(install.time, 'sleep', mock_sleep)
+
+    assert install._request_with_retries('https://example.org/pseudo.tgz') is response
+    assert mock_get.call_count == 3
+    assert mock_get.call_args.kwargs == {'timeout': (10, 120), 'verify': False}
+    assert [call.args for call in mock_sleep.call_args_list] == [(1,), (2,)]
+
+
+def test_pseudo_dojo_request_does_not_retry_permanent_http_error(monkeypatch):
+    """Do not retry client errors such as HTTP 404."""
+    from aiida_pseudo.cli import install
+
+    response = Mock(status_code=404)
+    response.raise_for_status.side_effect = install.requests.HTTPError('not found')
+    mock_get = Mock(return_value=response)
+    mock_sleep = Mock()
+    monkeypatch.setattr(install.requests, 'get', mock_get)
+    monkeypatch.setattr(install.time, 'sleep', mock_sleep)
+
+    with pytest.raises(install.requests.HTTPError, match='not found'):
+        install._request_with_retries('https://example.org/missing.tgz')
+
+    mock_get.assert_called_once()
+    mock_sleep.assert_not_called()
 
 
 @pytest.mark.usefixtures('aiida_profile_clean')

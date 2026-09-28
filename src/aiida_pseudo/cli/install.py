@@ -1,9 +1,11 @@
 """Command to install a pseudo potential family."""
+
 import json
 import pathlib
 import sys
 import tarfile
 import tempfile
+import time
 import typing as t
 
 import click
@@ -18,6 +20,34 @@ from .root import cmd_root
 if t.TYPE_CHECKING:
     from aiida_pseudo.data.pseudo import PseudoPotentialData
     from aiida_pseudo.groups.family import PseudoDojoConfiguration, PseudoDojoFamily, SsspConfiguration
+
+
+PSEUDODOJO_REQUEST_TIMEOUT = (10, 120)
+PSEUDODOJO_MAX_ATTEMPTS = 3
+PSEUDODOJO_RETRY_BACKOFF = 1
+PSEUDODOJO_RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+
+
+def _request_with_retries(url: str):
+    """Make a GET request, retrying transient network and server failures."""
+    for attempt in range(1, PSEUDODOJO_MAX_ATTEMPTS + 1):
+        try:
+            response = requests.get(url, timeout=PSEUDODOJO_REQUEST_TIMEOUT, verify=False)
+            if response.status_code in PSEUDODOJO_RETRY_STATUS_CODES:
+                if attempt == PSEUDODOJO_MAX_ATTEMPTS:
+                    response.raise_for_status()
+                reason = f'HTTP {response.status_code}'
+            else:
+                response.raise_for_status()
+                return response
+        except (requests.ConnectionError, requests.Timeout) as exception:
+            if attempt == PSEUDODOJO_MAX_ATTEMPTS:
+                raise
+            reason = str(exception)
+
+        delay = PSEUDODOJO_RETRY_BACKOFF * 2 ** (attempt - 1)
+        echo.echo_warning(f'Request to `{url}` failed ({reason}); retrying in {delay} seconds.')
+        time.sleep(delay)
 
 
 @cmd_root.group('install')
@@ -185,7 +215,7 @@ def install_sssp(
     for element, values in metadata.items():
         if family.get_pseudo(element).md5 != values['md5']:
             Group.collection.delete(family.pk)
-            msg = f"md5 of pseudo for element {element} does not match that of the metadata {values['md5']}"
+            msg = f'md5 of pseudo for element {element} does not match that of the metadata {values["md5"]}'
             echo.echo_critical(msg)
 
         cutoffs[element] = {'cutoff_wfc': values['cutoff_wfc'], 'cutoff_rho': values['cutoff_rho']}
@@ -319,15 +349,13 @@ def download_pseudo_dojo(
     url_metadata = PseudoDojoFamily.get_url_metadata(label)
 
     with attempt('downloading selected pseudopotentials archive... ', include_traceback=traceback):
-        response = requests.get(url_archive, timeout=30, verify=False)
-        response.raise_for_status()
+        response = _request_with_retries(url_archive)
         with open(filepath_archive, 'wb') as handle:
             handle.write(response.content)
             handle.flush()
 
     with attempt('downloading selected pseudopotentials metadata archive... ', include_traceback=traceback):
-        response = requests.get(url_metadata, timeout=30, verify=False)
-        response.raise_for_status()
+        response = _request_with_retries(url_metadata)
         with open(filepath_metadata, 'wb') as handle:
             handle.write(response.content)
             handle.flush()

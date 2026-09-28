@@ -122,7 +122,7 @@ def run_monkeypatched_install_pseudo_dojo(run_cli_command, filepath_pseudos, mon
         import shutil
 
         element = 'Ar'
-        entry_point = 'jthxml'
+        entry_point = configuration.pseudo_format
         filepath_pseudo = filepath_pseudos(entry_point) / f'{element}.{entry_point}'
         (tmp_path / filepath_pseudo.name).write_bytes(filepath_pseudo.read_bytes())
         md5 = hashlib.md5(filepath_pseudo.read_bytes()).hexdigest()
@@ -243,21 +243,21 @@ def test_install_sssp(run_cli_command):
 
 
 @pytest.mark.usefixtures('aiida_profile_clean')
-def test_install_pseudo_dojo(run_cli_command):
+def test_install_pseudo_dojo(run_monkeypatched_install_pseudo_dojo):
     """Test the ``aiida-pseudo install pseudo-dojo`` command."""
     from aiida_pseudo import __version__
 
-    result = run_cli_command(cmd_install_pseudo_dojo)
+    result = run_monkeypatched_install_pseudo_dojo()
     assert 'installed `PseudoDojo/' in result.output
     assert QueryBuilder().append(PseudoDojoFamily).count() == 1
 
     family = QueryBuilder().append(PseudoDojoFamily).one()[0]
     assert family.get_cutoffs is not None
     assert f'PseudoDojo v0.4 PBE SR standard psp8 installed with aiida-pseudo v{__version__}' in family.description
-    assert 'Archive pseudos md5: a43737369e8a0a4417ccf364397298b3' in family.description
-    assert 'Pseudo metadata md5: d0c0057f16cb905bb2d43382146ffad2' in family.description
+    assert 'Archive pseudos md5: ' in family.description
+    assert 'Pseudo metadata md5: ' in family.description
 
-    result = run_cli_command(cmd_install_pseudo_dojo, raises=SystemExit)
+    result = run_monkeypatched_install_pseudo_dojo(raises=SystemExit)
     assert 'is already installed' in result.output
 
 

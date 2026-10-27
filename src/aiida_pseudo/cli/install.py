@@ -556,3 +556,25 @@ def cmd_install_pseudo_dojo(
             configuration, filepath_archive, filepath_metadata, pseudo_type, label, description, traceback
         )
         family.set_default_stringency(default_stringency)
+
+
+def get_install_command(label: str) -> t.Optional[str]:
+    """Return the ``aiida-pseudo install`` command that installs the established pseudo family with the given label.
+
+    All options of the configuration are specified explicitly, so the command does not depend on the defaults of the
+    install command.
+
+    :param label: the label of the pseudo family.
+    :return: the install command, or ``None`` if the label does not correspond to a configuration that can be installed
+        with one of the automated install commands.
+    """
+    from aiida_pseudo.groups.family import PseudoDojoFamily, SsspFamily
+
+    for command, family_class in ((cmd_install_sssp, SsspFamily), (cmd_install_pseudo_dojo, PseudoDojoFamily)):
+        configuration = family_class.get_configuration_from_label(label)
+
+        if configuration is not None:
+            options = ' '.join(f'--{key.replace("_", "-")} {value}' for key, value in configuration._asdict().items())
+            return f'aiida-pseudo install {command.name} {options}'
+
+    return None

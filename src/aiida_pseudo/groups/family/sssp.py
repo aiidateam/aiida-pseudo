@@ -67,6 +67,19 @@ class SsspFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         )
 
     @classmethod
+    def get_configuration_from_label(cls, label: str) -> Optional[SsspConfiguration]:
+        """Return the SSSP configuration that corresponds to the given label.
+
+        :param label: the label of the SSSP family.
+        :return: the SSSP configuration, or ``None`` if the label does not correspond to a valid configuration.
+        """
+        for configuration in cls.valid_configurations:
+            if cls.format_configuration_label(configuration) == label:
+                return configuration
+
+        return None
+
+    @classmethod
     def format_configuration_filename(
         cls, configuration: SsspConfiguration, extension: str, patch_version: Optional[str] = None
     ) -> str:

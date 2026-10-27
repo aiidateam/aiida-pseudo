@@ -43,6 +43,20 @@ def test_format_configuration_label():
     assert SsspFamily.format_configuration_label(configuration) == 'SSSP/1.1/PBE/efficiency'
 
 
+def test_get_configuration_from_label():
+    """Test the `SsspFamily.get_configuration_from_label` class method."""
+    for configuration in SsspFamily.valid_configurations:
+        label = SsspFamily.format_configuration_label(configuration)
+        assert SsspFamily.get_configuration_from_label(label) == configuration
+
+    assert SsspFamily.get_configuration_from_label('SSSP/1.1/PBEsol/precision') == SsspConfiguration(
+        '1.1', 'PBEsol', 'precision'
+    )
+
+    for label in ('SSSP/0.1/PBE/efficiency', 'SSSP/1.1/PBE', 'PseudoDojo/0.4/PBE/SR/standard/psp8', 'custom'):
+        assert SsspFamily.get_configuration_from_label(label) is None
+
+
 def test_constructor():
     """Test that the `SsspFamily` constructor validates the label."""
     with pytest.raises(ValueError, match=r'the label `.*` is not a valid SSSP configuration label'):

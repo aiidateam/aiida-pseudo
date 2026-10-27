@@ -500,3 +500,43 @@ def test_install_pseudo_dojo_from_download(run_monkeypatched_install_pseudo_dojo
     result = run_monkeypatched_install_pseudo_dojo(options=options)
     assert PseudoDojoFamily.collection.count() == 1
     assert 'Success: installed `PseudoDojo' in result.output
+
+
+@pytest.mark.parametrize(
+    ('label', 'expected'),
+    (
+        (
+            'SSSP/1.1/PBEsol/precision',
+            'aiida-pseudo install sssp --version 1.1 --functional PBEsol --protocol precision',
+        ),
+        (
+            'PseudoDojo/0.4/PBE/SR/standard/upf',
+            'aiida-pseudo install pseudo-dojo --version 0.4 --functional PBE --relativistic SR --protocol standard '
+            '--pseudo-format upf',
+        ),
+        ('SSSP/0.1/PBE/efficiency', None),
+        ('custom-family', None),
+    ),
+)
+def test_get_install_command(label, expected):
+    """Test the `get_install_command` function."""
+    assert install.get_install_command(label) == expected
+
+
+@pytest.mark.parametrize(
+    ('command', 'family_class'), ((cmd_install_sssp, SsspFamily), (cmd_install_pseudo_dojo, PseudoDojoFamily))
+)
+def test_get_install_command_valid(command, family_class):
+    """Test that the command returned by `get_install_command` is accepted by the install command.
+
+    The arguments of the command are parsed by the install command for all valid configurations, and should result in
+    the same configuration as the one that corresponds to the label.
+    """
+    for configuration in family_class.valid_configurations:
+        label = family_class.format_configuration_label(configuration)
+        arguments = install.get_install_command(label).split()
+
+        assert arguments[:3] == ['aiida-pseudo', 'install', command.name]
+
+        context = command.make_context(command.name, arguments[3:])
+        assert {key: context.params[key] for key in configuration._fields} == configuration._asdict()

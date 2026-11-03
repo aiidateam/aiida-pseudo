@@ -1,5 +1,15 @@
 # Change log
 
+## v1.11.0
+
+### ✨ New features
+
+* ✨ Add utility to get the install command for a family label  [[4418cf5](https://github.com/aiidateam/aiida-pseudo/commit/4418cf5e66ed685d7978eb4d6ed7a0da54b413f0)]
+
+### ⬆️ Update dependencies
+
+* `pint`: bump lower bound to `0.24.4`  [[69584f0](https://github.com/aiidateam/aiida-pseudo/commit/69584f02ac39d5805ccd44c1087debec6228695c)]
+
 ## v1.10.0
 
 ### 👌 Improvements

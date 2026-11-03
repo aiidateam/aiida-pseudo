@@ -158,6 +158,19 @@ class PseudoDojoFamily(RecommendedCutoffMixin, PseudoPotentialFamily):
         )
 
     @classmethod
+    def get_configuration_from_label(cls, label: str) -> PseudoDojoConfiguration | None:
+        """Return the PseudoDojo configuration that corresponds to the given label.
+
+        :param label: the label of the PseudoDojo family.
+        :return: the PseudoDojo configuration, or ``None`` if the label does not correspond to a valid configuration.
+        """
+        for configuration in cls.valid_configurations:
+            if cls.format_configuration_label(configuration) == label:
+                return configuration
+
+        return None
+
+    @classmethod
     def get_url_archive(cls, label):
         """Return the URL for the pseudopotential archive file for a given family label.
 

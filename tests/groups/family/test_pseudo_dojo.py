@@ -43,6 +43,20 @@ def test_format_configuration_label():
     assert PseudoDojoFamily.format_configuration_label(configuration) == 'PseudoDojo/0.4/PBE/SR/standard/psp8'
 
 
+def test_get_configuration_from_label():
+    """Test the `PseudoDojoFamily.get_configuration_from_label` class method."""
+    for configuration in PseudoDojoFamily.valid_configurations:
+        label = PseudoDojoFamily.format_configuration_label(configuration)
+        assert PseudoDojoFamily.get_configuration_from_label(label) == configuration
+
+    assert PseudoDojoFamily.get_configuration_from_label('PseudoDojo/0.4/PBE/SR/standard/upf') == (
+        PseudoDojoConfiguration('0.4', 'PBE', 'SR', 'standard', 'upf')
+    )
+
+    for label in ('PseudoDojo/0.1/PBE/SR/standard/psp8', 'PseudoDojo/0.4/PBE', 'SSSP/1.1/PBE/efficiency', 'custom'):
+        assert PseudoDojoFamily.get_configuration_from_label(label) is None
+
+
 def test_constructor():
     """Test that the `PseudoDojoFamily` constructor validates the label."""
     with pytest.raises(ValueError, match=r'the label `.*` is not a valid PseudoDojo configuration label'):
